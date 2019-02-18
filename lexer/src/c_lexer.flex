@@ -11,7 +11,6 @@
 IDENTIFIER [_a-zA-Z][_a-zA-Z0-9]*
 
 ASSIGNMENT_OPERATOR (("<<"|">>"|[*\/%+\-&^|])"="|"=")
-BOOLEAN_OPERATOR ("<="|">="|"=="|"!="|"||"|"&&")
 INTEGERSUFFIX ([uU][lL]|[lL][uU]|[uUlL])
 
 DECIMALCONSTANT ([1-9][0-9]*)
@@ -57,13 +56,18 @@ WHITESPACE [ \t\r\n]+
 "sizeof"    { return T_SIZEOF; }
 
 {ASSIGNMENT_OPERATOR} { yylval.string = new std::string(yytext); return T_ASSIGNMENT_OP; }
-{BOOLEAN_OPERATOR}    { yylval.string = new std::string(yytext); return T_BOOLEAN_OP; }
 
 ">>"					{ return RIGHT_OP; }
 "<<"					{ return LEFT_OP; }
 "++"					{ return INC_OP; }
 "--"					{ return DEC_OP; }
 "->"					{ return PTR_OP; }
+"&&"			        { return AND_OP; }
+"||"			        { return OR_OP; }
+"<="			        { return LE_OP; }
+">="			        { return GE_OP; }
+"=="			        { return EQ_OP; }
+"!="			        { return NE_OP; }
 ";"					    { return ';'; }
 ["{"|"<%"]				{ return '{'; }
 ["}"|"%>"]				{ return '}'; }
@@ -91,7 +95,7 @@ WHITESPACE [ \t\r\n]+
 
 {IDENTIFIER}	{ yylval.string = new std::string(yytext); return T_IDENTIFIER; }
 
-({HEXCONSTANT}|{OCTALCONSTANT}|{DECIMALCONSTANT}){INTEGERSUFFIX}?	{ yylval.number = strtol(yytext, NULL, 0); return T_INT_CONSTANT; }
+({HEXCONSTANT}|{OCTALCONSTANT}|{DECIMALCONSTANT}){INTEGERSUFFIX}?	{ yylval.number = strtol(yytext, NULL, 0); return INT_CONSTANT; }
 
 
 {WHITESPACE} { ; }

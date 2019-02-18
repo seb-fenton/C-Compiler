@@ -9,18 +9,24 @@ enum TokenType{
     T_IDENTIFIER,
 
     //OPERATORS
-    T_BOOLEAN_OP,
     T_ASSIGNMENT_OP,
     RIGHT_SHIFT_OP,
     LEFT_SHIFT_OP,
     INC_OP,
     DEC_OP,
     PTR_OP,
+    AND_OP,
+    OR_OP,
+    LE_OP,
+    GE_OP,
+    EQ_OP,
+    NE_OP,
+    
 
     //CONSTANTS
 
-    T_INT_CONSTANT,
-    T_FLOAT_CONSTANT,
+    INT_CONSTANT,
+    FLOAT_CONSTANT,
 
     //TYPES
 
