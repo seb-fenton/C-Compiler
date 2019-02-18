@@ -8,16 +8,20 @@
 %}
 
 
-IDENTIFIER [_a-zA-Z][_a-zA-Z0-9]*
+IDENTIFIER          [_a-zA-Z][_a-zA-Z0-9]*
 
 ASSIGNMENT_OPERATOR (("<<"|">>"|[*\/%+\-&^|])"="|"=")
-INTEGERSUFFIX ([uU][lL]|[lL][uU]|[uUlL])
+INTEGERSUFFIX       ([uU][lL]|[lL][uU]|[uUlL])
+FLOATINGSUFFIX      ([fFlL])
+EXPONENTSUFFIX      ([Ee][+-]?[0-9]+)
+BASE2EXSUFFIX       ([Pp][+-]?[0-9]+)
 
-DECIMALCONSTANT ([1-9][0-9]*)
-OCTALCONSTANT ([0][0-7]*)
-HEXCONSTANT ([0][xX][0-9A-Fa-f]+)
-
-WHITESPACE [ \t\r\n]+ 
+NONZERO             [1-9]
+DEC                 [0-9]
+OCTAL               [0-7]
+HEX                 [a-fA-F0-9]
+HEXPREFIX           (0[xX])
+WHITESPACE          [ \t\r\n]+ 
 
 %%
 
@@ -95,7 +99,19 @@ WHITESPACE [ \t\r\n]+
 
 {IDENTIFIER}	{ yylval.string = new std::string(yytext); return T_IDENTIFIER; }
 
-({HEXCONSTANT}|{OCTALCONSTANT}|{DECIMALCONSTANT}){INTEGERSUFFIX}?	{ yylval.number = strtol(yytext, NULL, 0); return INT_CONSTANT; }
+
+{HEXPREFIX}{HEX}+{INTEGERSUFFIX}?                               { return INT_CONSTANT; }
+{NONZERO}{DEC}*{INTEGERSUFFIX}?                                 { return INT_CONSTANT; }
+"0"{OCTAL}*{INTEGERSUFFIX}?                                     { return INT_CONSTANT; }
+
+{DEC}+{EXPONENTSUFFIX}{FLOATINGSUFFIX}?                         {return FLOAT_CONSTANST}
+{DEC}*"."{DEC}+{EXPONENTSUFFIX}?{FLOATINGSUFFIX}?               {return FLOAT_CONSTANST}
+{DEC}+"."{EXPONENTSUFFIX}?{FLOATINGSUFFIX}?                     {return FLOAT_CONSTANST}
+{HEXPREFIX}{HEX}+{BASE2EXSUFFIX}{FLOATINGSUFFIX}?               {return FLOAT_CONSTANST}
+{HEXPREFIX}{HEX}*"."{HEX}+{BASE2EXSUFFIX}{FLOATINGSUFFIX}?      {return FLOAT_CONSTANST}
+{HEXPREFIX}{HEX}+"."{BASE2EXSUFFIX}{FLOATINGSUFFIX}?            {return FLOAT_CONSTANST}
+
+
 
 
 {WHITESPACE} { ; }
