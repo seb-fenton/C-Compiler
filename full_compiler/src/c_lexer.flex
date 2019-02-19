@@ -30,13 +30,12 @@ WHITESPACE          [ \t\r\n]+
 %%
 
 
-"/*"            { BEGIN(C_COMMENT); }
-<COMMENT_BLOCK>"*/" { BEGIN(INITIAL); }
+"/*"            { BEGIN(COMMENT_BLOCK); }
+<COMMENT_BLOCK>"*/" { BEGIN(INITIAL); return COMMENT }
 <COMMENT_BLOCK>\n   { }
 <COMMENT_BLOCK>.    { }
 
 "//"[^\n]*  {//one-line comment;}
-\/\*[]
 
 "void"		{ return T_VOID; }
 "char"		{ return T_CHAR; }
@@ -85,8 +84,8 @@ WHITESPACE          [ \t\r\n]+
 "=="			        { return EQ_OP; }
 "!="			        { return NE_OP; }
 ";"					    { return ';'; }
-["{"|"<%"]				{ return '{'; }
-["}"|"%>"]				{ return '}'; }
+"{"			            { return '{'; }
+"}"     		        { return '}'; }
 ","					    { return ','; }
 ":"					    { return ':'; }
 "="					    { return '='; }

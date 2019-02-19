@@ -27,6 +27,8 @@ enum TokenType{
 
     INT_CONSTANT,
     FLOAT_CONSTANT,
+    STRING_LITERAL,
+
 
     //TYPES
 
@@ -63,6 +65,8 @@ enum TokenType{
     T_DO,
     T_FOR,
     T_SIZEOF,
+
+    COMMENT
 
 };
 
