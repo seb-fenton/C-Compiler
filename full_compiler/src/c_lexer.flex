@@ -31,11 +31,11 @@ WHITESPACE          [ \t\r\n]+
 
 
 "/*"            { BEGIN(COMMENT_BLOCK); }
-<COMMENT_BLOCK>"*/" { BEGIN(INITIAL); return COMMENT }
+<COMMENT_BLOCK>"*/" { BEGIN(INITIAL); return COMMENT; }
 <COMMENT_BLOCK>\n   { }
 <COMMENT_BLOCK>.    { }
 
-"//"[^\n]*  {//one-line comment;}
+"//"[^\n]*  {;} //one-line comment
 
 "void"		{ return T_VOID; }
 "char"		{ return T_CHAR; }
@@ -72,8 +72,8 @@ WHITESPACE          [ \t\r\n]+
 
 {ASSIGNMENT_OPERATOR} { yylval.string = new std::string(yytext); return T_ASSIGNMENT_OP; }
 
-">>"					{ return RIGHT_OP; }
-"<<"					{ return LEFT_OP; }
+">>"					{ return RIGHT_SHIFT_OP; }
+"<<"					{ return LEFT_SHIFT_OP; }
 "++"					{ return INC_OP; }
 "--"					{ return DEC_OP; }
 "->"					{ return PTR_OP; }
@@ -84,15 +84,9 @@ WHITESPACE          [ \t\r\n]+
 "=="			        { return EQ_OP; }
 "!="			        { return NE_OP; }
 ";"					    { return ';'; }
-"{"			            { return '{'; }
-"}"     		        { return '}'; }
 ","					    { return ','; }
 ":"					    { return ':'; }
 "="					    { return '='; }
-"("					    { return '('; }
-")"					    { return ')'; }
-["["|"<:"]				{ return '['; }
-["]"|":>"]				{ return ']'; }
 "."					    { return '.'; }
 "&"					    { return '&'; }
 "!"					    { return '!'; }
@@ -107,6 +101,12 @@ WHITESPACE          [ \t\r\n]+
 "^"					    { return '^'; }
 "|"					    { return '|'; }
 "?"					    { return '?'; }
+"{"			            { return CLB; }
+"}"     		        { return CRB; }
+"("					    { return LB; }
+")"					    { return RB; }
+"["				        { return SLB; }
+"]"			            { return SRB; } 
 
 {IDENTIFIER}	{ yylval.string = new std::string(yytext); return T_IDENTIFIER; }
 
@@ -115,15 +115,15 @@ WHITESPACE          [ \t\r\n]+
 {NONZERO}{DEC}*{INTEGERSUFFIX}?                                 { return INT_CONSTANT; }
 "0"{OCTAL}*{INTEGERSUFFIX}?                                     { return INT_CONSTANT; }
 
-{DEC}+{EXPONENTSUFFIX}{FLOATINGSUFFIX}?                         {return FLOAT_CONSTANST}
-{DEC}*"."{DEC}+{EXPONENTSUFFIX}?{FLOATINGSUFFIX}?               {return FLOAT_CONSTANST}
-{DEC}+"."{EXPONENTSUFFIX}?{FLOATINGSUFFIX}?                     {return FLOAT_CONSTANST}
-{HEXPREFIX}{HEX}+{BASE2EXSUFFIX}{FLOATINGSUFFIX}?               {return FLOAT_CONSTANST}
-{HEXPREFIX}{HEX}*"."{HEX}+{BASE2EXSUFFIX}{FLOATINGSUFFIX}?      {return FLOAT_CONSTANST}
-{HEXPREFIX}{HEX}+"."{BASE2EXSUFFIX}{FLOATINGSUFFIX}?            {return FLOAT_CONSTANST}
+{DEC}+{EXPONENTSUFFIX}{FLOATINGSUFFIX}?                         {return FLOAT_CONSTANT;}
+{DEC}*"."{DEC}+{EXPONENTSUFFIX}?{FLOATINGSUFFIX}?               {return FLOAT_CONSTANT;}
+{DEC}+"."{EXPONENTSUFFIX}?{FLOATINGSUFFIX}?                     {return FLOAT_CONSTANT;}
+{HEXPREFIX}{HEX}+{BASE2EXSUFFIX}{FLOATINGSUFFIX}?               {return FLOAT_CONSTANT;}
+{HEXPREFIX}{HEX}*"."{HEX}+{BASE2EXSUFFIX}{FLOATINGSUFFIX}?      {return FLOAT_CONSTANT;}
+{HEXPREFIX}{HEX}+"."{BASE2EXSUFFIX}{FLOATINGSUFFIX}?            {return FLOAT_CONSTANT;}
 
 
-(\"[^\n\"]*\")                                                  {return STRING_LITERAL}
+(\"[^\n\"]*\")                                                  {return STRING_LITERAL;}
 
 
 

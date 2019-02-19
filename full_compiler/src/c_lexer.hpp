@@ -8,7 +8,7 @@ enum TokenType{
     None,
     T_IDENTIFIER,
 
-    //OPERATORS
+    //OPERATORS & SYMBOLS
     T_ASSIGNMENT_OP,
     RIGHT_SHIFT_OP,
     LEFT_SHIFT_OP,
@@ -21,6 +21,12 @@ enum TokenType{
     GE_OP,
     EQ_OP,
     NE_OP,
+    CLB,
+    CRB,
+    LB,
+    RB,
+    SRB,
+    SLB,
     
 
     //CONSTANTS
@@ -72,7 +78,7 @@ enum TokenType{
 
 union TokenValue{
     double number;
-    std::string string;
+    std::string *string;
 };
 
 extern TokenValue yylval;

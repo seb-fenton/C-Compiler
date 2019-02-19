@@ -15,7 +15,6 @@ bin/c_lexer : src/c_lexer.yy.o src/c_lexer_main.o
 	g++ $(CPPFLAGS) -o bin/c_lexer src/c_lexer.yy.o src/c_lexer_main.o
 
 clean :
-	-rm -f prog prog.exe
-	-rm -f *.yy.cpp
-	-rm -f test/out/*
-	-rm -f *.o
+	-rm -rf prog prog.exe
+	-rm -rf src/*.yy.cpp
+	-rm -rf src/*.o
