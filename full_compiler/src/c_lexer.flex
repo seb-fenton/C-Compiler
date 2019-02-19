@@ -1,10 +1,14 @@
-
 %option noyywrap
+%x COMMENT_BLOCK
+
 %{
     #include "c_lexer.hpp"
 
     #include <sstream>
     #include <stdlib.h>
+
+    extern void yyerror(const char *); 
+    static void comment(void);
 %}
 
 
@@ -26,6 +30,13 @@ WHITESPACE          [ \t\r\n]+
 %%
 
 
+"/*"            { BEGIN(C_COMMENT); }
+<COMMENT_BLOCK>"*/" { BEGIN(INITIAL); }
+<COMMENT_BLOCK>\n   { }
+<COMMENT_BLOCK>.    { }
+
+"//"[^\n]*  {//one-line comment;}
+\/\*[]
 
 "void"		{ return T_VOID; }
 "char"		{ return T_CHAR; }
@@ -58,6 +69,7 @@ WHITESPACE          [ \t\r\n]+
 "do"		{ return T_DO; }
 "for"		{ return T_FOR; }
 "sizeof"    { return T_SIZEOF; }
+
 
 {ASSIGNMENT_OPERATOR} { yylval.string = new std::string(yytext); return T_ASSIGNMENT_OP; }
 
@@ -112,9 +124,13 @@ WHITESPACE          [ \t\r\n]+
 {HEXPREFIX}{HEX}+"."{BASE2EXSUFFIX}{FLOATINGSUFFIX}?            {return FLOAT_CONSTANST}
 
 
+(\"[^\n\"]*\")                                                  {return STRING_LITERAL}
+
 
 
 {WHITESPACE} { ; }
+
+%%
 
 
 
