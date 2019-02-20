@@ -6,7 +6,7 @@ CPPFLAGS += -std=c++0x
 # Avoid warnings about yyunput not used
 CPPFLAGS += -Wno-unused-function
 
-lexer : c_lexer
+lexer : bin/c_lexer
 
 src/c_lexer.yy.cpp : src/c_lexer.flex
 	flex -o src/c_lexer.yy.cpp  src/c_lexer.flex

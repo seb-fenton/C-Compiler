@@ -20,14 +20,9 @@ int main()
         if(type==None){
             break; // No more tokens
 
-        }else if(type==COMMENT){
+        }else if(type==T_VOID){
  
-            std::cout<<"COMMENT FOUND" << std::endl;
-            
-
-        }else{
-            assert(0); // There are only three token types.
-            return 1;
+            std::cout<<"COMMENT FOUND" << std::endl;    
         }
     }
 

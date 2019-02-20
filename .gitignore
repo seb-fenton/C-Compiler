@@ -1,0 +1,4 @@
+full_compiler/src/*.yy.cpp
+full_compiler/src/c_lexer.yy.o
+full_compiler/src/c_lexer_main.o
+full_compiler/bin/c_lexer
