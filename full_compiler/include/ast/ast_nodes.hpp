@@ -46,7 +46,6 @@ class translation_unit : public Top_Node{
 			branches[i]->printTree();
 		}
 	}
-
 };
 
 

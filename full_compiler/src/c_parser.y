@@ -32,31 +32,33 @@
 %type <number> 
 %type <string> 
 
-%start translation_unit
+%start roor
 
 %%
 
 //TO-DO Group the rules so that similar things are together
 
+root: translation_unit {$1 = new translation_unit(); g_root = $1}
+
 translation_unit: 
-		external_declaration	//push back into g_root node
-		| translation_unit external_declaration  //pushback into g_root node
+		external_declaration	{$$->push($1)}//push back into g_root node
+		| translation_unit external_declaration  {$$->push($2); $1 = $$}//should only have one translation_unit in the entire tree with this
 		;
 
 external_declaration: 
-		function_definition //create function node in next step not now
-		| declaration   	//create declaration node in next step
+		function_definition {$$ = $1} 	//create function node in next step not now
+		| declaration   	{$$ = $1}	//create declaration node in next step
 		;
 
 declaration:
-		declaration_specifier_list ';' // maybe have a class which has a list of bools specifying the type of the variable
-		| declaration_specifier_list init_declarator_list ';' //need to find a way to create a base init_declarator_list class which has a vector of declarations
-		;
+		declaration_specifier_list ';'  {$1 = new declaration_specifier_list(); $$ = new declaration($1);}
+		| declaration_specifier_list init_declarator_list ';'  {$1 = new declaration_specifier_list(); $2 = new init_declarator_list(); $$ = new declaration($1,$2);} 
+		;	// also make two constructors
 
 declaration_specifier_list:
-		declaration_specifiers 									//do something like $$->push($1) where $1 is a either just a node or a string.
-		| declaration_specifier_list declaration_specifiers 	//first $$->push($2) to push the type into the original node,
-		;														// then $$ = $1 should make it so the next iteration uses the same node
+		declaration_specifiers 		{$$->push($1);}									//$1 will just return a string or something
+		| declaration_specifier_list declaration_specifiers {$$->push($2); $1 = $$;}	
+		;	// $1 = $$ should give you the same node on the next iteration
 
 declaration_specifiers:
 		T_VOID //decide how to return this, maybe as a string or bool values
@@ -79,12 +81,12 @@ declaration_specifiers:
 		;
 
 init_declarator_list:
-		init_declarator									//same way as sbove do $$->push($1) to store the init_declarator in the list node
-		| init_declarator ',' init_declarator_list 		//then $$->push($1); $1 = $$? hmm maybe ask olly, this or the other should work. who knows
+		init_declarator	{$$->push($1)}						//same way as sbove do $$->push($1) to store the init_declarator in the list node
+		| init_declarator ',' init_declarator_list {$$->push($2); $1 = $$;}		// this  should work. who knows
 		; 
 
 init_declarator:
-		declarator '=' initialiser //declarator is a variable name, and encompasses arrays aswell, decide a way to edit context to change the binding
+		declarator '=' initialiser //declarator is a variable name
 		| declarator
 		;
 
@@ -94,10 +96,10 @@ declarator:
 		;
 
 direct_declarator:
-		T_IDENTIFIER 		//returns variable name
+		T_IDENTIFIER 		//Need node to check bindings and identifier names
 		|'(' declarator ')' //works for dereferencing pointers
-		| direct_declarator '[' ']' //empty array
-		| direct_declarator '[' assignment_expression ']' //assignment_expression is just something which returns a value
+		| direct_declarator '[' ']' //need node for array declaration
+		| direct_declarator '[' assignment_expression ']' //
 		| direct_declarator '(' parameter_type_list ')' //returns a variable name and then a list of arguments? only used for function calls probably
 		| direct_declarator '(' identifier_list ')' //just a list of variables, no idea of example case
 		| direct_declarator '(' ')' //no clue - figure this one out maybe used for function calls
