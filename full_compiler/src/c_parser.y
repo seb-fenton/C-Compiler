@@ -36,6 +36,8 @@
 
 %%
 
+//TO-DO Group the rules so that similar things are together
+
 translation_unit: 
 		external_declaration	//push back into g_root node
 		| translation_unit external_declaration  //pushback into g_root node
