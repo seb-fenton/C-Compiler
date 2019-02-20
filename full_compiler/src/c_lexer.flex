@@ -1,5 +1,6 @@
 %option noyywrap
 %x COMMENT_BLOCK
+%x TYPEDEFS
 
 %{
     #include "c_lexer.hpp"
@@ -31,11 +32,11 @@ WHITESPACE          [ \t\r\n]+
 
 
 "/*"            { BEGIN(COMMENT_BLOCK); }
-<COMMENT_BLOCK>"*/" { BEGIN(INITIAL); return COMMENT; }
+<COMMENT_BLOCK>"*/" { BEGIN(INITIAL); }
 <COMMENT_BLOCK>\n   { }
 <COMMENT_BLOCK>.    { }
 
-"//"[^\n]*  {;} //one-line comment
+"//"[^\n]*  {} //one-line comment
 
 "void"		{ return T_VOID; }
 "char"		{ return T_CHAR; }
@@ -101,15 +102,15 @@ WHITESPACE          [ \t\r\n]+
 "^"					    { return '^'; }
 "|"					    { return '|'; }
 "?"					    { return '?'; }
-"{"			            { return CLB; }
-"}"     		        { return CRB; }
-"("					    { return LB; }
-")"					    { return RB; }
-"["				        { return SLB; }
-"]"			            { return SRB; } 
+"{"			            { return '}'; }
+"}"     		        { return '{'; }
+"("					    { return '('; }
+")"					    { return ')'; }
+"["				        { return '['; }
+"]"			            { return ']'; } 
 
-{IDENTIFIER}	{ yylval.string = new std::string(yytext); return T_IDENTIFIER; }
-
+{IDENTIFIER}	{ yylval.string = new std::string(yytext); return T_IDENTIFIER; } //Store variable names in bindings
+<TYPEDEFS>{IDENTIFIER} {yylval.string = new std::string(yytext); return T_IDENTIFIER; } //when making bindings store all typdefs in context
 
 {HEXPREFIX}{HEX}+{INTEGERSUFFIX}?                               { return INT_CONSTANT; }
 {NONZERO}{DEC}*{INTEGERSUFFIX}?                                 { return INT_CONSTANT; }

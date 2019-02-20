@@ -21,12 +21,6 @@ enum TokenType{
     GE_OP,
     EQ_OP,
     NE_OP,
-    CLB,
-    CRB,
-    LB,
-    RB,
-    SRB,
-    SLB,
     
 
     //CONSTANTS
@@ -72,7 +66,7 @@ enum TokenType{
     T_FOR,
     T_SIZEOF,
 
-    COMMENT
+    
 
 };
 
