@@ -12,29 +12,54 @@
 
 
 class Node;
-typedef std::shared_ptr<Node> NodePtr;
+typedef Node* NodePtr;
 
 
 //----------BASE_CLASS---------//
 class Node{
 
 	public:
-    		virtual  void print_C() const  {
-		}
-
-		 virtual ~Node()  {}
+		virtual ~Node()  {}
+		virtual void printTree();
 };
 
 
 //---------------------------------------------//
-//------------EXPRESSION_NODES-----------------//
+//------------TOP_NODES------------------------//
+//        Nodes with branches in them          //
 //---------------------------------------------//
 
-class Expression : public Node{
-    private:
+class Top_Node : public Node{
+    public:
+		std::vector<NodePtr> branches;
+		virtual ~Top_Node()  {}
+		void push(NodePtr n){
+			branches.push_back(n);
+		}
+};
 
+class translation_unit : public Top_Node{
+	public:
+	void printTree(){
+		std::cout << "Translation Unit" << std::endl;
+		for(int i; i < branches.size(); i++){
+			branches[i]->printTree();
+		}
+	}
+
+};
+
+
+//---------------------------------------------//
+//------------BASE_NODES------------------------//
+//        Nodes with branches in them          //
+//---------------------------------------------//
+
+class Base_Node : public Node{
+    private:
     protected:
     public:
+		virtual ~Base_Node()  {}
 };
 
 #endif
