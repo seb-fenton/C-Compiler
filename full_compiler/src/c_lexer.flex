@@ -110,7 +110,7 @@ WHITESPACE          [ \t\r\n]+
 "]"			            { return ']'; } 
 
 {IDENTIFIER}	{ yylval.string = new std::string(yytext); return T_IDENTIFIER; } //Store variable names in bindings
-<TYPEDEFS>{IDENTIFIER} {yylval.string = new std::string(yytext); return T_IDENTIFIER; BEGIN(TYPEDEFS); } //when making bindings store all typdefs in context
+<TYPEDEFS>{IDENTIFIER} {yylval.string = new std::string(yytext); return T_IDENTIFIER; BEGIN(INITIAL); } //when making bindings store all typdefs in context
 
 {HEXPREFIX}{HEX}+{INTEGERSUFFIX}?                               { return INT_CONSTANT; }
 {NONZERO}{DEC}*{INTEGERSUFFIX}?                                 { return INT_CONSTANT; }
