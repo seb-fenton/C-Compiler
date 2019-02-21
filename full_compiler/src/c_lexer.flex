@@ -145,7 +145,6 @@ int store_typedef(){
 
 void create_typedef(){
     yylval.string = new std::string(yytext);
-    std::cout << *yylval.string << std::endl;
     ctx.type_defs[ctx.scopeLevel].push_back(ctx.temp_typedef);
 }
 

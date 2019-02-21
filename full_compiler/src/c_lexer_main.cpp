@@ -18,6 +18,7 @@ std::string print_type(TokenType type) {
         case T_TYPEDEF: return "T_TYPEDEF: ";
         case T_IDENTIFIER: return "T_IDENTIFIER: ";
         case T_LONG: return "T_LONG: ";
+        case T_DOUBLE: return "T_DOUBLE: ";
         default: return "";
     }
 }
