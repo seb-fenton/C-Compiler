@@ -9,21 +9,25 @@
 
 
 
-// Define the instance of the variable that is declared in the histogram.hpp header
 TokenValue yylval;
+
+std::string print_type(TokenType type) {
+    switch(type) {
+        case T_INT: return "T_INT: ";
+        case TYPEDEF_NAME: return "TYPEDEF_NAME: ";
+        case T_TYPEDEF: return "T_TYPEDEF: ";
+        case T_IDENTIFIER: return "T_IDENTIFIER: ";
+        case T_LONG: return "T_LONG: ";
+        case T_DOUBLE: return "T_DOUBLE: ";
+        default: return "";
+    }
+}
 
 int main()
 {
-    while(1){
-        TokenType type=(TokenType)yylex();
-
-        if(type==None){
-            break; // No more tokens
-
-        }else if(type==T_VOID){
- 
-            std::cout<<"COMMENT FOUND" << std::endl;    
-        }
+    TokenType type;
+    while((type=(TokenType)yylex())){
+        std::cout << print_type(type) <<std::endl;
     }
 
 

@@ -1,21 +1,25 @@
 %option noyywrap
 %x COMMENT_BLOCK
-%x TYPEDEFS
+%s TYPEDEFS
 
 %{
     #include "c_lexer.hpp"
 
     #include <sstream>
     #include <stdlib.h>
+    #include <iostream>
 
     extern void yyerror(const char *); 
     static void comment(void);
+    int store_typedef();
+    void create_typedef();
+    int check_type();
 %}
 
 
 IDENTIFIER          [_a-zA-Z][_a-zA-Z0-9]*
 
-ASSIGNMENT_OPERATOR (("<<"|">>"|[*\/%+\-&^|])"="|"=")
+ASSIGNMENT_OPERATOR (("<<"|">>"|[*\/%+\-&^|])"=")
 INTEGERSUFFIX       ([uU][lL]|[lL][uU]|[uUlL])
 FLOATINGSUFFIX      ([fFlL])
 EXPONENTSUFFIX      ([Ee][+-]?[0-9]+)
@@ -47,7 +51,7 @@ WHITESPACE          [ \t\r\n]+
 "double"	{ return T_DOUBLE; }
 "signed"	{ return T_SIGNED; }
 "unsigned"	{ return T_UNSIGNED; }
-"typedef"	{ BEGIN(TYPEDEFS);return T_TYPEDEF; }
+"typedef"	{ BEGIN(TYPEDEFS); return T_TYPEDEF; }
 "extern"	{ return T_EXTERN; }
 "static"	{ return T_STATIC; }
 "auto"		{ return T_AUTO; }
@@ -84,7 +88,8 @@ WHITESPACE          [ \t\r\n]+
 ">="			        { return GE_OP; }
 "=="			        { return EQ_OP; }
 "!="			        { return NE_OP; }
-";"					    { return ';'; }
+<INITIAL>";"		    { return ';'; }
+<TYPEDEFS>";"			{ create_typedef(); BEGIN(INITIAL); return ';'; }
 ","					    { return ','; }
 ":"					    { return ':'; }
 "="					    { return '='; }
@@ -102,15 +107,15 @@ WHITESPACE          [ \t\r\n]+
 "^"					    { return '^'; }
 "|"					    { return '|'; }
 "?"					    { return '?'; }
-"{"			            { return '}'; }
-"}"     		        { return '{'; }
+"{"			            { ctx.incScope(); return '{'; }
+"}"     		        { ctx.decScope(); return '}'; }
 "("					    { return '('; }
 ")"					    { return ')'; }
 "["				        { return '['; }
 "]"			            { return ']'; } 
 
-{IDENTIFIER}	{ yylval.string = new std::string(yytext); return T_IDENTIFIER; } //Store variable names in bindings
-<TYPEDEFS>{IDENTIFIER} {yylval.string = new std::string(yytext); return T_IDENTIFIER; BEGIN(INITIAL); } //when making bindings store all typdefs in context
+<INITIAL>{IDENTIFIER}	{ return check_type();} //Store variable names in bindings
+<TYPEDEFS>{IDENTIFIER} { return store_typedef(); } //when making bindings store all typdefs in context
 
 {HEXPREFIX}{HEX}+{INTEGERSUFFIX}?                               { return INT_CONSTANT; }
 {NONZERO}{DEC}*{INTEGERSUFFIX}?                                 { return INT_CONSTANT; }
@@ -132,6 +137,24 @@ WHITESPACE          [ \t\r\n]+
 
 %%
 
+int store_typedef(){
+    yylval.string = new std::string(yytext);
+    ctx.temp_typedef = *yylval.string;
+    return T_IDENTIFIER;
+}
 
+void create_typedef(){
+    yylval.string = new std::string(yytext);
+    ctx.type_defs[ctx.scopeLevel].push_back(ctx.temp_typedef);
+}
+
+int check_type(){
+    yylval.string = new std::string(yytext);
+    if(std::find(ctx.type_defs[ctx.scopeLevel].begin(),ctx.type_defs[ctx.scopeLevel].end(), *yylval.string) != ctx.type_defs[ctx.scopeLevel].end()){
+        return TYPEDEF_NAME;
+    } else{
+        return T_IDENTIFIER;
+    }
+}
 
 

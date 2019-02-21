@@ -1,0 +1,9 @@
+typedef int x;
+{
+    x hello;
+    typedef double yoyo;
+    yoyo m;
+}
+
+yoyo wut;
+x are;
