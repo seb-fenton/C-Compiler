@@ -1,15 +1,19 @@
 %option noyywrap
 %x COMMENT_BLOCK
-%x TYPEDEFS
+%s TYPEDEFS
 
 %{
     #include "c_lexer.hpp"
 
     #include <sstream>
     #include <stdlib.h>
+    #include <iostream>
 
     extern void yyerror(const char *); 
     static void comment(void);
+    int store_typedef();
+    void create_typedef();
+    int check_type();
 %}
 
 
@@ -47,7 +51,7 @@ WHITESPACE          [ \t\r\n]+
 "double"	{ return T_DOUBLE; }
 "signed"	{ return T_SIGNED; }
 "unsigned"	{ return T_UNSIGNED; }
-"typedef"	{ BEGIN(TYPEDEFS); }
+"typedef"	{ BEGIN(TYPEDEFS); return T_TYPEDEF; }
 "extern"	{ return T_EXTERN; }
 "static"	{ return T_STATIC; }
 "auto"		{ return T_AUTO; }
@@ -84,7 +88,8 @@ WHITESPACE          [ \t\r\n]+
 ">="			        { return GE_OP; }
 "=="			        { return EQ_OP; }
 "!="			        { return NE_OP; }
-";"					    { return ';'; }
+<INITIAL>";"		    { return ';'; }
+<TYPEDEFS>";"			{ create_typedef(); BEGIN(INITIAL); return ';'; }
 ","					    { return ','; }
 ":"					    { return ':'; }
 "="					    { return '='; }
@@ -102,15 +107,15 @@ WHITESPACE          [ \t\r\n]+
 "^"					    { return '^'; }
 "|"					    { return '|'; }
 "?"					    { return '?'; }
-"{"			            { return '}'; }
-"}"     		        { return '{'; }
+"{"			            { ctx.incScope(); return '{'; }
+"}"     		        { ctx.decScope(); return '}'; }
 "("					    { return '('; }
 ")"					    { return ')'; }
 "["				        { return '['; }
 "]"			            { return ']'; } 
 
-{IDENTIFIER}	{ yylval.string = new std::string(yytext); return T_IDENTIFIER; } //Store variable names in bindings
-<TYPEDEFS>{IDENTIFIER} {yylval.string = new std::string(yytext); return TYPEDEF_NAME; BEGIN(INITIAL); } //when making bindings store all typdefs in context
+<INITIAL>{IDENTIFIER}	{ return check_type();} //Store variable names in bindings
+<TYPEDEFS>{IDENTIFIER} { return store_typedef(); } //when making bindings store all typdefs in context
 
 {HEXPREFIX}{HEX}+{INTEGERSUFFIX}?                               { return INT_CONSTANT; }
 {NONZERO}{DEC}*{INTEGERSUFFIX}?                                 { return INT_CONSTANT; }
@@ -130,88 +135,27 @@ WHITESPACE          [ \t\r\n]+
 
 {WHITESPACE} { ; }
 
-<TYPEDEFS>{
-    "void"		{  }
-    "char"		{ return T_CHAR; }
-    "short"		{ return T_SHORT; }
-    "int"		{ return T_INT; }
-    "long"		{ return T_LONG; }
-    "float"		{ return T_FLOAT; }
-    "double"	{ return T_DOUBLE; }
-    "signed"	{ return T_SIGNED; }
-    "unsigned"	{ return T_UNSIGNED; }
-    "typedef"	{ BEGIN(TYPEDEFS); }
-    "extern"	{ return T_EXTERN; }
-    "static"	{ return T_STATIC; }
-    "auto"		{ return T_AUTO; }
-    "register"	{ return T_REGISTER; }
-    "const"		{ return T_CONST; }
-    "volatile"	{ return T_VOLATILE; }
-    "struct"    { return T_STRUCT; }
-
-    "goto"		{ return T_GOTO; }
-    "break"		{ return T_BREAK; }
-    "continue"	{ return T_CONTINUE; }
-    "case"		{ return T_CASE; }
-    "default"	{ return T_DEFAULT; }
-    "switch"	{ return T_SWITCH; }
-    "if"	    { return T_IF; }
-    "else"		{ return T_ELSE; }
-    "return"	{ return T_RETURN; }
-    "while"		{ return T_WHILE; }
-    "do"		{ return T_DO; }
-    "for"		{ return T_FOR; }
-    "sizeof"    { return T_SIZEOF; }
-
-
-    {ASSIGNMENT_OPERATOR} { yylval.string = new std::string(yytext); return T_ASSIGNMENT_OP; }
-
-    ">>"					{ return RIGHT_SHIFT_OP; }
-    "<<"					{ return LEFT_SHIFT_OP; }
-    "++"					{ return INC_OP; }
-    "--"					{ return DEC_OP; }
-    "->"					{ return PTR_OP; }
-    "&&"			        { return AND_OP; }
-    "||"			        { return OR_OP; }
-    "<="			        { return LE_OP; }
-    ">="			        { return GE_OP; }
-    "=="			        { return EQ_OP; }
-    "!="			        { return NE_OP; }
-    ";"					    { return ';'; }
-    ","					    { return ','; }
-    ":"					    { return ':'; }
-    "="					    { return '='; }
-    "."					    { return '.'; }
-    "&"					    { return '&'; }
-    "!"					    { return '!'; }
-    "~"					    { return '~'; }
-    "-"					    { return '-'; }
-    "+"					    { return '+'; }
-    "*"					    { return '*'; }
-    "/"					    { return '/'; }
-    "%"					    { return '%'; }
-    "<"					    { return '<'; }
-    ">"					    { return '>'; }
-    "^"					    { return '^'; }
-    "|"					    { return '|'; }
-    "?"					    { return '?'; }
-    "{"			            { return '}'; }
-    "}"     		        { return '{'; }
-    "("					    { return '('; }
-    ")"					    { return ')'; }
-    "["				        { return '['; }
-    "]"			            { return ']'; } 
-}
-
 %%
 
-static int store_tokens(void){
-    std::string temp;
-    while( yytext[i] != NULL){
-		temp += yytext[i];
-		i++;
+int store_typedef(){
+    yylval.string = new std::string(yytext);
+    ctx.temp_typedef = *yylval.string;
+    return T_IDENTIFIER;
+}
+
+void create_typedef(){
+    yylval.string = new std::string(yytext);
+    std::cout << *yylval.string << std::endl;
+    ctx.type_defs[ctx.scopeLevel].push_back(ctx.temp_typedef);
+}
+
+int check_type(){
+    yylval.string = new std::string(yytext);
+    if(std::find(ctx.type_defs[ctx.scopeLevel].begin(),ctx.type_defs[ctx.scopeLevel].end(), *yylval.string) != ctx.type_defs[ctx.scopeLevel].end()){
+        return TYPEDEF_NAME;
+    } else{
+        return T_IDENTIFIER;
     }
-    ctx.temp.push_b
 }
 
 

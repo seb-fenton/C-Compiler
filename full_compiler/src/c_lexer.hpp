@@ -5,10 +5,12 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 enum TokenType{
     None,
     T_IDENTIFIER,
+    TYPEDEF_NAME,
 
     //OPERATORS & SYMBOLS
     T_ASSIGNMENT_OP,
@@ -30,6 +32,7 @@ enum TokenType{
     INT_CONSTANT,
     FLOAT_CONSTANT,
     STRING_LITERAL,
+    
 
 
     //TYPES
@@ -80,9 +83,22 @@ union TokenValue{
 
 
 struct context{
-    std::map<std::string, std::vector<std::string>> type_defs;
-    std::vector<std::string> temp_bindings;    
+    std::vector<std::vector<std::string>> type_defs = {{}};
+    int scopeLevel = 0;
+    std::string temp_typedef;
+
+    void incScope(){
+        type_defs.push_back(type_defs[scopeLevel]);
+        scopeLevel++;
+    }
+
+    void decScope(){
+        type_defs.pop_back();
+        scopeLevel--;
+    }
 };
+
+
 
 static context ctx;
 
