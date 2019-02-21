@@ -3,6 +3,8 @@
 
 
 #include <string>
+#include <vector>
+#include <map>
 
 enum TokenType{
     None,
@@ -74,6 +76,15 @@ union TokenValue{
     double number;
     std::string *string;
 };
+
+
+
+struct context{
+    std::map<std::string, std::vector<std::string>> type_defs;
+    std::vector<std::string> temp_bindings;    
+};
+
+static context ctx;
 
 extern TokenValue yylval;
 extern int yylex();
