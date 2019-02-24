@@ -37,8 +37,9 @@
 %%
 
 //TO-DO Group the rules so that similar things are together
+//Spec https://www.pdf-archive.com/2014/10/02/ansi-iso-9899-1990-1/ansi-iso-9899-1990-1.pdf
 
-root: translation_unit {/*$1 = new translation_unit();*/ g_root = $1};
+root: translation_unit {/*$1 = new translation_unit();*/ g_root = $1}; 
 
 translation_unit: 
 		external_declaration	{$$ = new translation_unit($1);/*$$->push($1)*/} //push back into g_root node
@@ -48,6 +49,7 @@ translation_unit:
 external_declaration: 
 		function_definition {$$ = $1} 	//create function node in next step not now
 		| declaration   	{$$ = $1}	//create declaration node in next step
+		| typedef_declaration 			//need to make this ourselves, ill explain it to you
 		;
 
 declaration:
@@ -56,9 +58,9 @@ declaration:
 		;	// also make two constructors
 
 declaration_specifier_list:
-		declaration_specifiers 		{$$ = new declaration_specifier_list($1);}									//$1 will just return a string or something
-		| declaration_specifier_list declaration_specifiers {$$ = $1; $$->push($2);}	
-		;	// $1 = $$ should give you the same node on the next iteration
+		declaration_specifiers 		{$$ = new declaration_specifier_list($1);}			// $1 will just return a string or something
+		| declaration_specifier_list declaration_specifiers {$$ = $1; $$->push($2);}	// $1 = $$ should give you the same node on the next iteration
+		;													
 
 declaration_specifiers:
 		T_VOID //decide how to return this, maybe as a string or bool values
@@ -82,7 +84,7 @@ declaration_specifiers:
 
 init_declarator_list:
 		init_declarator	{$$ = new init_declarator_list($1);}						//same way as sbove do $$->push($1) to store the init_declarator in the list node
-		| init_declarator ',' init_declarator_list {$$ = $1; $$->push($2);}		// this  should work. who knows
+		| init_declarator_list ',' init_declarator {$$ = $1; $$->push($2);}			
 		; 
 
 init_declarator:
@@ -91,20 +93,105 @@ init_declarator:
 		;
 
 declarator: 
-		pointer direct_declarator //each declarations should only happen once
+		pointer direct_declarator //each declarations should only happen once, so there is no recursion
 		| direct_declarator 
 		;
 
 direct_declarator:
-		T_IDENTIFIER 		//Need node to check bindings and identifier names
-		|'(' declarator ')' //works for dereferencing pointers
-		| direct_declarator '[' ']' //need node for array declaration   
-		| direct_declarator '[' assignment_expression ']' //
-		| direct_declarator '(' parameter_type_list ')' //returns a variable name and then a list of arguments? only used for function calls probably
-		| direct_declarator '(' identifier_list ')' //just a list of variables, no idea of example case
-		| direct_declarator '(' ')' //no clue - figure this one out maybe used for function calls
+		T_IDENTIFIER 										//Need node to check bindings and identifier names
+		|'(' declarator ')' 								//works for dereferencing pointers
+		| direct_declarator '[' ']' 						//need node for array declaration   
+		| direct_declarator '[' assignment_expression ']' 	//same as above but with expression inside square brackers
+		| direct_declarator '(' parameter_type_list ')' 	//returns a variable name and then a list of arguments? only used for function calls probably
+		| direct_declarator '(' identifier_list ')' 		//just a list of variables, no idea of example case
+		| direct_declarator '(' ')' 						//no clue - figure this one out, maybe used for function calls
+		;
+
+initialiser:
+		'{' initialiser_list '}' 		//used for arrays
+		|'{' initialiser_list ',' '}'	//i think for multi-dimensional array. PAGE:71 in spec linked above
+		|assignment_expression			//assignment_expression is anything that would be on the RHS of an assignment operator. An expression is just a list of these, we can rename it.
+		;								//Also this can be a full expression with its own assignment operator but dw about that for now
+
+assignment_expression:
+		conditional_expression											//this will go through all the operators that are used in evaulating an expression
+		| unary_expression assignment_operator assignment_expression	//this, I believe is used when changing variables etc. PAGE:53 in spec
+		;
+
+conditional_expression:
+		logical_or_expression												//this binds the highest and is thus first, 
+		| logical_or_expression '?' expression ':' conditional_expression	//the following expression rules just go in order of priority
+		;
+
+logical_or_expression:
+		logical_and_expression
+		| logical_or_expression OR_OP logical_and_expression			
+		;
+
+logical_and_expression:
+		inclusive_or_expression
+		| logical_and_expression AND_OP inclusive_or_expression		
+		;
+
+inclusive_or_expression:
+		exclusive_or_expression
+		| logical_or_expression '|' logical_and_expression			
 		;
 
 
+exclusive_or_expression:
+		and_expression
+		| exclusive_or_expression '^' and_expression			
+		;
 
-				
+and_expression:
+		equality_expression
+		| and_expression '&' equality_expression
+		;
+
+equality_expression:
+		relational_expression
+		| equality_expression EQ_OP relational_expression  //need to decide if we want different classes for each operator, or we can use one class for both
+		| equality_expression NE_OP relational_expression
+		;
+
+relational_expression:
+		shift_expression
+		| relational_expression '>' shift_expression  		//once again, one class or 4 classes? dont know if we can take the char value
+		| relational_expression '<' shift_expression		// of the single character operators, may be possible to turn all operators in the lex
+		| relational_expression LE_OP shift_expression		// to c-strings then we can just use those throughout the program
+		| relational_expression GE_OP shift_expression
+		;
+
+shift_expression:
+		additive_expression										//so after this we start the basic maths
+		| shift_expression LEFT_SHIFT_OP additive_expression
+		| shift_expression RIGHT_SHIFT_OP additive_expression
+		;
+
+additive_expression:
+		multiplicative_expression
+		| additive_expression '+' multiplicative_expression
+		| additive_expression '-' multiplicative_expression
+		;
+
+multiplicative_expression:
+		cast_expression
+		| multiplicative_expression '*' cast_expression
+		| multiplicative_expression '/' cast_expression
+		| multiplicative_expression '%' cast_expression
+		;
+
+cast_expression:
+		unary_expression 							//the unary expression does operations on single numbers or variable, all leads to getting the variable name at one point
+		| '(' type_name ')' cast_expression
+		;
+
+unary_expression:  									//PAGE : 43
+		postfix_expression
+		| INC_OP unary_expression
+		| DEC_OP unary_expression
+		| unary_operator cast_expression
+		| T_SIZEOF unary_expression
+		| T_SIZEOF '(' type_name ')'
+		;
