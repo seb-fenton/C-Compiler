@@ -52,6 +52,11 @@ external_declaration:
 		| typedef_declaration 			//need to make this ourselves, ill explain it to you
 		;
 
+typedef_declaration:
+		T_TYPEDEF declaration_specifier_list declarator ';' //this needs some thinking, since arrays work differently with typedefs,
+															//might be worth not doing it
+		;
+
 declaration:
 		declaration_specifier_list ';'  { $$ = new declaration($1);}
 		| declaration_specifier_list init_declarator_list ';'  { $$ = new declaration($1,$2);} 
@@ -72,15 +77,27 @@ declaration_specifiers:
     	|T_DOUBLE
     	|T_SIGNED
     	|T_UNSIGNED
-    	|T_TYPEDEF
     	|T_EXTERN
     	|T_STATIC
     	|T_AUTO
     	|T_REGISTER
     	|T_CONST
     	|T_VOLATILE
-    	|T_STRUCT
+    	| struct_or_union_specifier	
 		;
+
+struct_or_union_specifier:
+		struct_or_union '{' struct_declaration_list '}'					//used to initlialise structs
+		| struct_or_union IDENTIFIER '{' struct_declaration_list '}'
+		| struct_or_union IDENTIFIER
+		;
+
+	
+struct_or_union:
+		T_STRUCT
+		| T_UNION
+		;
+
 
 init_declarator_list:
 		init_declarator	{$$ = new init_declarator_list($1);}						//same way as sbove do $$->push($1) to store the init_declarator in the list node
@@ -93,7 +110,7 @@ init_declarator:
 		;
 
 declarator: 
-		pointer direct_declarator //each declarations should only happen once, so there is no recursion
+		pointer direct_declarator 				//each declarations should only happen once, so there is no recursion
 		| direct_declarator 
 		;
 
@@ -108,7 +125,7 @@ direct_declarator:
 		;
 
 initialiser:
-		'{' initialiser_list '}' 		//used for arrays
+		'{' initialiser_list '}' 		//used for arrays 
 		|'{' initialiser_list ',' '}'	//i think for multi-dimensional array. PAGE:71 in spec linked above
 		|assignment_expression			//assignment_expression is anything that would be on the RHS of an assignment operator. An expression is just a list of these, we can rename it.
 		;								//Also this can be a full expression with its own assignment operator but dw about that for now
