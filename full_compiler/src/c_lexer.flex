@@ -36,7 +36,7 @@ WHITESPACE          [ \t\r\n]+
 
 
 "/*"            { BEGIN(COMMENT_BLOCK); }
-<COMMENT_BLOCK>"*/" { BEGIN(INITIAL); }
+<COMMENT_BLOCK>"*/" { BEGIN(INITIAL); } //make it go to prev state not initial
 <COMMENT_BLOCK>\n   { }
 <COMMENT_BLOCK>.    { }
 
