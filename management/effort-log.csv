@@ -1,1 +1,6 @@
 Date,Effort,Developers,Milestones
+18/02,30m,SF,DefineInitialMilestones 
+25/02,?,ALL,FinishLabExercises
+22/02,3h,NG,WriteLexerTokens
+23/02,1.5h,NG,WriteLexerTypedefs
+
