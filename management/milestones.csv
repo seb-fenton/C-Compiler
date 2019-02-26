@@ -5,7 +5,7 @@ WriteLexerTokens, , 3h, NG, Y, Write initial Lexer structure based on ANSI C
 WriteLexerTypedefs, WriteLexerTokens, 1.5h, NG, Y, Add typedef support to Lexer
 DebugLexer, WriteLexerTypedefs, 4h, SF, N, Test Lexer by creating fake context header and using separate main
 AddTypedefExtremeCaseSupport, DebugLexer, 4h, SF, N, Add support for extreme typdef use cases
-AddParserRules, WriteLexerTypedefs, 4h, NG, N, Create Parser template with basic rules
+AddParserRules, WriteLexerTypedefs, 4h, NG, Y, Create Parser template with basic rules
 CreateAST, , 4h, NG, N, Create AST with nodes
 PrintFunctionForNodes, , 1h, SF, N, Create printfunction for AST nodes
 AddParserASTSupport,AddParserRules, 6h?, ALL, N, Add AST support in Parser rules
