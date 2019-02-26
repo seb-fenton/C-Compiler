@@ -84,11 +84,12 @@ declaration_specifiers:
     	|T_CONST
     	|T_VOLATILE
     	| struct_or_union_specifier	
+		|TYPEDEF_NAME
 		;
 
 struct_or_union_specifier:
 		struct_or_union '{' struct_declaration_list '}'					//used to initlialise structs
-		| struct_or_union IDENTIFIER '{' struct_declaration_list '}'
+		| struct_or_union IDENTIFIER '{' struct_declaration_list '}'	//Page: 59
 		| struct_or_union IDENTIFIER
 		;
 
@@ -96,6 +97,27 @@ struct_or_union_specifier:
 struct_or_union:
 		T_STRUCT
 		| T_UNION
+		;
+	
+struct_declaration_list:
+		struct_declaration										
+		| struct_declaration_list struct_declaration
+		; 
+
+struct_declaration:
+		declaration_specifier_list ';' /* for anonymous structs/unions */
+		| declaration_specifier_list struct_declarator_list ';'
+		; //One more rule using static don't know if it needs to be implemented
+
+struct_declarator_list:
+		struct_declarator  //creates a list of variables to be used in a struct
+		| struct_declarator_list ',' struct_declarator
+		;
+
+struct_declarator:
+		':' constant_expression
+		| declarator ':' constant_expression
+		| declarator
 		;
 
 
@@ -124,11 +146,22 @@ direct_declarator:
 		| direct_declarator '(' ')' 						//no clue - figure this one out, maybe used for function calls
 		;
 
+initialiser_list:
+		designation initialiser
+		| initialiser
+		| initialiser_list ',' designation initialiser
+		| initialiser_list ',' initialiser
+		;
+
 initialiser:
 		'{' initialiser_list '}' 		//used for arrays 
 		|'{' initialiser_list ',' '}'	//i think for multi-dimensional array. PAGE:71 in spec linked above
 		|assignment_expression			//assignment_expression is anything that would be on the RHS of an assignment operator. An expression is just a list of these, we can rename it.
 		;								//Also this can be a full expression with its own assignment operator but dw about that for now
+
+constant_expression:
+		conditional_expression
+		;
 
 assignment_expression:
 		conditional_expression											//this will go through all the operators that are used in evaulating an expression
@@ -211,4 +244,133 @@ unary_expression:  									//PAGE : 43
 		| unary_operator cast_expression
 		| T_SIZEOF unary_expression
 		| T_SIZEOF '(' type_name ')'
+		;
+
+postfix_expression:
+		primary_expression						//Page 39
+		| postfix_expression '[' expression ']'  //array calls
+		| postfix_expression '(' ')'
+		| postfix_expression '(' argument_expression_list ')' //used for function calls most likely
+		| postfix_expression '.' IDENTIFIER
+		| postfix_expression PTR_OP IDENTIFIER
+		| postfix_expression INC_OP
+		| postfix_expression DEC_OP
+		| '(' type_name ')' '{' initialiser_list '}'
+		| '(' type_name ')' '{' initialiser_list ',' '}'
+		;
+
+primary_expression:
+		IDENTIFIER
+		| constant
+		| STRING_LITERAL
+		| '(' expression ')'
+		;
+
+constant:
+		INT_CONSTANT
+		| FLOAT_CONSTANT
+		| ENUMERATION_CONSTANT  // Do this later
+		;
+
+expression:
+		assignment_expression
+		| expression ',' assignment_expression
+		;
+
+designation:
+		designator_list '='
+		;
+
+designator_list:
+		designator
+		| designator_list designator
+		;
+
+designator:
+		'[' constant_expression ']'
+		| '.' IDENTIFIER
+		;
+		
+function_definition:
+		declaration_specifiers declarator declaration_list compound_statement
+		| declaration_specifiers declarator compound_statement
+		;
+
+declaration_list:
+		declaration
+		| declaration_list declaration
+		;
+
+parameter_type_list:
+		parameter_list
+		;
+
+parameter_list:
+		parameter_declaration
+		| parameter_list ',' parameter_declaration
+		;
+
+parameter_declaration:
+		declaration_specifiers declarator
+		| declaration_specifier
+		;
+
+identifier_list:
+		IDENTIFIER
+		| identifier_list ',' IDENTIFIER
+		;
+
+//statements
+
+statement:
+		labeled_statement
+		| compound_statement
+		| expression_statement
+		| selection_statement
+		| iteration_statement
+		| jump_statement
+		;
+
+compound_statement:
+		'{' '}'
+		| '{' block_item_list '}'
+		;
+
+block_item_list:
+		block_item
+		| block_item_list block_item
+		;
+
+block_item:
+		declaration
+		| statement
+		;
+
+expression_statement:
+		';'
+		| expression ';'
+		;
+
+selection_statement:
+		T_IF '(' expression ')' statement T_ELSE statement  //Page: 77
+		| T_IF '(' expression ')' statement 
+		| T_SWITCH '(' expression ')' statement
+		;
+
+iteration_statement:
+		T_WHILE '(' expression ')' statement 							//page 78
+		| T_DO statement T_WHILE '(' expression ')' ';'
+		| T_FOR '(' expression_statement expression_statement ')' statement
+		| T_FOR '(' expression_statement expression_statement expression ')' statement
+		| T_FOR '(' declaration expression_statement ')' statement
+		| T_FOR '(' declaration expression_statement expression ')' statement
+		;	
+
+
+
+jump_statement:
+		CONTINUE ';'
+		| BREAK ';'
+		| RETURN ';'
+		| RETURN expression ';'
 		;
