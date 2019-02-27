@@ -25,20 +25,20 @@ class Node{
 
 
 //---------------------------------------------//
-//------------TOP_NODES------------------------//
+//------------BRANCH_NODES------------------------//
 //        Nodes with branches in them          //
 //---------------------------------------------//
 
-class Top_Node : public Node{
+class Branch_Node : public Node{
     public:
 		std::vector<NodePtr> branches;
-		virtual ~Top_Node()  {}
+		virtual ~Branch_Node()  {}
 		void push(NodePtr n){
 			branches.push_back(n);
 		}
 };
 
-class translation_unit : public Top_Node{
+class translation_unit : public Branch_Node{
 	public:
 	void printTree(){
 		std::cout << "Translation Unit" << std::endl;
@@ -50,15 +50,15 @@ class translation_unit : public Top_Node{
 
 
 //---------------------------------------------//
-//------------BASE_NODES------------------------//
-//        Nodes with branches in them          //
+//------------SPEC_NODES-----------------------//
+//        Nodes with specified pointers		     //
 //---------------------------------------------//
 
-class Base_Node : public Node{
+class Spec_Node : public Node{
     private:
     protected:
     public:
-		virtual ~Base_Node()  {}
+		virtual ~Spec_Node()  {}
 };
 
 #endif

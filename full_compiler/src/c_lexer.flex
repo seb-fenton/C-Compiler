@@ -1,4 +1,5 @@
 %option noyywrap
+%option stack
 %x COMMENT_BLOCK
 %s TYPEDEFS
 
@@ -35,8 +36,8 @@ WHITESPACE          [ \t\r\n]+
 %%
 
 
-"/*"            { BEGIN(COMMENT_BLOCK); }
-<COMMENT_BLOCK>"*/" { BEGIN(INITIAL); } //make it go to prev state not initial
+"/*"            { yy_push_state(COMMENT_BLOCK); }
+<COMMENT_BLOCK>"*/" { yy_pop_state(); } //make it go to prev state not initial
 <COMMENT_BLOCK>\n   { }
 <COMMENT_BLOCK>.    { }
 
@@ -51,7 +52,7 @@ WHITESPACE          [ \t\r\n]+
 "double"	{ return T_DOUBLE; }
 "signed"	{ return T_SIGNED; }
 "unsigned"	{ return T_UNSIGNED; }
-"typedef"	{ BEGIN(TYPEDEFS); return T_TYPEDEF; }
+"typedef"	{ yy_push_state(TYPEDEFS); return T_TYPEDEF; }
 "extern"	{ return T_EXTERN; }
 "static"	{ return T_STATIC; }
 "auto"		{ return T_AUTO; }
