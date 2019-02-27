@@ -12,9 +12,11 @@ src/c_lexer.yy.cpp : src/c_lexer.flex
 	flex -o src/c_lexer.yy.cpp  src/c_lexer.flex
 
 bin/c_lexer : src/c_lexer.yy.o src/c_lexer_main.o
+	mkdir -p bin 
 	g++ $(CPPFLAGS) -o bin/c_lexer src/c_lexer.yy.o src/c_lexer_main.o
 
 clean :
 	-rm -rf prog prog.exe
 	-rm -rf src/*.yy.cpp
 	-rm -rf src/*.o
+	-rm -rf bin

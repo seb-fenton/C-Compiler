@@ -11,23 +11,30 @@
 
 TokenValue yylval;
 
-std::string print_type(TokenType type) {
-    switch(type) {
-        case T_INT: return "T_INT: ";
-        case TYPEDEF_NAME: return "TYPEDEF_NAME: ";
-        case T_TYPEDEF: return "T_TYPEDEF: ";
-        case T_IDENTIFIER: return "T_IDENTIFIER: ";
-        case T_LONG: return "T_LONG: ";
-        case T_DOUBLE: return "T_DOUBLE: ";
-        default: return "";
-    }
-}
+
+std::map<TokenType, std::string> tokenStr = {
+    {T_INT, "T_INT"},
+    {T_DOUBLE, "T_DOUBLE"},
+    {TYPEDEF_NAME, "TYPEDEF_NAME"},
+    {T_TYPEDEF, "T_TYPEDEF"},
+    {T_IDENTIFIER, "T_IDENTIFIER"},
+    {T_LONG, "T_LONG"},
+    {INT_CONSTANT, "INT_CONSTANT"},
+    {FLOAT_CONSTANT, "FLOAT_CONSTANT"},
+    {T_DOUBLE, "T_DOUBLE"}
+};
+
 
 int main()
 {
     TokenType type;
     while((type=(TokenType)yylex())){
-        std::cout << print_type(type) <<std::endl;
+        if(tokenStr.find(type) != tokenStr.end()){
+            std::cout<< tokenStr[type] << std::endl;
+        }else{
+            std::cout << (char)type << std::endl;
+        }
+
     }
 
 

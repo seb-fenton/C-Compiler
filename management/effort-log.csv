@@ -5,4 +5,5 @@ Date,Effort,Developers,Milestones
 23/02,1.5h,NG,WriteLexerTypedefs
 26/02,1.5h,NG,AddParserRules
 27/02,3h,NG,AddParserASTSupport
+27/02,2.5h,NG,CreateAST
 

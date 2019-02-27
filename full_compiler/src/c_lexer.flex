@@ -118,16 +118,16 @@ WHITESPACE          [ \t\r\n]+
 <INITIAL>{IDENTIFIER}	{ return check_type();} //Store variable names in bindings
 <TYPEDEFS>{IDENTIFIER} { return store_typedef(); } //when making bindings store all typdefs in context
 
-{HEXPREFIX}{HEX}+{INTEGERSUFFIX}?                               { return INT_CONSTANT; }
-{NONZERO}{DEC}*{INTEGERSUFFIX}?                                 { return INT_CONSTANT; }
+{HEXPREFIX}{HEX}+{INTEGERSUFFIX}?                               {yylval.number=strtod(yytext, 0); return INT_CONSTANT; }
+{NONZERO}{DEC}*{INTEGERSUFFIX}?                                 {yylval.number=strtod(yytext, 0);  return INT_CONSTANT; }
 "0"{OCTAL}*{INTEGERSUFFIX}?                                     { return INT_CONSTANT; }
 
-{DEC}+{EXPONENTSUFFIX}{FLOATINGSUFFIX}?                         {return FLOAT_CONSTANT;}
-{DEC}*"."{DEC}+{EXPONENTSUFFIX}?{FLOATINGSUFFIX}?               {return FLOAT_CONSTANT;}
-{DEC}+"."{EXPONENTSUFFIX}?{FLOATINGSUFFIX}?                     {return FLOAT_CONSTANT;}
-{HEXPREFIX}{HEX}+{BASE2EXSUFFIX}{FLOATINGSUFFIX}?               {return FLOAT_CONSTANT;}
-{HEXPREFIX}{HEX}*"."{HEX}+{BASE2EXSUFFIX}{FLOATINGSUFFIX}?      {return FLOAT_CONSTANT;}
-{HEXPREFIX}{HEX}+"."{BASE2EXSUFFIX}{FLOATINGSUFFIX}?            {return FLOAT_CONSTANT;}
+{DEC}+{EXPONENTSUFFIX}{FLOATINGSUFFIX}?                         {yylval.number=strtod(yytext, 0); return FLOAT_CONSTANT;}
+{DEC}*"."{DEC}+{EXPONENTSUFFIX}?{FLOATINGSUFFIX}?               {yylval.number=strtod(yytext, 0); return FLOAT_CONSTANT;}
+{DEC}+"."{EXPONENTSUFFIX}?{FLOATINGSUFFIX}?                     {yylval.number=strtod(yytext, 0); return FLOAT_CONSTANT;}
+{HEXPREFIX}{HEX}+{BASE2EXSUFFIX}{FLOATINGSUFFIX}?               {yylval.number=strtod(yytext, 0); return FLOAT_CONSTANT;}
+{HEXPREFIX}{HEX}*"."{HEX}+{BASE2EXSUFFIX}{FLOATINGSUFFIX}?      {yylval.number=strtod(yytext, 0); return FLOAT_CONSTANT;}
+{HEXPREFIX}{HEX}+"."{BASE2EXSUFFIX}{FLOATINGSUFFIX}?            {yylval.number=strtod(yytext, 0); return FLOAT_CONSTANT;}
 
 
 (\"[^\n\"]*\")                                                  {return STRING_LITERAL;}

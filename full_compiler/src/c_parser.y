@@ -30,7 +30,7 @@
 %token TYPEDEF_NAME, T_IDENTIFIER
 
 %type <node> translation_unit external_declaration declaration declaration_specifier_list declaration_specifier
-%type <node> init_declarator_list declarator direct_declarator
+%type <node> init_declarator_list declarator direct_declarator init_declarator primary_expression
 %type <fnumber> FLOAT_CONSTANT
 %type <inumber> INT_CONSTANT
 %type <string> TYPEDEF_NAME T_IDENTIFIER STRING_LITERAL
@@ -39,7 +39,9 @@
 
 %%
 
-//TO-DO Group the rules so that similar things are together
+//TODO Group the rules so that similar things are together
+//TODO Finish allocating types to different terminals
+//TODO Code all classes
 //Spec https://www.pdf-archive.com/2014/10/02/ansi-iso-9899-1990-1/ansi-iso-9899-1990-1.pdf
 
 root: translation_unit {/*$1 = new translation_unit();*/ g_root = $1}; 
@@ -74,7 +76,7 @@ declaration_specifiers: //we need to make this a class which holds the specifer 
 		T_VOID 						{$$ = new declaration_specifier($1);}
     	|T_CHAR						{$$ = new declaration_specifier($1);}
     	|T_SHORT					{$$ = new declaration_specifier($1);}
-    	|T_INT						{$$ = new declaration_specifier($1);}
+    	|T_INT						{$$ = new declaration_specifier("int");}
     	|T_LONG						{$$ = new declaration_specifier($1);}
     	|T_FLOAT					{$$ = new declaration_specifier($1);}
     	|T_DOUBLE					{$$ = new declaration_specifier($1);}
@@ -86,7 +88,7 @@ declaration_specifiers: //we need to make this a class which holds the specifer 
     	|T_REGISTER					{$$ = new declaration_specifier($1);}
     	|T_CONST					{$$ = new declaration_specifier($1);}
     	|T_VOLATILE					{$$ = new declaration_specifier($1);}
-    	| struct_or_union_specifier	{$$ = new declaration_specifier($1, 1);} //make a second constructor which accepts a integer specficying if its an enum, typedef or a struct
+    	| struct_or_union_specifier	{$$ = new declaration_specifier($1, 1);} //might want to make different classes for special cases
 		|TYPEDEF_NAME				{$$ = new declaration_specifier($1, 2);}
 		;
 
@@ -135,12 +137,12 @@ init_declarator:
 		;
 
 declarator: 
-		pointer direct_declarator 	{$$ = new declarator($1, TRUE);}			//each declarations should only happen once, so there is no recursion
-		| direct_declarator 		{$$ = new declarator($1, FALSE);} //true indicates the declrator is a pointer
+		pointer direct_declarator 	{$$ = new declarator($2, $1);}			//each declarations should only happen once, so there is no recursion
+		| direct_declarator 		{$$ = new declarator($1,);} //true indicates the declrator is a pointer
 		;
 
 direct_declarator:
-		T_IDENTIFIER 										{$$ = new direct_declarator(*$1);}//Need node to check bindings and T_IDENTIFIER names
+		T_IDENTIFIER 										{$$ = new direct_declarator(*($1));}//Need node to check bindings and T_IDENTIFIER names
 		|'(' declarator ')' 								{ }								//works for dereferencing pointers
 		| direct_declarator '[' ']' 						{$$ = $1; NodePtr tmp = new ArrayDeclaration(); $$->isArray(temp);}//need node for array declaration   
 		| direct_declarator '[' assignment_expression ']' 	{$$ = $1; NodePtr tmp = new ArrayDeclaration($3); $$->isArray(temp);}//make a second constructer for declarations with expressions
@@ -159,7 +161,7 @@ initialiser_list:
 initialiser:
 		'{' initialiser_list '}' 		//used for arrays 
 		|'{' initialiser_list ',' '}'	//i think for multi-dimensional array. PAGE:71 in spec linked above
-		|assignment_expression			//assignment_expression is anything that would be on the RHS of an assignment operator. An expression is just a list of these, we can rename it.
+		|assignment_expression			{$$ = $1} //assignment_expression is anything that would be on the RHS of an assignment operator. An expression is just a list of these, we can rename it.
 		;								//Also this can be a full expression with its own assignment operator but dw about that for now
 
 assignment_operator:
@@ -183,34 +185,34 @@ conditional_expression:
 
 logical_or_expression:
 		logical_and_expression											{$$ = $1;}
-		| logical_or_expression OR_OP logical_and_expression			{$$ = logical_or_expression($1,$3);}
+		| logical_or_expression OR_OP logical_and_expression			{$$ = LogicalOrOp($1,$3);}
 		;
 
 logical_and_expression:
 		inclusive_or_expression											{$$ = $1);}
-		| logical_and_expression AND_OP inclusive_or_expression			{$$ = logical_and_expression($1,$3);}
+		| logical_and_expression AND_OP inclusive_or_expression			{$$ = LogicalAndOp($1,$3);}
 		;
 
 inclusive_or_expression:
 		exclusive_or_expression											{$$ = $1;}
-		| logical_or_expression '|' logical_and_expression				{$$ = inclusive_or_expression($1,$3);}
+		| logical_or_expression '|' logical_and_expression				{$$ = InclusiveOrOp($1,$3);}
 		;
 
 
 exclusive_or_expression:
 		and_expression													{$$ = $1;}
-		| exclusive_or_expression '^' and_expression					{$$ = exclusive_expression($1, $3);}
+		| exclusive_or_expression '^' and_expression					{$$ = ExclusiveOrOp($1, $3);}
 		;
 
 and_expression:
 		equality_expression												{$$ = $1;}
-		| and_expression '&' equality_expression						{$$ = and_expression($1, $3);}
+		| and_expression '&' equality_expression						{$$ = AndOp($1, $3);}
 		;
 
 equality_expression:
 		relational_expression											{$$ = $1;}
-		| equality_expression EQ_OP relational_expression  				{$$ = equality_expression($1,$3,TRUE);} // TRUE indicates equal
-		| equality_expression NE_OP relational_expression				{$$ = equality_expression($1,$3,FALSE)} //FALSE means not equal
+		| equality_expression EQ_OP relational_expression  				{$$ = EqualOp($1,$3);} // TRUE indicates equal
+		| equality_expression NE_OP relational_expression				{$$ = NotEqualOp($1,$3)} //FALSE means not equal
 		;
 
 relational_expression:
@@ -241,7 +243,7 @@ multiplicative_expression:
 		;
 
 cast_expression:
-		unary_expression 												{$$ = $1;}	//the unary expression does operations on single numbers or variable
+		unary_expression 												{$$ = $1;}	
 		| '(' type_name ')' cast_expression								{$$ = cast_expression($2, $4);}	//all leads to getting the variable name at one point
 		;
 
@@ -255,11 +257,11 @@ unary_expression:  									//PAGE : 43
 		;
 
 postfix_expression:
-		primary_expression						{$$ = $1}//Page 39
-		| postfix_expression '[' expression ']'  //array calls
+		primary_expression												{$$ = $1}	//Page 39
+		| postfix_expression '[' expression ']'  					//array calls
 		| postfix_expression '(' ')'
-		| postfix_expression '(' argument_expression_list ')' //used for function calls most likely
-		| postfix_expression '.' T_IDENTIFIER
+		| postfix_expression '(' argument_expression_list ')' 		//used for function calls most likely
+		| postfix_expression '.' T_IDENTIFIER	
 		| postfix_expression PTR_OP T_IDENTIFIER
 		| postfix_expression INC_OP
 		| postfix_expression DEC_OP
@@ -268,8 +270,8 @@ postfix_expression:
 		;
 
 primary_expression:
-		T_IDENTIFIER						{$$ = primary_expression(*($1));} //for now we can just return the value of the variable in an eval func,
-		| constant															//but we may need more constructors to differentiate different primary_expressions
+		T_IDENTIFIER													{$$ = primary_expression(*($1));} //for now we can just return the value of the variable in an eval func,
+		| constant																					//but we may need more constructors to differentiate different primary_expressions
 		| STRING_LITERAL
 		| '(' expression ')'
 		;
@@ -326,6 +328,11 @@ parameter_declaration:
 identifier_list:
 		T_IDENTIFIER
 		| identifier_list ',' T_IDENTIFIER
+		;
+
+pointer:
+		'*'
+		| '*' pointer
 		;
 
 //statements
