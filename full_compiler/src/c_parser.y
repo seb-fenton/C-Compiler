@@ -215,29 +215,29 @@ equality_expression:
 
 relational_expression:
 		shift_expression												{$$ = $1;}
-		| relational_expression '>' shift_expression  					{$$ = relational_expression($1, $3, 1);} int arg to determine the operator
-		| relational_expression '<' shift_expression					{$$ = relational_expression($1, $3, 2);}
-		| relational_expression LE_OP shift_expression					{$$ = relational_expression($1, $3, 3);}
-		| relational_expression GE_OP shift_expression					{$$ = relational_expression($1, $3, 4);}
+		| relational_expression '>' shift_expression  					{$$ = GreaterThanOp($1, $3);}
+		| relational_expression '<' shift_expression					{$$ = LessThanOp($1, $3);}
+		| relational_expression LE_OP shift_expression					{$$ = LessThanEqOp($1, $3);}
+		| relational_expression GE_OP shift_expression					{$$ = GreaterThanEqOp($1, $3);}
 		;
 
 shift_expression:
 		additive_expression												{$$ = $1;}
-		| shift_expression LEFT_SHIFT_OP additive_expression			{$$ = shift_expression($1, $3, 1);} bool or int we can change it
-		| shift_expression RIGHT_SHIFT_OP additive_expression			{$$ = shift_expression($1, $3, 2);}
+		| shift_expression LEFT_SHIFT_OP additive_expression			{$$ = LeftShiftOp($1, $3);}
+		| shift_expression RIGHT_SHIFT_OP additive_expression			{$$ = RightShiftOp($1, $3);}
 		;
 
 additive_expression:
 		multiplicative_expression										{$$ = $1;}
-		| additive_expression '+' multiplicative_expression				{$$ = additive_expression($1, $3, TRUE);} //we can have two classes but shouldnt matter
-		| additive_expression '-' multiplicative_expression				{$$ = additive_expression($1, $3, FALSE);}
+		| additive_expression '+' multiplicative_expression				{$$ = AddOp($1, $3);}
+		| additive_expression '-' multiplicative_expression				{$$ = SubOp($1, $3);}
 		;
 
 multiplicative_expression:
 		cast_expression													{$$ = $1;}
-		| multiplicative_expression '*' cast_expression					{$$ = multiplicative_expression($1, $3, 1)}
-		| multiplicative_expression '/' cast_expression					{$$ = multiplicative_expression($1, $3, 2)}
-		| multiplicative_expression '%' cast_expression					{$$ = multiplicative_expression($1, $3, 3)}
+		| multiplicative_expression '*' cast_expression					{$$ = MultOp($1, $3)}
+		| multiplicative_expression '/' cast_expression					{$$ = DivOp($1, $3)}
+		| multiplicative_expression '%' cast_expression					{$$ = ModulusOp($1, $3)}
 		;
 
 cast_expression:
