@@ -11,18 +11,16 @@
 
 
 
-class Node;
-typedef Node* NodePtr;
+
 
 
 //----------BASE_CLASS---------//
 class Node{
 
 	public:
-		virtual ~Node()  {}
-		virtual void printTree(int n);
+		virtual void printTree(int n) = 0 ;
 };
-
+typedef  Node* NodePtr;
 
 //---------------------------------------------//
 //------------BRANCH_NODES---------------------//
@@ -33,7 +31,7 @@ class Branch_Node : public Node{
     public:
 		std::vector<NodePtr> branches;
 		
-		void push(NodePtr n){
+		void push(NodePtr n) {
 			branches.push_back(n);
 		}
 
@@ -43,13 +41,13 @@ class Branch_Node : public Node{
 class translation_unit : public Branch_Node{
 	public:
 	translation_unit(NodePtr p){branches.push_back(p);}
-	void printTree(int n){
+	void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
 		}
-		std::cout << "Translation Unit" << std::endl;
-		for(int i; i < branches.size(); i++){
-			branches[i]->printTree(++n);
+		std::cout << "Translation Unit" <<std::endl;
+		for(int i = 0; i < branches.size(); i++){
+			branches[i]->printTree(n+1);
 		}
 	}
 	~translation_unit() {}
@@ -58,13 +56,13 @@ class translation_unit : public Branch_Node{
 class declaration_specifier_list : public Branch_Node{
 	public:
 	declaration_specifier_list(NodePtr p){branches.push_back(p);}
-	void printTree(int n){
+	void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
 		}
 		std::cout << "Declaration Specifier List" << std::endl;
-		for(int i; i < branches.size(); i++){
-			branches[i]->printTree(++n);
+		for(int i = 0; i < branches.size(); i++){
+			branches[i]->printTree(n+1);
 		}
 	}
 	~declaration_specifier_list() {}
@@ -73,13 +71,13 @@ class declaration_specifier_list : public Branch_Node{
 class init_declarator_list : public Branch_Node{
 	public:
 	init_declarator_list(NodePtr p){branches.push_back(p);} //branches contain init_declarator nodes
-	void printTree(int n){
+	void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
 		}
 		std::cout << "Init Declarator List" << std::endl;
-		for(int i; i < branches.size(); i++){
-			branches[i]->printTree(++n);
+		for(int i = 0; i < branches.size(); i++){
+			branches[i]->printTree(n+1);
 		}
 	}
 	~init_declarator_list() {}
@@ -100,22 +98,22 @@ class declaration : public Node{
 	declaration(NodePtr spec, NodePtr dec): specifier_list(spec), declarator_list(dec) {}
 	declaration(NodePtr spec): specifier_list(spec) {}
 
-	void printTree(int n){
+	void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
 		}
 		std::cout << "Declaration" << std::endl;
-		if(specifier_list != NULL){specifier_list->printTree(++n);}
-		if(declarator_list != NULL)declarator_list->printTree(++n);
+		if(specifier_list != NULL){specifier_list->printTree(n+1);}
+		if(declarator_list != NULL)declarator_list->printTree(n+1);
 	}
 };
 
-class declaration_specifier : public Node{
+class declaration_specifiers : public Node{
 	public:
 	std::string type_name;
-	declaration_specifier(std::string s): type_name(s) {}
+	declaration_specifiers(std::string s): type_name(s) {}
 
-	void printTree(int n){
+	void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
 		}
@@ -131,13 +129,13 @@ class init_declarator : public Node{
 	init_declarator(NodePtr declarator, NodePtr initial): declaratorPtr(declarator), initialiserPtr(initial) {}
 	init_declarator(NodePtr declarator): declaratorPtr(declarator) {}
 
-	void printTree(int n){
+	void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
 		}
-		std::cout << "Declaration" << std::endl;
-		if(declaratorPtr != NULL){declaratorPtr->printTree(++n);}
-		if(initialiserPtr != NULL){initialiserPtr->printTree(++n);}
+		std::cout << "Init Declarator" << std::endl;
+		if(declaratorPtr != NULL){declaratorPtr->printTree(n+1);}
+		if(initialiserPtr != NULL){initialiserPtr->printTree(n+1);}
 	}
 };
 
@@ -148,23 +146,23 @@ class declarator : public Node{
 	declarator(NodePtr direct, NodePtr pointer): directDeclarator(direct), pointerPtr(pointer) {}
 	declarator(NodePtr direct): directDeclarator(direct) {}
 
-	void printTree(int n){
+	void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
 		}
 		std::cout << "Declarator" << std::endl;
-		if(directDeclarator != NULL){directDeclarator->printTree(++n);}
-		if(pointerPtr != NULL){pointerPtr->printTree(++n);}
+		if(directDeclarator != NULL){directDeclarator->printTree(n+1);}
+		if(pointerPtr != NULL){pointerPtr->printTree(n+1);}
 	}
 };
 
 class direct_declarator : public Node{
 	public:
 	std::string identifier;
-	//TODO: Need to apapt so that it has functions which turn this class into array declarators and function calls
+	//TODO: Need to adapt so that it has functions which turn this class into array declarators and function calls
 	direct_declarator(std::string s): identifier(s) {}
 
-	void printTree(int n){
+	void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
 		}
@@ -180,9 +178,10 @@ class direct_declarator : public Node{
 //---------------------------------------------//
 
 class primary_expression : public Node{
+	public:
 	std::string identifier;
 	primary_expression(std::string s): identifier(s) {}
-	void printTree(int n){
+	void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
 		}

@@ -7,19 +7,24 @@
 #include <initializer_list>
 #include <vector>
 #include <map>
-
-struct binding{
-    //add way of storing value
-    std::string var_name;
-    bool is_numeric = false;
-    bool is_boolean = false;
-    bool is_string = false;
-
-};
+#include <algorithm>
 
 struct context{
-    std::vector<binding> bindings; //stores all bindings
+    std::vector<std::vector<std::string>> type_defs = {{}};
+    int scopeLevel = 0;
+    std::string temp_typedef;
 
+    void incScope(){
+        type_defs.push_back(type_defs[scopeLevel]);
+        scopeLevel++;
+    }
+
+    void decScope(){
+        type_defs.pop_back();
+        scopeLevel--;
+    }
 };
+
+static context ctx;
 
 #endif

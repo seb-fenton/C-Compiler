@@ -4,7 +4,7 @@
 %s TYPEDEFS
 
 %{
-    #include "c_lexer.hpp"
+    #include "c_parser.tab.hpp"
 
     #include <sstream>
     #include <stdlib.h>
@@ -46,7 +46,7 @@ WHITESPACE          [ \t\r\n]+
 "void"		{ return T_VOID; }
 "char"		{ return T_CHAR; }
 "short"		{ return T_SHORT; }
-"int"		{ return T_INT; }
+"int"		{return T_INT; }
 "long"		{ return T_LONG; }
 "float"		{ return T_FLOAT; }
 "double"	{ return T_DOUBLE; }
@@ -89,7 +89,7 @@ WHITESPACE          [ \t\r\n]+
 ">="			        { return GE_OP; }
 "=="			        { return EQ_OP; }
 "!="			        { return NE_OP; }
-<INITIAL>";"		    { return ';'; }
+<INITIAL>";"		    {return ';'; }
 <TYPEDEFS>";"			{ create_typedef(); BEGIN(INITIAL); return ';'; }
 ","					    { return ','; }
 ":"					    { return ':'; }
@@ -115,7 +115,7 @@ WHITESPACE          [ \t\r\n]+
 "["				        { return '['; }
 "]"			            { return ']'; } 
 
-<INITIAL>{IDENTIFIER}	{ return check_type();} //Store variable names in bindings
+<INITIAL>{IDENTIFIER}	{return check_type();} //Store variable names in bindings
 <TYPEDEFS>{IDENTIFIER} { return store_typedef(); } //when making bindings store all typdefs in context
 
 {HEXPREFIX}{HEX}+{INTEGERSUFFIX}?                               {yylval.number=strtod(yytext, 0); return INT_CONSTANT; }
@@ -156,6 +156,12 @@ int check_type(){
     } else{
         return T_IDENTIFIER;
     }
+}
+
+void yyerror (char const *s)
+{
+  fprintf (stderr, "Parse error : %s\n", s);
+  exit(1);
 }
 
 

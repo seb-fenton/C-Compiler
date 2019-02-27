@@ -3,7 +3,7 @@
 
   #include <cassert>
 
-  extern const Top_Node *g_root; // A way of getting the AST out
+  extern Branch_Node *g_root; // A way of getting the AST out
 
   //! This is to fix problems when generating C++
   // We are declaring the functions provided by Flex, so
@@ -11,29 +11,34 @@
   int yylex(void);
   void yyerror(const char *);
 }
+%define parse.error verbose
 
 // Represents the value associated with any kind of
 // AST node.
 %union{
-  const Node *node;
-  double fnumber;
-  long inumber;
+  Node *node;
+  Branch_Node *bnode;
+  double number;
   std::string *string;
 }
 
-%token T_ASSIGNMENT_OP, RIGHT_SHIFT_OP, LEFT_SHIFT_OP, INC_OP, DEC_OP, PTR_OP, AND_OP, OR_OP, LE_OP, GE_OP, EQ_OP, NE_OP,
-%token INT_CONSTANT, FLOAT_CONSTANT, STRING_LITERAL
-%token T_VOID, T_CHAR, T_SHORT, T_INT, T_LONG, T_FLOAT, T_DOUBLE, T_SIGNED
-%token T_UNSIGNED, T_TYPEDEF, T_EXTERN, T_STATIC, T_AUTO, T_REGISTER, T_CONST, T_VOLATILE, T_STRUCT,
-%token T_GOTO, T_BREAK, T_CONTINUE, T_CASE, T_DEFAULT, T_SWITCH, T_IF, T_ELSE, 
-%token T_RETURN, T_WHILE, T_DO, T_FOR, T_SIZEOF
-%token TYPEDEF_NAME, T_IDENTIFIER
+%token T_ASSIGNMENT_OP RIGHT_SHIFT_OP LEFT_SHIFT_OP INC_OP DEC_OP PTR_OP AND_OP OR_OP LE_OP GE_OP EQ_OP NE_OP
+%token INT_CONSTANT FLOAT_CONSTANT STRING_LITERAL
+%token T_VOID T_CHAR T_SHORT T_INT T_LONG T_FLOAT T_DOUBLE T_SIGNED
+%token T_UNSIGNED T_TYPEDEF T_EXTERN T_STATIC T_AUTO T_REGISTER T_CONST T_VOLATILE T_STRUCT T_UNION
+%token T_GOTO T_BREAK T_CONTINUE T_CASE T_DEFAULT T_SWITCH T_IF T_ELSE 
+%token T_RETURN T_WHILE T_DO T_FOR T_SIZEOF
+%token TYPEDEF_NAME T_IDENTIFIER ENUMERATION_CONSTANT
 
-%type <node> translation_unit external_declaration declaration declaration_specifier_list declaration_specifier
-%type <node> init_declarator_list declarator direct_declarator init_declarator primary_expression
-%type <fnumber> FLOAT_CONSTANT
-%type <inumber> INT_CONSTANT
-%type <string> TYPEDEF_NAME T_IDENTIFIER STRING_LITERAL
+//TODO: sort out which are branch nodes and which are normal, maybe introduce expression nodes
+%type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list
+%type <node> declarator direct_declarator init_declarator initialiser primary_expression declaration declaration_specifiers
+%type <node> identifier_list pointer expression external_declaration
+%type <node> assignment_expression conditional_expression logical_or_expression logical_and_expression inclusive_or_expression
+%type <node> exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression
+%type <node> multiplicative_expression cast_expression unary_expression postfix_expression
+%type <number> FLOAT_CONSTANT INT_CONSTANT
+%type <string> TYPEDEF_NAME T_IDENTIFIER STRING_LITERAL T_ASSIGNMENT_OP assignment_operator
 
 %start root
 
@@ -44,26 +49,25 @@
 //TODO Code all classes
 //Spec https://www.pdf-archive.com/2014/10/02/ansi-iso-9899-1990-1/ansi-iso-9899-1990-1.pdf
 
-root: translation_unit {/*$1 = new translation_unit();*/ g_root = $1}; 
+root: translation_unit {/*$1 = new translation_unit();*/ g_root = $1;} 
 
 translation_unit: 
-		external_declaration	{$$ = new translation_unit($1);/*$$->push($1)*/} //push back into g_root node
+		external_declaration	{$$ = new translation_unit($1);} //push back into g_root node
 		| translation_unit external_declaration  { $$ = $1; $$->push($2);}//should only have one translation_unit in the entire tree with this
 		;
 
 external_declaration: 
-		function_definition {$$ = $1} 	//create function node in next step not now
-		| declaration   	{$$ = $1}	//create declaration node in next step
+		function_definition //{$$ = $1;} 	//create function node in next step not now
+		| declaration   	{$$ = $1;}	//create declaration node in next step
 		| typedef_declaration 			//need to make this ourselves, ill explain it to you
 		;
 
 typedef_declaration:
-		T_TYPEDEF declaration_specifier_list declarator ';' //this needs some thinking, since arrays work differently with typedefs,
-															//might be worth not doing it
+		T_TYPEDEF declaration_specifier_list declarator ';' //this needs some thinking, since arrays work differently with typedefs, might be worth not doing it
 		;
 
 declaration:
-		declaration_specifier_list ';'  { $$ = new declaration($1);}
+		declaration_specifier_list ';'  {$$ = new declaration($1);}
 		| declaration_specifier_list init_declarator_list ';'  { $$ = new declaration($1,$2);} 
 		;	// also make two constructors
 
@@ -73,23 +77,23 @@ declaration_specifier_list:
 		;													
 
 declaration_specifiers: //we need to make this a class which holds the specifer name, and optionally all the struct information
-		T_VOID 						{$$ = new declaration_specifier($1);}
-    	|T_CHAR						{$$ = new declaration_specifier($1);}
-    	|T_SHORT					{$$ = new declaration_specifier($1);}
-    	|T_INT						{$$ = new declaration_specifier("int");}
-    	|T_LONG						{$$ = new declaration_specifier($1);}
-    	|T_FLOAT					{$$ = new declaration_specifier($1);}
-    	|T_DOUBLE					{$$ = new declaration_specifier($1);}
-    	|T_SIGNED					{$$ = new declaration_specifier($1);}
-    	|T_UNSIGNED					{$$ = new declaration_specifier($1);}
-    	|T_EXTERN					{$$ = new declaration_specifier($1);}
-    	|T_STATIC					{$$ = new declaration_specifier($1);}
-    	|T_AUTO						{$$ = new declaration_specifier($1);}
-    	|T_REGISTER					{$$ = new declaration_specifier($1);}
-    	|T_CONST					{$$ = new declaration_specifier($1);}
-    	|T_VOLATILE					{$$ = new declaration_specifier($1);}
-    	| struct_or_union_specifier	{$$ = new declaration_specifier($1, 1);} //might want to make different classes for special cases
-		|TYPEDEF_NAME				{$$ = new declaration_specifier($1, 2);}
+		T_VOID 						{$$ = new declaration_specifiers("void");}
+    	|T_CHAR						{$$ = new declaration_specifiers("char");}
+    	|T_SHORT					{$$ = new declaration_specifiers("short");}
+    	|T_INT						{$$ = new declaration_specifiers("int"); }
+    	|T_LONG						{$$ = new declaration_specifiers("long");}
+    	|T_FLOAT					{$$ = new declaration_specifiers("float");}
+    	|T_DOUBLE					{$$ = new declaration_specifiers("double");}
+    	|T_SIGNED					{$$ = new declaration_specifiers("signed");}
+    	|T_UNSIGNED					{$$ = new declaration_specifiers("unsigned");}
+    	|T_EXTERN					//rules might not be needed
+    	|T_STATIC					
+    	|T_AUTO						
+    	|T_REGISTER					
+    	|T_CONST					
+    	|T_VOLATILE					
+    	|struct_or_union_specifier	//{$$ = new declaration_specifiers($1, 1);} //might want to make different classes for special cases
+		|TYPEDEF_NAME				//{$$ = new declaration_specifiers($1, 2);}
 		;
 
 struct_or_union_specifier:
@@ -128,27 +132,27 @@ struct_declarator:
 
 init_declarator_list:
 		init_declarator	{$$ = new init_declarator_list($1);}						//same way as sbove do $$->push($1) to store the init_declarator in the list node
-		| init_declarator_list ',' init_declarator {$$ = $1; $$->push($2);}			
+		| init_declarator_list ',' init_declarator {$$ = $1; $$->push($3);}			
 		; 
 
 init_declarator:
 		declarator '=' initialiser	 {$$ = new init_declarator($1, $3);} //declarator is a variable name
-		| declarator				 {$$ = new init_declarator($1);} //two constructors one taking an initialiser
+		| declarator 				 {$$ = new init_declarator($1);} //two constructors one taking an initialiser
 		;
 
 declarator: 
 		pointer direct_declarator 	{$$ = new declarator($2, $1);}			//each declarations should only happen once, so there is no recursion
-		| direct_declarator 		{$$ = new declarator($1,);} //true indicates the declrator is a pointer
+		| direct_declarator 		{$$ = $1;} //true indicates the declrator is a pointer
 		;
 
 direct_declarator:
 		T_IDENTIFIER 										{$$ = new direct_declarator(*($1));}//Need node to check bindings and T_IDENTIFIER names
 		|'(' declarator ')' 								{ }								//works for dereferencing pointers
-		| direct_declarator '[' ']' 						{$$ = $1; NodePtr tmp = new ArrayDeclaration(); $$->isArray(temp);}//need node for array declaration   
-		| direct_declarator '[' assignment_expression ']' 	{$$ = $1; NodePtr tmp = new ArrayDeclaration($3); $$->isArray(temp);}//make a second constructer for declarations with expressions
-		| direct_declarator '(' parameter_type_list ')' 	{$$ = $1; $$->isFuncDef($3);} 	//used for function definitions
-		| direct_declarator '(' identifier_list ')' 		{$$ = $1; $$->isFuncCall($3);} 	//this function makes the direct declarator state its a fucntion call
-		| direct_declarator '(' ')' 						{$$ = $1; $$->isFuncCall();}	//used for function calls with no args
+		| direct_declarator '[' ']' 						//{$$ = $1; NodePtr tmp = new ArrayDeclaration(); $$->isArray(temp);}//need node for array declaration   
+		| direct_declarator '[' assignment_expression ']' 	//{$$ = $1; NodePtr tmp = new ArrayDeclaration($3); $$->isArray(temp);}//make a second constructer for declarations with expressions
+		| direct_declarator '(' parameter_type_list ')' 	//{$$ = $1; $$->isFuncDef($3);} 	//used for function definitions
+		| direct_declarator '(' identifier_list ')' 		//{$$ = $1; $$->isFuncCall($3);} 	//this function makes the direct declarator state its a fucntion call
+		| direct_declarator '(' ')' 						//{$$ = $1; $$->isFuncCall();}	//used for function calls with no args
 		;
 
 initialiser_list:
@@ -161,7 +165,7 @@ initialiser_list:
 initialiser:
 		'{' initialiser_list '}' 		//used for arrays 
 		|'{' initialiser_list ',' '}'	//i think for multi-dimensional array. PAGE:71 in spec linked above
-		|assignment_expression			{$$ = $1} //assignment_expression is anything that would be on the RHS of an assignment operator. An expression is just a list of these, we can rename it.
+		|assignment_expression			{$$ = $1;} //assignment_expression is anything that would be on the RHS of an assignment operator. An expression is just a list of these, we can rename it.
 		;								//Also this can be a full expression with its own assignment operator but dw about that for now
 
 assignment_operator:
@@ -175,89 +179,98 @@ constant_expression:
 
 assignment_expression:
 		conditional_expression									{$$ = $1;}		//this will go through all the operators that are used in evaulating an expression
-		| unary_expression assignment_operator assignment_expression {$$ = assignment_expression($1, *$2, $3);}	//need to decide how ast will deal with expressions.  PAGE:53 in spec
+		| unary_expression assignment_operator assignment_expression //{$$ = assignment_expression($1, *$2, $3);}	//need to decide how ast will deal with expressions.  PAGE:53 in spec
 		;																									//specifcally how to make it easier to print assembly
 
 conditional_expression:
 		logical_or_expression											{$$ = $1;}	//this binds the highest and is thus first, 
-		| logical_or_expression '?' expression ':' conditional_expression {$$ = conditional_expression($1,$3,$5);}	//the following expression rules just go in order of priority
+		| logical_or_expression '?' expression ':' conditional_expression //{$$ = conditional_expression($1,$3,$5);}	//the following expression rules just go in order of priority
 		;
 
 logical_or_expression:
 		logical_and_expression											{$$ = $1;}
-		| logical_or_expression OR_OP logical_and_expression			{$$ = LogicalOrOp($1,$3);}
+		| logical_or_expression OR_OP logical_and_expression			//{$$ = LogicalOrOp($1,$3);}
 		;
 
 logical_and_expression:
-		inclusive_or_expression											{$$ = $1);}
-		| logical_and_expression AND_OP inclusive_or_expression			{$$ = LogicalAndOp($1,$3);}
+		inclusive_or_expression											{$$ = $1;}
+		| logical_and_expression AND_OP inclusive_or_expression			//{$$ = LogicalAndOp($1,$3);}
 		;
 
 inclusive_or_expression:
 		exclusive_or_expression											{$$ = $1;}
-		| logical_or_expression '|' logical_and_expression				{$$ = InclusiveOrOp($1,$3);}
+		| logical_or_expression '|' logical_and_expression				//{$$ = InclusiveOrOp($1,$3);}
 		;
 
 
 exclusive_or_expression:
 		and_expression													{$$ = $1;}
-		| exclusive_or_expression '^' and_expression					{$$ = ExclusiveOrOp($1, $3);}
+		| exclusive_or_expression '^' and_expression					//{$$ = ExclusiveOrOp($1, $3);}
 		;
 
 and_expression:
 		equality_expression												{$$ = $1;}
-		| and_expression '&' equality_expression						{$$ = AndOp($1, $3);}
+		| and_expression '&' equality_expression						//{$$ = AndOp($1, $3);}
 		;
 
 equality_expression:
 		relational_expression											{$$ = $1;}
-		| equality_expression EQ_OP relational_expression  				{$$ = EqualOp($1,$3);} // TRUE indicates equal
-		| equality_expression NE_OP relational_expression				{$$ = NotEqualOp($1,$3)} //FALSE means not equal
+		| equality_expression EQ_OP relational_expression  				//{$$ = EqualOp($1,$3);} // TRUE indicates equal
+		| equality_expression NE_OP relational_expression				//{$$ = NotEqualOp($1,$3)} //FALSE means not equal
 		;
 
 relational_expression:
 		shift_expression												{$$ = $1;}
-		| relational_expression '>' shift_expression  					{$$ = GreaterThanOp($1, $3);}
-		| relational_expression '<' shift_expression					{$$ = LessThanOp($1, $3);}
-		| relational_expression LE_OP shift_expression					{$$ = LessThanEqOp($1, $3);}
-		| relational_expression GE_OP shift_expression					{$$ = GreaterThanEqOp($1, $3);}
+		| relational_expression '>' shift_expression  					//{$$ = GreaterThanOp($1, $3);}
+		| relational_expression '<' shift_expression					//{$$ = LessThanOp($1, $3);}
+		| relational_expression LE_OP shift_expression					//{$$ = LessThanEqOp($1, $3);}
+		| relational_expression GE_OP shift_expression					//{$$ = GreaterThanEqOp($1, $3);}
 		;
 
 shift_expression:
 		additive_expression												{$$ = $1;}
-		| shift_expression LEFT_SHIFT_OP additive_expression			{$$ = LeftShiftOp($1, $3);}
-		| shift_expression RIGHT_SHIFT_OP additive_expression			{$$ = RightShiftOp($1, $3);}
+		| shift_expression LEFT_SHIFT_OP additive_expression			//{$$ = LeftShiftOp($1, $3);}
+		| shift_expression RIGHT_SHIFT_OP additive_expression			//{$$ = RightShiftOp($1, $3);}
 		;
 
 additive_expression:
 		multiplicative_expression										{$$ = $1;}
-		| additive_expression '+' multiplicative_expression				{$$ = AddOp($1, $3);}
-		| additive_expression '-' multiplicative_expression				{$$ = SubOp($1, $3);}
+		| additive_expression '+' multiplicative_expression				//{$$ = AddOp($1, $3);}
+		| additive_expression '-' multiplicative_expression				//{$$ = SubOp($1, $3);}
 		;
 
 multiplicative_expression:
 		cast_expression													{$$ = $1;}
-		| multiplicative_expression '*' cast_expression					{$$ = MultOp($1, $3)}
-		| multiplicative_expression '/' cast_expression					{$$ = DivOp($1, $3)}
-		| multiplicative_expression '%' cast_expression					{$$ = ModulusOp($1, $3)}
+		| multiplicative_expression '*' cast_expression					//{$$ = MultOp($1, $3)}
+		| multiplicative_expression '/' cast_expression					//{$$ = DivOp($1, $3)}
+		| multiplicative_expression '%' cast_expression					//{$$ = ModulusOp($1, $3)}
 		;
 
 cast_expression:
 		unary_expression 												{$$ = $1;}	
-		| '(' type_name ')' cast_expression								{$$ = cast_expression($2, $4);}	//all leads to getting the variable name at one point
+		| '(' declaration_specifiers ')' cast_expression				//{$$ = cast_expression($2, $4);}	//all leads to getting the variable name at one point
 		;
 
 unary_expression:  									//PAGE : 43
-		postfix_expression												{$$ = $1}
+		postfix_expression												{$$ = $1;}
 		| INC_OP unary_expression
 		| DEC_OP unary_expression
 		| unary_operator cast_expression
 		| T_SIZEOF unary_expression
-		| T_SIZEOF '(' type_name ')'
+		| T_SIZEOF '(' declaration_specifiers ')'
+		;
+
+unary_operator:
+		'&'
+		| '*'
+		| '+'
+		| '-'
+		| '~'
+		| '!'
 		;
 
 postfix_expression:
-		primary_expression												{$$ = $1}	//Page 39
+		primary_expression												{$$ = $1;}	//Page 39
 		| postfix_expression '[' expression ']'  					//array calls
 		| postfix_expression '(' ')'
 		| postfix_expression '(' argument_expression_list ')' 		//used for function calls most likely
@@ -265,12 +278,12 @@ postfix_expression:
 		| postfix_expression PTR_OP T_IDENTIFIER
 		| postfix_expression INC_OP
 		| postfix_expression DEC_OP
-		| '(' type_name ')' '{' initialiser_list '}'
-		| '(' type_name ')' '{' initialiser_list ',' '}'
+		| '(' declaration_specifiers ')' '{' initialiser_list '}'
+		| '(' declaration_specifiers ')' '{' initialiser_list ',' '}'
 		;
 
 primary_expression:
-		T_IDENTIFIER													{$$ = primary_expression(*($1));} //for now we can just return the value of the variable in an eval func,
+		T_IDENTIFIER													{$$ = new primary_expression(*($1));} //for now we can just return the value of the variable in an eval func,
 		| constant																					//but we may need more constructors to differentiate different primary_expressions
 		| STRING_LITERAL
 		| '(' expression ')'
@@ -302,8 +315,8 @@ designator:
 		;
 		
 function_definition:
-		declaration_specifiers declarator declaration_list compound_statement
-		| declaration_specifiers declarator compound_statement
+		declaration_specifier_list declarator declaration_list compound_statement
+		| declaration_specifier_list declarator compound_statement
 		;
 
 declaration_list:
@@ -322,7 +335,7 @@ parameter_list:
 
 parameter_declaration:
 		declaration_specifiers declarator
-		| declaration_specifier
+		| declaration_specifiers
 		;
 
 identifier_list:
@@ -334,6 +347,12 @@ pointer:
 		'*'
 		| '*' pointer
 		;
+
+argument_expression_list:
+		assignment_expression
+		| argument_expression_list ',' assignment_expression
+		;
+
 
 //statements
 
@@ -377,15 +396,28 @@ iteration_statement:
 		| T_DO statement T_WHILE '(' expression ')' ';'
 		| T_FOR '(' expression_statement expression_statement ')' statement
 		| T_FOR '(' expression_statement expression_statement expression ')' statement
-		| T_FOR '(' declaration expression_statement ')' statement
-		| T_FOR '(' declaration expression_statement expression ')' statement
 		;	
 
-
+labeled_statement:
+		T_IDENTIFIER ':' statement
+		| T_CASE constant_expression ':' statement
+		| T_DEFAULT ':' statement
+		;
 
 jump_statement:
-		CONTINUE ';'
-		| BREAK ';'
-		| RETURN ';'
-		| RETURN expression ';'
+		T_CONTINUE ';'
+		| T_BREAK ';'
+		| T_RETURN ';'
+		| T_RETURN expression ';'
 		;
+
+%%
+
+Branch_Node *g_root;
+
+Node *parseAST()
+{
+  	g_root=0;
+  	yyparse();
+  	return g_root;
+}

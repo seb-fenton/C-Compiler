@@ -5,7 +5,7 @@
 #include "ast/context.hpp"
 
 
-extern const Node *parseAST();
+extern  Node *parseAST();
 
 
 
