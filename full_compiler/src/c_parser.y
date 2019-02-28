@@ -3,7 +3,7 @@
 
   #include <cassert>
 
-  extern Branch_Node *g_root; // A way of getting the AST out
+  extern BranchNode *g_root; // A way of getting the AST out
 
   //! This is to fix problems when generating C++
   // We are declaring the functions provided by Flex, so
@@ -17,7 +17,8 @@
 // AST node.
 %union{
   Node *node;
-  Branch_Node *bnode;
+  BranchNode *bnode;
+  ExpressionNode *enode;
   double number;
   std::string *string;
 }
@@ -32,12 +33,12 @@
 
 //TODO: sort out which are branch nodes and which are normal, maybe introduce expression nodes
 %type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list
-%type <node> declarator direct_declarator init_declarator initialiser primary_expression declaration declaration_specifiers
-%type <node> identifier_list pointer expression external_declaration
-%type <node> assignment_expression conditional_expression logical_or_expression logical_and_expression inclusive_or_expression
-%type <node> exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression
-%type <node> multiplicative_expression cast_expression unary_expression postfix_expression
-%type <number> FLOAT_CONSTANT INT_CONSTANT
+%type <node> declarator direct_declarator init_declarator initialiser declaration declaration_specifiers
+%type <node> identifier_list pointer external_declaration function_definition
+%type <enode> assignment_expression conditional_expression logical_or_expression logical_and_expression inclusive_or_expression
+%type <enode> exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression
+%type <enode> multiplicative_expression cast_expression unary_expression postfix_expression primary_expression expression
+%type <number> FLOAT_CONSTANT INT_CONSTANT constant
 %type <string> TYPEDEF_NAME T_IDENTIFIER STRING_LITERAL T_ASSIGNMENT_OP assignment_operator
 
 %start root
@@ -57,7 +58,7 @@ translation_unit:
 		;
 
 external_declaration: 
-		function_definition //{$$ = $1;} 	//create function node in next step not now
+		function_definition {$$ = $1;} 	//create function node in next step not now
 		| declaration   	{$$ = $1;}	//create declaration node in next step
 		| typedef_declaration 			//need to make this ourselves, ill explain it to you
 		;
@@ -141,8 +142,8 @@ init_declarator:
 		;
 
 declarator: 
-		pointer direct_declarator 	{$$ = new declarator($2, $1);}			//each declarations should only happen once, so there is no recursion
-		| direct_declarator 		{$$ = $1;} //true indicates the declrator is a pointer
+		pointer direct_declarator 	{$$ = new declarator($2, $1);}			//pointer class will return the pointer level and other misc info
+		| direct_declarator 		{$$ = $1;} //declarators should only exist if something is a pointer
 		;
 
 direct_declarator:
@@ -165,7 +166,7 @@ initialiser_list:
 initialiser:
 		'{' initialiser_list '}' 		//used for arrays 
 		|'{' initialiser_list ',' '}'	//i think for multi-dimensional array. PAGE:71 in spec linked above
-		|assignment_expression			{$$ = $1;} //assignment_expression is anything that would be on the RHS of an assignment operator. An expression is just a list of these, we can rename it.
+		|assignment_expression			{$$ = new initialiser($1);} //assignment_expression is anything that would be on the RHS of an assignment operator. An expression is just a list of these, we can rename it.
 		;								//Also this can be a full expression with its own assignment operator but dw about that for now
 
 assignment_operator:
@@ -184,66 +185,66 @@ assignment_expression:
 
 conditional_expression:
 		logical_or_expression											{$$ = $1;}	//this binds the highest and is thus first, 
-		| logical_or_expression '?' expression ':' conditional_expression //{$$ = conditional_expression($1,$3,$5);}	//the following expression rules just go in order of priority
+		| logical_or_expression '?' expression ':' conditional_expression {$$ = new conditional_expression($1,$3,$5);}	//the following expression rules just go in order of priority
 		;
 
 logical_or_expression:
 		logical_and_expression											{$$ = $1;}
-		| logical_or_expression OR_OP logical_and_expression			//{$$ = LogicalOrOp($1,$3);}
+		| logical_or_expression OR_OP logical_and_expression			{$$ = new LogicalOrOp($1,$3);}
 		;
 
 logical_and_expression:
 		inclusive_or_expression											{$$ = $1;}
-		| logical_and_expression AND_OP inclusive_or_expression			//{$$ = LogicalAndOp($1,$3);}
+		| logical_and_expression AND_OP inclusive_or_expression			{$$ = new LogicalAndOp($1,$3);}
 		;
 
 inclusive_or_expression:
 		exclusive_or_expression											{$$ = $1;}
-		| logical_or_expression '|' logical_and_expression				//{$$ = InclusiveOrOp($1,$3);}
+		| logical_or_expression '|' logical_and_expression				{$$ = new InclusiveOrOp($1,$3);}
 		;
 
 
 exclusive_or_expression:
 		and_expression													{$$ = $1;}
-		| exclusive_or_expression '^' and_expression					//{$$ = ExclusiveOrOp($1, $3);}
+		| exclusive_or_expression '^' and_expression					{$$ = new ExclusiveOrOp($1, $3);}
 		;
 
 and_expression:
 		equality_expression												{$$ = $1;}
-		| and_expression '&' equality_expression						//{$$ = AndOp($1, $3);}
+		| and_expression '&' equality_expression						{$$ = new AndOp($1, $3);}
 		;
 
 equality_expression:
 		relational_expression											{$$ = $1;}
-		| equality_expression EQ_OP relational_expression  				//{$$ = EqualOp($1,$3);} // TRUE indicates equal
-		| equality_expression NE_OP relational_expression				//{$$ = NotEqualOp($1,$3)} //FALSE means not equal
+		| equality_expression EQ_OP relational_expression  				{$$ = new EqualOp($1,$3);}
+		| equality_expression NE_OP relational_expression				{$$ = new NotEqualOp($1,$3);} 
 		;
 
 relational_expression:
 		shift_expression												{$$ = $1;}
-		| relational_expression '>' shift_expression  					//{$$ = GreaterThanOp($1, $3);}
-		| relational_expression '<' shift_expression					//{$$ = LessThanOp($1, $3);}
-		| relational_expression LE_OP shift_expression					//{$$ = LessThanEqOp($1, $3);}
-		| relational_expression GE_OP shift_expression					//{$$ = GreaterThanEqOp($1, $3);}
+		| relational_expression '>' shift_expression  					{$$ = new GreaterThanOp($1, $3);}
+		| relational_expression '<' shift_expression					{$$ = new LessThanOp($1, $3);}
+		| relational_expression LE_OP shift_expression					{$$ = new LessThanEqOp($1, $3);}
+		| relational_expression GE_OP shift_expression					{$$ = new GreaterThanEqOp($1, $3);}
 		;
 
 shift_expression:
 		additive_expression												{$$ = $1;}
-		| shift_expression LEFT_SHIFT_OP additive_expression			//{$$ = LeftShiftOp($1, $3);}
-		| shift_expression RIGHT_SHIFT_OP additive_expression			//{$$ = RightShiftOp($1, $3);}
+		| shift_expression LEFT_SHIFT_OP additive_expression			{$$ = new LeftShiftOp($1, $3);}
+		| shift_expression RIGHT_SHIFT_OP additive_expression			{$$ = new RightShiftOp($1, $3);}
 		;
 
 additive_expression:
 		multiplicative_expression										{$$ = $1;}
-		| additive_expression '+' multiplicative_expression				//{$$ = AddOp($1, $3);}
-		| additive_expression '-' multiplicative_expression				//{$$ = SubOp($1, $3);}
+		| additive_expression '+' multiplicative_expression				{$$ = new AddOp($1, $3);}
+		| additive_expression '-' multiplicative_expression				{$$ = new SubOp($1, $3);}
 		;
 
 multiplicative_expression:
 		cast_expression													{$$ = $1;}
-		| multiplicative_expression '*' cast_expression					//{$$ = MultOp($1, $3)}
-		| multiplicative_expression '/' cast_expression					//{$$ = DivOp($1, $3)}
-		| multiplicative_expression '%' cast_expression					//{$$ = ModulusOp($1, $3)}
+		| multiplicative_expression '*' cast_expression					{$$ = new MultOp($1, $3);}
+		| multiplicative_expression '/' cast_expression					{$$ = new DivOp($1, $3);}
+		| multiplicative_expression '%' cast_expression					{$$ = new ModulusOp($1, $3);}
 		;
 
 cast_expression:
@@ -284,14 +285,14 @@ postfix_expression:
 
 primary_expression:
 		T_IDENTIFIER													{$$ = new primary_expression(*($1));} //for now we can just return the value of the variable in an eval func,
-		| constant																					//but we may need more constructors to differentiate different primary_expressions
+		| constant														{$$ = new constantNode($1);}							//but we may need more constructors to differentiate different primary_expressions
 		| STRING_LITERAL
 		| '(' expression ')'
 		;
 
 constant:
-		INT_CONSTANT
-		| FLOAT_CONSTANT
+		INT_CONSTANT			{$$ = $1;}
+		| FLOAT_CONSTANT		{$$ = $1;}
 		| ENUMERATION_CONSTANT  // Do this later
 		;
 
@@ -413,7 +414,7 @@ jump_statement:
 
 %%
 
-Branch_Node *g_root;
+BranchNode *g_root;
 
 Node *parseAST()
 {
