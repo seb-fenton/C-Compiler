@@ -1,6 +1,6 @@
 Week,    DateRange,          PlannedEffort,  ActualEffort,  OtherDeadlines
  1, 18th Feb - 24th Feb,                  ,              ,  
  2, 25th Feb -  3rd Mar,                  ,              , db cw 2; codegen; lexer test 
- 3,  4th Mar - 10th Mar,                  ,              , parser test
+ 3,  4th Mar - 10th Mar,               30h,              , parser test
  4, 11th Mar - 17th Mar,                  ,              , optimisation test
  5, 18th Mar - 25th Mar,                  ,              , numerical analysis 
