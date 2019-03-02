@@ -7,6 +7,6 @@ DebugLexer, WriteLexerTypedefs, 5h, SF, N, Test Lexer by creating fake context h
 AddTypedefExtremeCaseSupport, DebugLexer, 4h, SF, N, Add support for extreme typdef use cases
 AddParserRules, WriteLexerTypedefs, 4h, NG, Y, Create Parser template with basic rules
 AddParserASTSupport,AddParserRules, 6h?, ALL, N, Add AST support in Parser rules
-CreateAST, , 4h, NG, N, Create AST with nodes
+CreateAST, , 15h, ALL, N, Create AST with nodes
 PrintFunctionForNodes, , 1h, SF, N, Create printfunction for AST nodes
 DebugParser, AddParserASTSupport, 6h?, ALL, N, Debug parser using completed Lexer
