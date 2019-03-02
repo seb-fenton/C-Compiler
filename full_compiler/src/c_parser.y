@@ -273,9 +273,9 @@ unary_operator:
 
 postfix_expression: 
 		primary_expression												{$$ = $1;}	//Page 39
-		| postfix_expression '[' expression ']'  						{$$ = postfix_exppression_array($1, $3);}//array calls
-		| postfix_expression '(' ')'									{$$ = postfix_expression_bracket($1, NULL);}
-		| postfix_expression '(' argument_expression_list ')' 			{$$ = postfix_expression_bracket($1, $3);}//used for function calls most likely
+		| postfix_expression '[' expression ']'  						{$$ = array_call($1, $3);}//array calls TODO
+		| postfix_expression '(' ')'									{$$ = function_call($1, NULL);}
+		| postfix_expression '(' argument_expression_list ')' 			{$$ = function_call($1, $3);}//used for function calls most likely
 		| postfix_expression '.' T_IDENTIFIER							{$$ = postfix_expression_other($1, NULL, $3);}
 		| postfix_expression PTR_OP T_IDENTIFIER						{$$ = postfix_expression_other($1, $2, $3);}
 		| postfix_expression INC_OP										{$$ = PostIncOp($1);}

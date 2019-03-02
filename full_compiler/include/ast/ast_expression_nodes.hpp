@@ -330,16 +330,16 @@ class SizeOf: public ExpressionNode{
     }
 };
 
-class postfix_exppression_array: public ExpressionNode{
+class array_call: public ExpressionNode{ //TODO
     public: 
     //what the cock
 };
 
-class postfix_exppression_bracket: public ExpressionNode{
+class function_call: public ExpressionNode{
     public: 
     ExpPtr expr = NULL;
     ExpPtr list = NULL;
-    postfix_exppression_bracket(ExpPtr a, ExpPtr b): expr(a), list(b){}
+    function_call(ExpPtr a, ExpPtr b): expr(a), list(b){}
     void printTree(int n){
         if(expr != NULL){expr->printTree(n);}
         std::cout << "(";
