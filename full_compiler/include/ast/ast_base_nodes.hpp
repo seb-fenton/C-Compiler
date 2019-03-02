@@ -28,6 +28,16 @@ class ExpressionNode : public Node{
 };
 typedef ExpressionNode* ExpPtr;
 
+class BranchNode : public Node{
+    public:
+		std::vector<NodePtr> branches;
+		
+		void push(NodePtr n) {
+			branches.push_back(n);
+		}
+
+		virtual ~BranchNode()  {}
+};
 
 
 
