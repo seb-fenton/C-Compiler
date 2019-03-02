@@ -4,8 +4,8 @@
 %s TYPEDEFS
 
 %{
-    #include "../../debugging/lexer/c_lexer.hpp" //for testing purposes? this makes it stop breaking
-    //#include "src/c_parser.tab.hpp"
+    //#include "../../debugging/lexer/c_lexer.hpp" //for testing purposes? this makes it stop breaking
+    #include "c_parser.tab.hpp"
 
     #include <sstream>
     #include <stdlib.h>

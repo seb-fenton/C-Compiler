@@ -252,7 +252,7 @@ cast_expression:
 		| '(' declaration_specifiers ')' cast_expression				//{$$ = cast_expression($2, $4);}	//all leads to getting the variable name at one point
 		;
 
-unary_expression:  									//PAGE : 43 //SEB
+unary_expression:  									//PAGE : 43
 		postfix_expression												{$$ = $1;}
 		| INC_OP unary_expression
 		| DEC_OP unary_expression
@@ -318,6 +318,8 @@ designator:
 function_definition:
 		declaration_specifier_list declarator declaration_list compound_statement
 		| declaration_specifier_list declarator compound_statement
+		| declarator declaration_list compound_statement
+		| declarator compound_statement
 		;
 
 declaration_list:
