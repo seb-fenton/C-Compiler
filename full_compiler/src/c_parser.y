@@ -318,6 +318,8 @@ designator:
 function_definition:
 		declaration_specifier_list declarator declaration_list compound_statement
 		| declaration_specifier_list declarator compound_statement
+		| declarator declaration_list compound_statement
+		| declarator compound_statement
 		;
 
 declaration_list:
