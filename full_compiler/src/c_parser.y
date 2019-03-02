@@ -250,45 +250,45 @@ multiplicative_expression:
 
 cast_expression:
 		unary_expression 												{$$ = $1;}	
-		| '(' declaration_specifiers ')' cast_expression				//{$$ = cast_expression($2, $4);}	//all leads to getting the variable name at one point
+		| '(' declaration_specifier_list ')' cast_expression			{$$ = cast_expression($2, $4);}	//all leads to getting the variable name at one point
 		;
 
 unary_expression:  									//PAGE : 43
 		postfix_expression												{$$ = $1;}
-		| INC_OP unary_expression
-		| DEC_OP unary_expression
-		| unary_operator cast_expression
-		| T_SIZEOF unary_expression
-		| T_SIZEOF '(' declaration_specifiers ')'
+		| INC_OP unary_expression										{$$ = PreIncOp($2);}
+		| DEC_OP unary_expression										{$$ = PreDecOp($2);}
+		| unary_operator cast_expression								{$$ = unary_expression($1, $2);}
+		| T_SIZEOF unary_expression										{$$ = SizeOf($1, $2, false);}
+		| T_SIZEOF '(' declaration_specifiers ')'						{$$ = SizeOf($1, $3, true);}
 		;
 
 unary_operator:
-		'&'
-		| '*'
-		| '+'
-		| '-'
-		| '~'
-		| '!'
+		'&'																{$$ = new std::string(*($1);}
+		| '*'															{$$ = new std::string(*($1);}
+		| '+'															{$$ = new std::string(*($1);}
+		| '-'															{$$ = new std::string(*($1);}
+		| '~'															{$$ = new std::string(*($1);}
+		| '!'															{$$ = new std::string(*($1);}
 		;
 
-postfix_expression:
+postfix_expression: 
 		primary_expression												{$$ = $1;}	//Page 39
-		| postfix_expression '[' expression ']'  					//array calls
-		| postfix_expression '(' ')'
-		| postfix_expression '(' argument_expression_list ')' 		//used for function calls most likely
-		| postfix_expression '.' T_IDENTIFIER	
-		| postfix_expression PTR_OP T_IDENTIFIER
-		| postfix_expression INC_OP
-		| postfix_expression DEC_OP
-		| '(' declaration_specifiers ')' '{' initialiser_list '}'
-		| '(' declaration_specifiers ')' '{' initialiser_list ',' '}'
+		| postfix_expression '[' expression ']'  						{$$ = postfix_exppression_array($1, $3);}//array calls
+		| postfix_expression '(' ')'									{$$ = postfix_expression_bracket($1, NULL);}
+		| postfix_expression '(' argument_expression_list ')' 			{$$ = postfix_expression_bracket($1, $3);}//used for function calls most likely
+		| postfix_expression '.' T_IDENTIFIER							{$$ = postfix_expression_other($1, NULL, $3);}
+		| postfix_expression PTR_OP T_IDENTIFIER						{$$ = postfix_expression_other($1, $2, $3);}
+		| postfix_expression INC_OP										{$$ = PostIncOp($1);}
+		| postfix_expression DEC_OP										{$$ = PostDecOp($1);}
+		| '(' declaration_specifiers ')' '{' initialiser_list '}'		{$$ = postfix_dec_init($2, $5, false);}
+		| '(' declaration_specifiers ')' '{' initialiser_list ',' '}'	{$$ = postfix_dec_init($2, $5, true);}
 		;
 
 primary_expression:
 		T_IDENTIFIER													{$$ = new primary_expression(*($1));} //for now we can just return the value of the variable in an eval func,
 		| constant														{$$ = new constantNode($1);}							//but we may need more constructors to differentiate different primary_expressions
-		| STRING_LITERAL
-		| '(' expression ')'
+		| STRING_LITERAL												{$$ = new stringNode(*($1));}
+		| '(' expression ')'											{$$ = $2;}
 		;
 
 constant:

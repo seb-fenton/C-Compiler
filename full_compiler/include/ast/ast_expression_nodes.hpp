@@ -10,7 +10,6 @@
 
 
 
-
 class primary_expression : public ExpressionNode{
 	public:
 	std::string identifier;
@@ -24,6 +23,15 @@ class constantNode : public ExpressionNode{
 	public:
 	double init;
 	constantNode(double n): init(n) {}
+	void printTree(int n) {
+		std::cout << init;
+	}
+};
+
+class stringNode : public ExpressionNode{
+	public:
+	std::string init;
+	stringNode(std::string n): init(n) {}
 	void printTree(int n) {
 		std::cout << init;
 	}
@@ -242,6 +250,134 @@ class  ModulusOp: public ExpressionNode{
 		std::cout << " % ";
 		if(right != NULL){right->printTree(n);}
 	}
+};
+
+class cast_expression: public ExpressionNode{
+    public:
+    NodePtr left = NULL;
+    ExpPtr right = NULL;
+    cast_expression(NodePtr a, ExpPtr b): left(a), right(b){}
+    void printTree(int n){
+        std::cout << "( ";
+        if(left != NULL){left->printTree(n);}
+        std::cout << " ) ";
+        if(right != NULL){right->printTree(n);}
+    }
+};
+
+class PreIncOp: public ExpressionNode{
+    public: 
+    ExpPtr expr = NULL;
+    PreIncOp(ExpPtr a): expr(a){}
+    void printTree(int n){
+        std::cout << "++";
+        if(expr != NULL){expr->printTree(n);}
+    }
+};
+
+class PreDecOp: public ExpressionNode{
+    public: 
+    ExpPtr expr = NULL;
+    PreDecOp(ExpPtr a): expr(a){}
+    void printTree(int n){
+        std::cout << "--";
+        if(expr != NULL){expr->printTree(n);}
+    }
+};
+
+class PostIncOp: public ExpressionNode{
+    public: 
+    ExpPtr expr = NULL;
+    PostIncOp(ExpPtr a): expr(a){}
+    void printTree(int n){
+        if(expr != NULL){expr->printTree(n);}
+        std::cout << "++";
+    }
+};
+
+class PostDecOp: public ExpressionNode{
+    public: 
+    ExpPtr expr = NULL;
+    PostDecOp(ExpPtr a): expr(a){}
+    void printTree(int n){
+        if(expr != NULL){expr->printTree(n);}
+        std::cout << "--";    
+    }
+};
+
+class unary_expression: public ExpressionNode{
+    public:
+    std::string unaryOp = NULL;
+    ExpPtr expr = NULL;
+    unary_expression(std::string a, ExpPtr b): unaryOp(a), expr(b){}
+    void printTree(int n){
+        std::cout << unaryOp;
+        if(expr != NULL){expr->printTree(n);}
+    }
+};
+
+class SizeOf: public ExpressionNode{
+    public: 
+    NodePtr sizeOf = NULL;
+    ExpPtr expr = NULL;
+    bool primitive = false;
+    SizeOf(NodePtr a, ExpPtr b, bool c): sizeOf(a), expr(b), primitive(c){}
+    void printTree(int n){
+        if(sizeOf != NULL){sizeOf->printTree(n);}
+		if(primitive) std::cout << "(";
+		if(expr != NULL){expr->printTree(n);}
+        if(primitive) std::cout << ")";
+    }
+};
+
+class postfix_exppression_array: public ExpressionNode{
+    public: 
+    //what the cock
+};
+
+class postfix_exppression_bracket: public ExpressionNode{
+    public: 
+    ExpPtr expr = NULL;
+    ExpPtr list = NULL;
+    postfix_exppression_bracket(ExpPtr a, ExpPtr b): expr(a), list(b){}
+    void printTree(int n){
+        if(expr != NULL){expr->printTree(n);}
+        std::cout << "(";
+        if(list != NULL){list->printTree(n);}
+        std::cout << ")";
+    }
+};
+
+class postfix_exppression_other: public ExpressionNode{
+    public: 
+    ExpPtr expr = NULL;
+    ExpPtr ptrOp = NULL;
+    ExpPtr identifier = NULL;
+    postfix_exppression_other(ExpPtr a, ExpPtr b, ExpPtr c): expr(a), ptrOp(b), identifier(c){}
+    void printTree(int n){
+        if(expr != NULL){expr->printTree(n);}
+        if(ptrOp != NULL){ptrOp->printTree(n);}
+        else std::cout << ".";
+        if(identifier != NULL){identifier->printTree(n);}
+    } 
+    
+};
+
+class postfix_exppression_dec_init: public ExpressionNode{
+    public: 
+    ExpPtr dec = NULL;
+    ExpPtr init = NULL;
+    bool comma = false;
+    postfix_exppression_dec_init(ExpPtr a, ExpPtr b): dec(a), init(b){}
+    void printTree(int n){
+        std::cout << "(";
+        if(dec != NULL){dec->printTree(n);}
+        std::cout << "){";
+        if(init != NULL){init->printTree(n);}
+        if(comma) std::cout << ",";
+        std::cout << "}";
+    } 
+    
 };
 
 #endif
