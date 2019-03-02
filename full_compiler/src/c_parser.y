@@ -38,6 +38,7 @@
 %type <enode> assignment_expression conditional_expression logical_or_expression logical_and_expression inclusive_or_expression
 %type <enode> exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression
 %type <enode> multiplicative_expression cast_expression unary_expression postfix_expression primary_expression expression
+%type <enode> constant_expression
 %type <number> FLOAT_CONSTANT INT_CONSTANT constant
 %type <string> TYPEDEF_NAME T_IDENTIFIER STRING_LITERAL T_ASSIGNMENT_OP assignment_operator
 
@@ -297,8 +298,7 @@ constant:
 		;
 
 expression:
-		assignment_expression
-		| expression ',' assignment_expression
+		assignment_expression {$$ = $1;}
 		;
 
 designation:
@@ -317,9 +317,9 @@ designator:
 		
 function_definition:
 		declaration_specifier_list declarator declaration_list compound_statement
-		| declaration_specifier_list declarator compound_statement
+		| declaration_specifier_list declarator compound_statement						{$$ = new functionDefinition($1, $2, $3);}
 		| declarator declaration_list compound_statement
-		| declarator compound_statement
+		| declarator compound_statement													{$$ = new functionDefinition($1, $2);}
 		;
 
 declaration_list:
@@ -360,51 +360,51 @@ argument_expression_list:
 //statements
 
 statement:
-		labeled_statement
-		| compound_statement
-		| expression_statement
-		| selection_statement
-		| iteration_statement
-		| jump_statement
+		labeled_statement						{$$ = $1;}
+		| compound_statement					{$$ = $1;}
+		| expression_statement					{$$ = $1;}
+		| selection_statement					{$$ = $1;}
+		| iteration_statement					{$$ = $1;}
+		| jump_statement						{$$ = $1;}
 		;
 
 compound_statement:
-		'{' '}'
-		| '{' block_item_list '}'
+		'{' '}'									{$$ = new compound_statement();}
+		| '{' block_item_list '}'				{$$ = new compound_statement($2);}
 		;
 
 block_item_list:
-		block_item
-		| block_item_list block_item
+		block_item								{$$ = new block_item_list($1);}
+		| block_item_list block_item			{$$ = $1; $$->push($1);}
 		;
 
 block_item:
-		declaration
-		| statement
+		declaration								{$$ = $1;}
+		| statement								{$$ = $1;}
 		;
 
 expression_statement:
-		';'
-		| expression ';'
+		';'										{$$ = new expression_statement();}
+		| expression ';'						{$$ = new expression_statement($1);}
 		;
 
 selection_statement:
-		T_IF '(' expression ')' statement T_ELSE statement  //Page: 77
-		| T_IF '(' expression ')' statement 
-		| T_SWITCH '(' expression ')' statement
+		T_IF '(' expression ')' statement T_ELSE statement  {$$ = new IfStatement($3, $5, $7);}//Page: 77
+		| T_IF '(' expression ')' statement 				{$$ = new IfStatement($3, $5);}
+		| T_SWITCH '(' expression ')' statement				{$$ = new SwitchStatement($3, $5);}
 		;
 
 iteration_statement:
-		T_WHILE '(' expression ')' statement 							//page 78
-		| T_DO statement T_WHILE '(' expression ')' ';'
-		| T_FOR '(' expression_statement expression_statement ')' statement
-		| T_FOR '(' expression_statement expression_statement expression ')' statement
+		T_WHILE '(' expression ')' statement 											{$$ = new WhileStatement($3, $5);}			//page 78
+		| T_DO statement T_WHILE '(' expression ')' ';'									{$$ = new DoStatement($2, $5);}
+		| T_FOR '(' expression_statement expression_statement ')' statement				{$$ = new ForStatement($3, $4, $6);}
+		| T_FOR '(' expression_statement expression_statement expression ')' statement	{$$ = new ForStatement($3, $4, $5, $7);}
 		;	
 
 labeled_statement:
-		T_IDENTIFIER ':' statement
-		| T_CASE constant_expression ':' statement
-		| T_DEFAULT ':' statement
+		T_IDENTIFIER ':' statement						{$$ = LabelStatement(*($1), $3);}
+		| T_CASE constant_expression ':' statement		{$$ = CaseStatement($2, $4);}
+		| T_DEFAULT ':' statement						{$$ = DefaultStatement($3);}
 		;
 
 jump_statement:

@@ -156,4 +156,24 @@ class initialiser : public Node{
 };
 
 
+class function_definition : public Node{
+	public:
+	NodePtr type = NULL, name = NULL, statement = NULL, decList = NULL;
+	function_definition(NodePtr specifiers, NodePtr varName, NodePtr _statement): type(specifiers), name(varName), statement(_statement) {}
+	function_definition(NodePtr varName, NodePtr _statement):name(varName), statement(_statement) {
+		type = new declaration_specifier_list(new declaration_specifiers("int"));
+	}
+	void printTree(int n) {
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Function Definition" << std::endl;
+		if(type != NULL){ type->printTree(n+1);}
+		if(name != NULL){ name->printTree(n+1);}
+		if(decList != NULL){decList->printTree(n+1);}
+		if(statement != NULL){statement->printTree(n+1);}
+		
+	}
+};
+
 #endif
