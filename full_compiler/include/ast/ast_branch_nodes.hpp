@@ -8,16 +8,6 @@
 //        Nodes with branches in them          //
 //---------------------------------------------//
 
-class BranchNode : public Node{
-    public:
-		std::vector<NodePtr> branches;
-		
-		void push(NodePtr n) {
-			branches.push_back(n);
-		}
-
-		virtual ~BranchNode()  {}
-};
 
 class translation_unit : public BranchNode{
 	public:
