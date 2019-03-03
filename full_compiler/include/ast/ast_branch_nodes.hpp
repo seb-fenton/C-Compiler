@@ -17,7 +17,7 @@ class translation_unit : public BranchNode{
 			std::cout<< "|\t" ;
 		}*/
 		//std::cout << "Translation Unit" <<std::endl;
-		for(int i = 0; i < branches.size(); i++){
+		for(int i = 0; i < (int)branches.size(); i++){
 			branches[i]->printTree(n);
 		}
 	}
@@ -32,7 +32,7 @@ class declaration_specifier_list : public BranchNode{
 			std::cout<< "|\t" ;
 		}*/
 		//std::cout << "Declaration Specifier List" << std::endl;
-		for(int i = 0; i < branches.size(); i++){
+		for(int i = 0; i < (int)branches.size(); i++){
 			branches[i]->printTree(n);
 		}
 	}
@@ -47,7 +47,7 @@ class init_declarator_list : public BranchNode{
 			std::cout<< "|\t" ;
 		}*/
 		//std::cout << "Init Declarator List" << std::endl;
-		for(int i = 0; i < branches.size(); i++){
+		for(int i = 0; i < (int)branches.size(); i++){
 			branches[i]->printTree(n);
 		}
 	}

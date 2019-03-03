@@ -32,13 +32,15 @@
 %token TYPEDEF_NAME T_IDENTIFIER ENUMERATION_CONSTANT
 
 //TODO: sort out which are branch nodes and which are normal, maybe introduce expression nodes
-%type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list
+%type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list block_item_list
 %type <node> declarator direct_declarator init_declarator initialiser declaration declaration_specifiers
-%type <node> identifier_list pointer external_declaration function_definition
+%type <node> identifier_list pointer external_declaration function_definition compound_statement statement
+%type <node> block_item expression_statement selection_statement iteration_statement labeled_statement
+%type <node> jump_statement initialiser_list designation designator_list designator 
 %type <enode> assignment_expression conditional_expression logical_or_expression logical_and_expression inclusive_or_expression
 %type <enode> exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression
 %type <enode> multiplicative_expression cast_expression unary_expression postfix_expression primary_expression expression
-%type <enode> constant_expression
+%type <enode> constant_expression argument_expression_list
 %type <number> FLOAT_CONSTANT INT_CONSTANT constant
 %type <string> TYPEDEF_NAME T_IDENTIFIER STRING_LITERAL T_ASSIGNMENT_OP assignment_operator
 
@@ -70,7 +72,7 @@ typedef_declaration:
 
 declaration:
 		declaration_specifier_list ';'  {$$ = new declaration($1);}
-		| declaration_specifier_list init_declarator_list ';'  { $$ = new declaration($1,$2);} 
+		| declaration_specifier_list init_declarator_list ';'  {$$ = new declaration($1,$2);} 
 		;	// also make two constructors
 
 declaration_specifier_list:
@@ -87,13 +89,7 @@ declaration_specifiers: //we need to make this a class which holds the specifer 
     	|T_FLOAT					{$$ = new declaration_specifiers("float");}
     	|T_DOUBLE					{$$ = new declaration_specifiers("double");}
     	|T_SIGNED					{$$ = new declaration_specifiers("signed");}
-    	|T_UNSIGNED					{$$ = new declaration_specifiers("unsigned");}
-    	|T_EXTERN					//rules might not be needed
-    	|T_STATIC					
-    	|T_AUTO						
-    	|T_REGISTER					
-    	|T_CONST					
-    	|T_VOLATILE					
+    	|T_UNSIGNED					{$$ = new declaration_specifiers("unsigned");}				
     	|struct_or_union_specifier	//{$$ = new declaration_specifiers($1, 1);} //might want to make different classes for special cases
 		|TYPEDEF_NAME				//{$$ = new declaration_specifiers($1, 2);}
 		;
@@ -181,7 +177,7 @@ constant_expression:
 
 assignment_expression:
 		conditional_expression									{$$ = $1;}		//this will go through all the operators that are used in evaulating an expression
-		| unary_expression assignment_operator assignment_expression //{$$ = assignment_expression($1, *$2, $3);}	//need to decide how ast will deal with expressions.  PAGE:53 in spec
+		| unary_expression assignment_operator assignment_expression {$$ = new assignment_expression($1, *$2, $3);}	//need to decide how ast will deal with expressions.  PAGE:53 in spec
 		;																									//specifcally how to make it easier to print assembly
 
 conditional_expression:
@@ -250,38 +246,34 @@ multiplicative_expression:
 
 cast_expression:
 		unary_expression 												{$$ = $1;}	
-		| '(' declaration_specifier_list ')' cast_expression			{$$ = cast_expression($2, $4);}	//all leads to getting the variable name at one point
+		| '(' declaration_specifier_list ')' cast_expression			{$$ = new cast_expression($2, $4);}	//all leads to getting the variable name at one point
 		;
 
 unary_expression:  									//PAGE : 43
 		postfix_expression												{$$ = $1;}
-		| INC_OP unary_expression										{$$ = PreIncOp($2);}
-		| DEC_OP unary_expression										{$$ = PreDecOp($2);}
-		| unary_operator cast_expression								{$$ = unary_expression($1, $2);}
-		| T_SIZEOF unary_expression										{$$ = SizeOf($1, $2, false);}
-		| T_SIZEOF '(' declaration_specifiers ')'						{$$ = SizeOf($1, $3, true);}
-		;
-
-unary_operator:
-		'&'																{$$ = new std::string(*($1);}
-		| '*'															{$$ = new std::string(*($1);}
-		| '+'															{$$ = new std::string(*($1);}
-		| '-'															{$$ = new std::string(*($1);}
-		| '~'															{$$ = new std::string(*($1);}
-		| '!'															{$$ = new std::string(*($1);}
+		| INC_OP unary_expression										{$$ = new PreIncOp($2);}
+		| DEC_OP unary_expression										{$$ = new PreDecOp($2);}
+		| '&' cast_expression											{$$ = new RefOp($2);}
+		| '*' cast_expression											{$$ = new PtrOp($2);}
+		| '+' cast_expression											{$$ = new UAddOp($2);}
+		| '-' cast_expression											{$$ = new USubOp($2);}
+		| '~' cast_expression											{$$ = new BitwiseNotOp($2);}
+		| '!' cast_expression											{$$ = new LogicalNotOp($2);}
+		| T_SIZEOF unary_expression										{$$ = new SizeOf($2);}
+		| T_SIZEOF '(' declaration_specifier_list ')'					{$$ = new SizeOf($3);}
 		;
 
 postfix_expression: 
 		primary_expression												{$$ = $1;}	//Page 39
-		| postfix_expression '[' expression ']'  						{$$ = array_call($1, $3);}//array calls TODO
-		| postfix_expression '(' ')'									{$$ = function_call($1, NULL);}
-		| postfix_expression '(' argument_expression_list ')' 			{$$ = function_call($1, $3);}//used for function calls most likely
-		| postfix_expression '.' T_IDENTIFIER							{$$ = postfix_expression_other($1, NULL, $3);}
-		| postfix_expression PTR_OP T_IDENTIFIER						{$$ = postfix_expression_other($1, $2, $3);}
-		| postfix_expression INC_OP										{$$ = PostIncOp($1);}
-		| postfix_expression DEC_OP										{$$ = PostDecOp($1);}
-		| '(' declaration_specifiers ')' '{' initialiser_list '}'		{$$ = postfix_dec_init($2, $5, false);}
-		| '(' declaration_specifiers ')' '{' initialiser_list ',' '}'	{$$ = postfix_dec_init($2, $5, true);}
+		| postfix_expression '[' expression ']'  						{$$ = new array_call($1, $3);}//array calls TODO
+		| postfix_expression '(' ')'									{$$ = new function_call($1, NULL);}
+		| postfix_expression '(' argument_expression_list ')' 			{$$ = new function_call($1, $3);}//used for function calls most likely
+		| postfix_expression '.' T_IDENTIFIER							{$$ = new DotMemberOp($1, *($3));} //turn into two classes one for pointer referencing, one for dot operator
+		| postfix_expression PTR_OP T_IDENTIFIER						{$$ = new PtrMemberOp($1, *($3));}
+		| postfix_expression INC_OP										{$$ = new PostIncOp($1);}
+		| postfix_expression DEC_OP										{$$ = new PostDecOp($1);}
+		| '(' declaration_specifiers ')' '{' initialiser_list '}'		{$$ = new postfix_dec_init($2, $5, false);}
+		| '(' declaration_specifiers ')' '{' initialiser_list ',' '}'	{$$ = new postfix_dec_init($2, $5, true);}
 		;
 
 primary_expression:
@@ -317,9 +309,9 @@ designator:
 		
 function_definition:
 		declaration_specifier_list declarator declaration_list compound_statement
-		| declaration_specifier_list declarator compound_statement						{$$ = new functionDefinition($1, $2, $3);}
+		| declaration_specifier_list declarator compound_statement						{$$ = new function_definition($1, $2, $3);}
 		| declarator declaration_list compound_statement
-		| declarator compound_statement													{$$ = new functionDefinition($1, $2);}
+		| declarator compound_statement													{$$ = new function_definition($1, $2);}
 		;
 
 declaration_list:
@@ -375,7 +367,7 @@ compound_statement:
 
 block_item_list:
 		block_item								{$$ = new block_item_list($1);}
-		| block_item_list block_item			{$$ = $1; $$->push($1);}
+		| block_item_list block_item			{$$ = $1; $$->push($2);}
 		;
 
 block_item:
@@ -402,16 +394,16 @@ iteration_statement:
 		;	
 
 labeled_statement:
-		T_IDENTIFIER ':' statement						{$$ = LabelStatement(*($1), $3);}
-		| T_CASE constant_expression ':' statement		{$$ = CaseStatement($2, $4);}
-		| T_DEFAULT ':' statement						{$$ = DefaultStatement($3);}
+		T_IDENTIFIER ':' statement						{$$ = new LabelStatement(*($1), $3);}
+		| T_CASE constant_expression ':' statement		{$$ = new CaseStatement($2, $4);}
+		| T_DEFAULT ':' statement						{$$ = new DefaultStatement($3);}
 		;
 
 jump_statement:
-		T_CONTINUE ';'
-		| T_BREAK ';'
-		| T_RETURN ';'
-		| T_RETURN expression ';'
+		T_CONTINUE ';'									{$$ = new ContinueStatement();}
+		| T_BREAK ';'									{$$ = new BreakStatement();}
+		| T_RETURN ';'									{$$ = new ReturnStatement();}
+		| T_RETURN expression ';'						{$$ = new ReturnStatement($2);}
 		;
 
 %%
