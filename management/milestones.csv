@@ -8,7 +8,8 @@ AddTypedefExtremeCaseSupport, DebugLexer, 4h, SF, N, Add support for extreme typ
 AddParserRules, WriteLexerTypedefs, 4h, NG, Y, Create Parser template with basic rules
 AddParserASTSupport,AddParserRules, 6h?, ALL, N, Add AST support in Parser rules
 CreateAST, , 15h, ALL, N, Create AST with nodes
-CreateASTEval, , 15h, ALL, N, Create evaluate function for AST
+???CreateASTEval, , 15h, ALL, N, Create evaluate function for AST
 PrintFunctionForNodes, , 1h, SF, N, Create printfunction for AST nodes
 DebugParser, AddParserASTSupport, 6h?, ALL, N, Debug parser using completed Lexer
 MakeTestSuite, , 5h, ALL, N, Create the test suite along with the test files
+MakeOverheadInfrastructure, ,3h, SF, N, Create infrastructure to allow for automated testing compliant to spec
