@@ -28,7 +28,8 @@ bin/c_compiler.o : src/c_compiler.cpp
 parser: src/c_lexer.yy.cpp
 parsertest : bin/eval_expr
 
-bin/eval_expr : bin/eval_parser.o src/c_parser.tab.o src/c_lexer.yy.o src/c_parser.tab.o
+bin/eval_expr : src/eval_parser.o src/c_parser.tab.o src/c_lexer.yy.o src/c_parser.tab.o
+	mkdir -p bin
 	g++ $(CPPFLAGS) -o bin/eval_expr $^
 
 src/c_lexer.yy.cpp : src/c_lexer.flex src/c_parser.tab.hpp
@@ -37,9 +38,9 @@ src/c_lexer.yy.cpp : src/c_lexer.flex src/c_parser.tab.hpp
 src/c_parser.tab.cpp src/c_parser.tab.hpp : src/c_parser.y
 	bison -v -d src/c_parser.y -o src/c_parser.tab.cpp
 
-bin/eval_parser.o : src/eval_parser.cpp
+src/eval_parser.o : src/eval_parser.cpp
 	mkdir -p bin
-	g++ $(CPPFLAGS) -c src/eval_parser.cpp -o bin/eval_parse.o
+	g++ $(CPPFLAGS) -c src/eval_parser.cpp -o src/eval_parser.o
 
 
 ###CLEAN RULES###

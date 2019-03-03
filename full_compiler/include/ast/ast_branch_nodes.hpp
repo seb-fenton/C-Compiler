@@ -54,6 +54,50 @@ class init_declarator_list : public BranchNode{
 	~init_declarator_list() {}
 };
 
+class argument_expression_list : public BranchNode{
+	public:
+	argument_expression_list(NodePtr p){branches.push_back(p);}
+	void printTree(int n){
+		std::cout<< "Arguments: [";
+		for(int i = 0; i < (int)branches.size(); i++){
+			std::cout << i+1 << ": ";
+			branches[i]->printTree(n);
+			if(i < (int)branches.size()-1){std::cout<< ", ";}
+		}
+		std::cout << "]";
+	}
+};
+
+class parameter_list : public BranchNode{
+	public:
+	parameter_list(NodePtr p){branches.push_back(p);}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout<< "Parameters: " << std::endl;
+		for(int i = 0; i < (int)branches.size(); i++){
+			branches[i]->printTree(n+1);
+		}
+	}
+};
+
+class identifier_list : public Node{
+	public:
+	std::vector<std::string> identifiers;
+	identifier_list(std::string id){identifiers.push_back(id);}
+	void push(std::string id){identifiers.push_back(id);}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout<< "Idenitifers: ";
+		for(int i = 0; i < (int)identifiers.size(); i++){
+			std::cout<< identifiers[i] << " " ;
+		}
+		std::cout << std::endl;
+	}
+};
 
 
 //---------------------------------------------//
@@ -175,5 +219,54 @@ class function_definition : public Node{
 		
 	}
 };
+
+class ArrayDeclaration : public Node{
+	public:
+	NodePtr varName = NULL;
+	ExpPtr size = NULL;
+	ArrayDeclaration(NodePtr _varName): varName(_varName) {}
+	ArrayDeclaration(NodePtr _varName, ExpPtr _size): varName(_varName), size(_size) {}
+	void printTree(int n) {
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout<< "ArrayDeclaration" << std::endl;
+		if(varName != NULL){varName->printTree(n+1);}
+		if(size != NULL){std::cout<< "Size: ";size->printTree(n);}
+	}
+};
+
+class parameter_declaration : public Node{
+	public:
+	NodePtr specifiers = NULL, dec = NULL;
+	parameter_declaration(NodePtr _specifiers, NodePtr _dec): specifiers(_specifiers), dec(_dec) {}
+	parameter_declaration(NodePtr _specifiers): specifiers(_specifiers) {}
+	void printTree(int n) {
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout<< "Parameter" << std::endl;
+		if(specifiers != NULL){specifiers->printTree(n+1);}
+		if(dec != NULL){dec->printTree(n+1);}
+	}
+
+};
+
+class FunctionDeclaration : public Node{
+	public:
+	NodePtr funcName = NULL, argList = NULL;
+	FunctionDeclaration(NodePtr _funcName, NodePtr _argList): funcName(_funcName), argList(_argList) {}
+	FunctionDeclaration(NodePtr _funcName): funcName(_funcName) {}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout<< "Function Declaration:" << std::endl;
+		if(funcName != NULL){funcName->printTree(n+1);}
+		if(argList != NULL){argList->printTree(n+1);}
+
+	}
+};
+
 
 #endif

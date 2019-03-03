@@ -400,13 +400,14 @@ class array_call: public ExpressionNode{ //TODO
 class function_call: public ExpressionNode{
     public: 
     ExpPtr expr = NULL;
-    ExpPtr list = NULL;
-    function_call(ExpPtr a, ExpPtr b): expr(a), list(b){}
+    NodePtr list = NULL;
+    function_call(ExpPtr a, NodePtr b): expr(a), list(b){}
     void printTree(int n){
+		std::cout<< "Function Call: { Name: ";
         if(expr != NULL){expr->printTree(n);}
-        std::cout << "(";
+		std::cout<< ", ";
         if(list != NULL){list->printTree(n);}
-        std::cout << ")";
+		std::cout << " }";
     }
 };
 
@@ -432,22 +433,5 @@ class PtrMemberOp : public ExpressionNode{
     }
 };
 
-
-class postfix_dec_init: public ExpressionNode{
-    public: 
-    NodePtr dec = NULL;
-    NodePtr init = NULL;
-    bool comma = false;
-    postfix_dec_init(NodePtr a, NodePtr b, bool c): dec(a), init(b), comma(c){}
-    void printTree(int n){
-        std::cout << "(";
-        if(dec != NULL){dec->printTree(n);}
-        std::cout << "){";
-        if(init != NULL){init->printTree(n);}
-        if(comma) std::cout << ",";
-        std::cout << "}";
-    } 
-    
-};
 
 #endif

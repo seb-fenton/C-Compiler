@@ -19,8 +19,8 @@ class Node{
 
 	public:
 		virtual void printTree(int n) = 0;
-		virtual void printPy(std::string fileName); //TODO - Implement this
-		virtual void printMips(std::string fileName); //TODO - Implement this
+		//virtual void printPy(std::string fileName); //TODO - Implement this
+		//virtual void printMips(std::string fileName); //TODO - Implement this
 
 };
 typedef Node* NodePtr;

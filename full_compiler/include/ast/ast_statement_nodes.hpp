@@ -120,13 +120,15 @@ class ForStatement : public Node{
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
 		}
-		std::cout << "For Statement: ";
-        if(init != NULL) {init->printTree(n);}
-        std::cout << "; ";
-		if(cond != NULL) {cond->printTree(n);}
-        std::cout << "; ";
+		std::cout << "For Statement: " << std::endl;
+        if(init != NULL) {init->printTree(n+1);}
+		if(cond != NULL) {cond->printTree(n+1);}
+        for(int i = 0; i < n+1; i++){
+			std::cout<< "|\t" ;
+		}
+        std::cout<< "Iteration: ";
         if(iter != NULL) {iter->printTree(n);}
-        std::cout<< std::endl;
+        std::cout<<std::endl;
         if(stmt != NULL) {stmt->printTree(n+1);}
     }
 };

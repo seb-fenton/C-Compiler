@@ -21,6 +21,7 @@
   ExpressionNode *enode;
   double number;
   std::string *string;
+  identifier_list *idlist;
 }
 
 %token T_ASSIGNMENT_OP RIGHT_SHIFT_OP LEFT_SHIFT_OP INC_OP DEC_OP PTR_OP AND_OP OR_OP LE_OP GE_OP EQ_OP NE_OP
@@ -32,17 +33,19 @@
 %token TYPEDEF_NAME T_IDENTIFIER ENUMERATION_CONSTANT
 
 //TODO: sort out which are branch nodes and which are normal, maybe introduce expression nodes
-%type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list block_item_list
+%type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list block_item_list 
+%type <bnode> argument_expression_list parameter_list
 %type <node> declarator direct_declarator init_declarator initialiser declaration declaration_specifiers
-%type <node> identifier_list pointer external_declaration function_definition compound_statement statement
+%type <node> pointer external_declaration function_definition compound_statement statement parameter_declaration
 %type <node> block_item expression_statement selection_statement iteration_statement labeled_statement
-%type <node> jump_statement initialiser_list designation designator_list designator 
+%type <node> jump_statement initialiser_list designation designator_list designator  
 %type <enode> assignment_expression conditional_expression logical_or_expression logical_and_expression inclusive_or_expression
 %type <enode> exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression
 %type <enode> multiplicative_expression cast_expression unary_expression postfix_expression primary_expression expression
-%type <enode> constant_expression argument_expression_list
+%type <enode> constant_expression
 %type <number> FLOAT_CONSTANT INT_CONSTANT constant
 %type <string> TYPEDEF_NAME T_IDENTIFIER STRING_LITERAL T_ASSIGNMENT_OP assignment_operator
+%type <idlist> identifier_list
 
 %start root
 
@@ -146,11 +149,11 @@ declarator:
 direct_declarator:
 		T_IDENTIFIER 										{$$ = new direct_declarator(*($1));}//Need node to check bindings and T_IDENTIFIER names
 		|'(' declarator ')' 								{ }								//works for dereferencing pointers
-		| direct_declarator '[' ']' 						//{$$ = $1; NodePtr tmp = new ArrayDeclaration(); $$->isArray(temp);}//need node for array declaration   
-		| direct_declarator '[' assignment_expression ']' 	//{$$ = $1; NodePtr tmp = new ArrayDeclaration($3); $$->isArray(temp);}//make a second constructer for declarations with expressions
-		| direct_declarator '(' parameter_type_list ')' 	//{$$ = $1; $$->isFuncDef($3);} 	//used for function definitions
-		| direct_declarator '(' identifier_list ')' 		//{$$ = $1; $$->isFuncCall($3);} 	//this function makes the direct declarator state its a fucntion call
-		| direct_declarator '(' ')' 						//{$$ = $1; $$->isFuncCall();}	//used for function calls with no args
+		| direct_declarator '[' ']' 						{$$ = new ArrayDeclaration($1);}//need node for array declaration   
+		| direct_declarator '[' assignment_expression ']' 	{$$ = new ArrayDeclaration($1, $3);}//make a second constructer for declarations with expressions
+		| direct_declarator '(' parameter_type_list ')' 	{$$ = new FunctionDeclaration($1, $3);} 	//used for function definitions
+		| direct_declarator '(' identifier_list ')' 		{$$ = new FunctionDeclaration($1, $3);} 
+		| direct_declarator '(' ')' 						{$$ = new FunctionDeclaration($1);}	//used for function calls with no args
 		;
 
 initialiser_list:
@@ -197,7 +200,7 @@ logical_and_expression:
 
 inclusive_or_expression:
 		exclusive_or_expression											{$$ = $1;}
-		| logical_or_expression '|' logical_and_expression				{$$ = new InclusiveOrOp($1,$3);}
+		| logical_or_expression '|' exclusive_or_expression				{$$ = new InclusiveOrOp($1,$3);}
 		;
 
 
@@ -272,8 +275,6 @@ postfix_expression:
 		| postfix_expression PTR_OP T_IDENTIFIER						{$$ = new PtrMemberOp($1, *($3));}
 		| postfix_expression INC_OP										{$$ = new PostIncOp($1);}
 		| postfix_expression DEC_OP										{$$ = new PostDecOp($1);}
-		| '(' declaration_specifiers ')' '{' initialiser_list '}'		{$$ = new postfix_dec_init($2, $5, false);}
-		| '(' declaration_specifiers ')' '{' initialiser_list ',' '}'	{$$ = new postfix_dec_init($2, $5, true);}
 		;
 
 primary_expression:
@@ -319,23 +320,23 @@ declaration_list:
 		| declaration_list declaration
 		;
 
-parameter_type_list:
-		parameter_list
+parameter_type_list:			
+		parameter_list									{$$ = $1;}
 		;
 
 parameter_list:
-		parameter_declaration
-		| parameter_list ',' parameter_declaration
+		parameter_declaration							{$$ = new parameter_list($1);}
+		| parameter_list ',' parameter_declaration		{$$ = $1; $$->push($3);}
 		;
 
 parameter_declaration:
-		declaration_specifiers declarator
-		| declaration_specifiers
+		declaration_specifier_list declarator			{$$ = new parameter_declaration($1, $2);}
+		| declaration_specifier_list					{$$ = new parameter_declaration($1);}
 		;
 
 identifier_list:
-		T_IDENTIFIER
-		| identifier_list ',' T_IDENTIFIER
+		T_IDENTIFIER									{$$ = new identifier_list(*($1));}
+		| identifier_list ',' T_IDENTIFIER				{$$ = $1; $$->push(*($3));}
 		;
 
 pointer:
@@ -344,8 +345,8 @@ pointer:
 		;
 
 argument_expression_list:
-		assignment_expression
-		| argument_expression_list ',' assignment_expression
+		assignment_expression									{$$ = new argument_expression_list($1);}
+		| argument_expression_list ',' assignment_expression	{$$ = $1; $$->push($3);}
 		;
 
 
