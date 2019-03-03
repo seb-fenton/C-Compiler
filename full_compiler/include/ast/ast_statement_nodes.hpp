@@ -23,7 +23,12 @@ class expression_statement: public Node{
     expression_statement() {}
     expression_statement(ExpPtr _stmt): stmt(_stmt) {}
     void printTree(int n){
+        for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+        std::cout<< "Expression: ";
         if(stmt != NULL){stmt->printTree(n);}
+        std::cout << std::endl;
     }
 };
 
@@ -33,7 +38,7 @@ class block_item_list : public BranchNode{
         branches.push_back(item);
     }
     void printTree(int n) {
-		for(int i; i < branches.size(); i++){
+		for(int i = 0; i < (int)branches.size(); i++){
             branches[i]->printTree(n);
         }
 	}
@@ -75,8 +80,8 @@ class SwitchStatement : public Node{
 
 class WhileStatement : public Node{
     public:
-    ExpPtr cond;
-    NodePtr stmt;
+    ExpPtr cond = NULL;
+    NodePtr stmt = NULL;
     WhileStatement(ExpPtr _cond, NodePtr _stmt): cond(_cond), stmt(_stmt) {}
     void printTree(int n) {
 		for(int i = 0; i < n; i++){
@@ -91,8 +96,8 @@ class WhileStatement : public Node{
 
 class DoStatement : public Node{
     public:
-    ExpPtr cond;
-    NodePtr stmt;
+    ExpPtr cond = NULL;
+    NodePtr stmt = NULL;
     DoStatement(NodePtr _stmt, ExpPtr _cond): cond(_cond), stmt(_stmt) {}
     void printTree(int n) {
 		for(int i = 0; i < n; i++){
@@ -109,8 +114,8 @@ class ForStatement : public Node{
     public:
     ExpPtr  iter = NULL;
     NodePtr stmt = NULL, init = NULL, cond = NULL;
-    ForStatement(NodePtr _init, NodePtr _cond, ExpPtr _iter, NodePtr _stmt): init(_init), cond(_cond), iter(_iter), stmt(_stmt) {}
-    ForStatement(NodePtr _init, NodePtr _cond, NodePtr _stmt): init(_init), cond(_cond), stmt(_stmt) {/*constructor without the iteration statement*/}
+    ForStatement(NodePtr _init, NodePtr _cond, ExpPtr _iter, NodePtr _stmt): iter(_iter), stmt(_stmt), init(_init), cond(_cond) {}
+    ForStatement(NodePtr _init, NodePtr _cond, NodePtr _stmt): stmt(_stmt), init(_init), cond(_cond) {/*constructor without the iteration statement*/}
     void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
@@ -129,7 +134,7 @@ class ForStatement : public Node{
 class LabelStatement : public Node{
     public:
     std::string labelName;
-    NodePtr stmt;
+    NodePtr stmt = NULL;
     LabelStatement(std::string name, NodePtr _stmt): labelName(name), stmt(_stmt) {}
     void printTree(int n) {
 		for(int i = 0; i < n; i++){
@@ -143,8 +148,8 @@ class LabelStatement : public Node{
 
 class CaseStatement : public Node{
     public:
-    ExpPtr val;
-    NodePtr stmt;
+    ExpPtr val = NULL;
+    NodePtr stmt = NULL;
     CaseStatement(ExpPtr _val, NodePtr _stmt): val(_val), stmt(_stmt) {}
     void printTree(int n) {
 		for(int i = 0; i < n; i++){
@@ -157,6 +162,55 @@ class CaseStatement : public Node{
     }
 };
 
+class DefaultStatement : public Node{
+    public:
+    NodePtr stmt = NULL;
+    DefaultStatement(NodePtr _stmt):  stmt(_stmt) {}
+    void printTree(int n) {
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Default Statement: " << std::endl;
+        if(stmt != NULL) {stmt->printTree(n+1);}
+    }
+};
+
+class ContinueStatement : public Node{
+    public:
+    ContinueStatement() {}
+    void printTree(int n) {
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Continue Statement: " << std::endl;
+    }
+};
+
+class BreakStatement : public Node{
+    public:
+    BreakStatement() {}
+    void printTree(int n) {
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Break Statement: " << std::endl;
+    }
+};
+
+class ReturnStatement : public Node{
+    public:
+    ExpPtr expr = NULL;
+    ReturnStatement(ExpPtr _expr): expr(_expr) {}
+    ReturnStatement() {}
+    void printTree(int n) {
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Return Statement: ";
+        if(expr != NULL){expr->printTree(n);}
+        std::cout<<std::endl;
+    }
+};
 
 
 #endif
