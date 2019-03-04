@@ -33,12 +33,12 @@
 %token TYPEDEF_NAME T_IDENTIFIER ENUMERATION_CONSTANT
 
 //TODO: sort out which are branch nodes and which are normal, maybe introduce expression nodes
-%type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list block_item_list 
-%type <bnode> argument_expression_list parameter_list initialiser_list
-%type <node> declarator direct_declarator init_declarator initialiser declaration declaration_specifiers
+%type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list block_item_list declaration_list
+%type <bnode> argument_expression_list parameter_list initialiser_list struct_declaration_list struct_declarator_list
+%type <node> declarator direct_declarator init_declarator initialiser declaration declaration_specifiers struct_declarator
 %type <node> pointer external_declaration function_definition compound_statement statement parameter_declaration
-%type <node> block_item expression_statement selection_statement iteration_statement labeled_statement
-%type <node> jump_statement designation designator_list designator  
+%type <node> block_item expression_statement selection_statement iteration_statement labeled_statement struct_declaration
+%type <node> jump_statement designation designator_list designator typedef_declaration struct_or_union_specifier
 %type <enode> assignment_expression conditional_expression logical_or_expression logical_and_expression inclusive_or_expression
 %type <enode> exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression
 %type <enode> multiplicative_expression cast_expression unary_expression postfix_expression primary_expression expression
@@ -66,11 +66,11 @@ translation_unit:
 external_declaration: 
 		function_definition {$$ = $1;} 	//create function node in next step not now
 		| declaration   	{$$ = $1;}	//create declaration node in next step
-		| typedef_declaration 			//need to make this ourselves, ill explain it to you
+		| typedef_declaration 	{$$ = $1;}		//need to make this ourselves, ill explain it to you
 		;
 
 typedef_declaration:
-		T_TYPEDEF declaration_specifier_list declarator ';' //this needs some thinking, since arrays work differently with typedefs, might be worth not doing it
+		T_TYPEDEF declaration_specifier_list declarator ';' {$$ = new typedef_declaration($2,$3);}//this needs some thinking, since arrays work differently with typedefs, might be worth not doing it
 		;
 
 declaration:
@@ -93,41 +93,35 @@ declaration_specifiers: //we need to make this a class which holds the specifer 
     	|T_DOUBLE					{$$ = new declaration_specifiers("double");}
     	|T_SIGNED					{$$ = new declaration_specifiers("signed");}
     	|T_UNSIGNED					{$$ = new declaration_specifiers("unsigned");}				
-    	|struct_or_union_specifier	//{$$ = new declaration_specifiers($1, 1);} //might want to make different classes for special cases
-		|TYPEDEF_NAME				//{$$ = new declaration_specifiers($1, 2);}
+    	|struct_or_union_specifier	{$$ = $1;} //might want to make different classes for special cases
+		|TYPEDEF_NAME				{$$ = new TypdefSpecifier(*($1));}
 		;
 
 struct_or_union_specifier:
-		struct_or_union '{' struct_declaration_list '}'					//used to initlialise structs
-		| struct_or_union T_IDENTIFIER '{' struct_declaration_list '}'	//Page: 59
-		| struct_or_union T_IDENTIFIER
-		;
-
-	
-struct_or_union:
-		T_STRUCT
-		| T_UNION
+		T_STRUCT'{' struct_declaration_list '}'					{$$ = new struct_specifier($3);}//used to initlialise structs
+		| T_STRUCT T_IDENTIFIER '{' struct_declaration_list '}'	{$$ = new struct_specifier(*($2), $4);}//Page: 59
+		| T_STRUCT T_IDENTIFIER									{$$ = new struct_specifier(*($2));}
 		;
 	
 struct_declaration_list:
-		struct_declaration										
-		| struct_declaration_list struct_declaration
+		struct_declaration										{$$ = new struct_declaration_list($1);}
+		| struct_declaration_list struct_declaration			{$$ = $1; $$->push($2);}
 		; 
 
 struct_declaration:
-		declaration_specifier_list ';' /* for anonymous structs/unions */
-		| declaration_specifier_list struct_declarator_list ';'
+		declaration_specifier_list ';' 							{$$ = new struct_declaration($1);}/* for anonymous structs/unions */
+		| declaration_specifier_list struct_declarator_list ';'	{$$ = new struct_declaration($1, $2);}
 		; //One more rule using static don't know if it needs to be implemented
 
 struct_declarator_list:
-		struct_declarator  //creates a list of variables to be used in a struct
-		| struct_declarator_list ',' struct_declarator
+		struct_declarator  										{$$ = new struct_declarator_list($1);}	//creates a list of variables to be used in a struct
+		| struct_declarator_list ',' struct_declarator			{$$ = $1; $$->push($3);}
 		;
 
 struct_declarator:
-		':' constant_expression
-		| declarator ':' constant_expression
-		| declarator
+		':' constant_expression									{$$ = new struct_declarator($2);}
+		| declarator ':' constant_expression					{$$ = new struct_declarator($1, $3);}
+		| declarator											{$$ = new struct_declarator($1);}
 		;
 
 
@@ -300,8 +294,8 @@ function_definition:
 		;
 
 declaration_list:
-		declaration
-		| declaration_list declaration
+		declaration										{$$ = new declaration_list($1);}
+		| declaration_list declaration					{$$ = $1; $$->push($2);}
 		;
 
 parameter_type_list:			

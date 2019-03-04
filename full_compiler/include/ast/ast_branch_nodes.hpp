@@ -109,6 +109,36 @@ class initialiser_list : public BranchNode{
 	}
 };
 
+class struct_declaration_list : public BranchNode {
+	public:
+	struct_declaration_list(NodePtr p){branches.push_back(p);}
+	void printTree(int n){
+		for(int i = 0; i < (int)branches.size(); i++){
+			branches[i]->printTree(n);
+		}
+	}
+};
+
+class struct_declarator_list : public BranchNode{
+	public:
+	struct_declarator_list(NodePtr p){branches.push_back(p);}
+	void printTree(int n){
+		for(int i = 0; i < (int)branches.size(); i++){
+			branches[i]->printTree(n);
+		}
+	}
+};
+
+class declaration_list : public BranchNode{
+	public:
+	declaration_list(NodePtr p){branches.push_back(p);}
+	void printTree(int n){
+		for(int i = 0; i < (int)branches.size(); i++){
+			branches[i]->printTree(n);
+		}
+	}
+};
+
 //---------------------------------------------//
 //------------Spec_Nodes-----------------------//
 //           Nodes with specific pointers      //
@@ -295,5 +325,82 @@ class ObjectInitialiser : public Node{
 		if(initList != NULL){initList->printTree(n+1);}
 	}
 };
+
+class typedef_declaration : public Node{
+	public:
+	NodePtr specifierList = NULL, defName = NULL;
+	typedef_declaration(NodePtr _specifierList, NodePtr _defName = NULL): specifierList(_specifierList), defName(_defName) {}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout<< "Typedef Declaration:" << std::endl;
+		if(specifierList != NULL){specifierList->printTree(n+1);}
+		if(defName != NULL){defName->printTree(n+1);}
+	}
+};
+
+class TypdefSpecifier : public Node{
+	public:
+	std::string defName;
+	TypdefSpecifier(std::string s): defName(s) {}
+	void printTree(int n) {
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Typedef: " << defName << std::endl;
+	}
+};
+
+class struct_specifier : public Node{
+	public:
+	std::string id;
+	NodePtr decList = NULL;
+	struct_specifier(std::string _id, NodePtr _decList): id(_id), decList(_decList) {}
+	struct_specifier(NodePtr _decList): id(""), decList(_decList) {}
+	struct_specifier(std::string _id): id(_id), decList(NULL) {}
+	void printTree(int n) {
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Struct: ";
+		if(id == ""){std::cout<<id;}
+		std::cout << std::endl;
+		if(decList != NULL){decList->printTree(n+1);}
+	}
+};
+
+class struct_declaration : public Node{
+	public:
+	NodePtr specList = NULL, declaratorList = NULL;
+	struct_declaration(NodePtr _specList, NodePtr _declaratorList): specList(_specList), declaratorList(_declaratorList) {}
+	struct_declaration(NodePtr _specList): specList(_specList), declaratorList(NULL) {}
+	void printTree(int n){
+				for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Struct Declaration" << std::endl;
+		if(specList != NULL){specList->printTree(n+1);}
+		if(declaratorList != NULL){declaratorList->printTree(n+1);}
+	}
+};
+
+class struct_declarator : public Node{
+	public:
+	NodePtr declarator = NULL;
+	ExpPtr constExp = NULL;
+	struct_declarator(NodePtr _declarator, ExpPtr _constExp): declarator(_declarator), constExp(_constExp) {} 
+	struct_declarator(NodePtr _declarator): declarator(_declarator), constExp(NULL) {} 
+	struct_declarator(ExpPtr _constExp): declarator(NULL), constExp(_constExp) {} 
+	void printTree(int n){
+				for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Struct Declarator" << std::endl;
+		if(declarator != NULL){declarator->printTree(n+1);}
+		if(constExp != NULL){std::cout<< "Buffer: " ;constExp->printTree(n+1); std::cout<<std::endl;}
+	}
+};
+
 
 #endif
