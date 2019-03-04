@@ -428,25 +428,4 @@ class PtrMemberOp : public ExpressionNode{
 };
 
 
-<<<<<<< HEAD
-class postfix_dec_init: public ExpressionNode{
-    public: 
-    NodePtr dec = NULL;
-    NodePtr init = NULL;
-    bool comma = false;
-    postfix_dec_init(NodePtr a, NodePtr b, bool c): dec(a), init(b), comma(c){}
-    void printTree(int n){
-        std::cout << "(";
-        if(dec != NULL){dec->printTree(n);}
-        std::cout << "){";
-        if(init != NULL){init->printTree(n);}
-        if(comma) std::cout << ",";
-        std::cout << "}";
-    } 
-    
-};
-
-
-=======
->>>>>>> 08a552f0602c09a3dc81cfed1bfdd499d7eef7da
 #endif

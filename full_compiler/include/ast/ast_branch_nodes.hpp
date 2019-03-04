@@ -99,6 +99,15 @@ class identifier_list : public Node{
 	}
 };
 
+class initialiser_list : public BranchNode{
+	public:
+	initialiser_list(NodePtr p){branches.push_back(p);}
+	void printTree(int n){
+		for(int i = 0; i < (int)branches.size(); i++){
+			branches[i]->printTree(n);
+		}
+	}
+};
 
 //---------------------------------------------//
 //------------Spec_Nodes-----------------------//
@@ -232,7 +241,13 @@ class ArrayDeclaration : public Node{
 		}
 		std::cout<< "ArrayDeclaration" << std::endl;
 		if(varName != NULL){varName->printTree(n+1);}
-		if(size != NULL){std::cout<< "Size: ";size->printTree(n);}
+		if(size != NULL){
+			for(int i = 0; i < n+1; i++){
+				std::cout<< "|\t" ;
+			}	
+			std::cout<< "Size: ";size->printTree(n);
+			std::cout << std::endl;
+		}
 	}
 };
 
@@ -268,5 +283,17 @@ class FunctionDeclaration : public Node{
 	}
 };
 
+class ObjectInitialiser : public Node{
+	public:
+	NodePtr initList;
+	ObjectInitialiser(NodePtr _initList): initList(_initList) {}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout<< "Object Initlialiser:" << std::endl;
+		if(initList != NULL){initList->printTree(n+1);}
+	}
+};
 
 #endif
