@@ -13,8 +13,13 @@ class Node{
 
 	public:
 		virtual void printTree(int n) = 0;
+<<<<<<< HEAD
 		virtual void printPy(){ std::cout << "#python not implemented for this command\n";}
 		virtual void printMips(); //TODO - Implement this
+=======
+		//virtual void printPy(std::string fileName); //TODO - Implement this
+		//virtual void printMips(std::string fileName); //TODO - Implement this
+>>>>>>> 08a552f0602c09a3dc81cfed1bfdd499d7eef7da
 
 };
 typedef Node* NodePtr;

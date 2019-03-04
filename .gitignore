@@ -3,3 +3,5 @@ full_compiler/src/c_lexer.yy.o
 full_compiler/src/c_lexer_main.o
 full_compiler/bin/c_lexer
 full_compiler/src/c_parser.output
+full_compiler/input_test.txt
+full_compiler/output.txt
