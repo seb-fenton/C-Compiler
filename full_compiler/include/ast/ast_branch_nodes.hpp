@@ -402,5 +402,18 @@ class struct_declarator : public Node{
 	}
 };
 
+class Pointer : public Node{
+	public:
+	int ptrDepth = 0;
+	Pointer(): ptrDepth(1) {}
+	void inc(){ptrDepth++;}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Pointer Depth: "<< ptrDepth << std::endl;
+	}
+};
+
 
 #endif

@@ -22,6 +22,7 @@
   double number;
   std::string *string;
   identifier_list *idlist;
+  Pointer *ptrNode;
 }
 
 %token T_ASSIGNMENT_OP RIGHT_SHIFT_OP LEFT_SHIFT_OP INC_OP DEC_OP PTR_OP AND_OP OR_OP LE_OP GE_OP EQ_OP NE_OP
@@ -36,9 +37,9 @@
 %type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list block_item_list declaration_list
 %type <bnode> argument_expression_list parameter_list initialiser_list struct_declaration_list struct_declarator_list
 %type <node> declarator direct_declarator init_declarator initialiser declaration declaration_specifiers struct_declarator
-%type <node> pointer external_declaration function_definition compound_statement statement parameter_declaration
+%type <node> external_declaration function_definition compound_statement statement parameter_declaration
 %type <node> block_item expression_statement selection_statement iteration_statement labeled_statement struct_declaration
-%type <node> jump_statement designation designator_list designator typedef_declaration struct_or_union_specifier
+%type <node> jump_statement designation designator_list designator typedef_declaration struct_or_union_specifier type_name abstract_declarator direct_abstract_declarator
 %type <enode> assignment_expression conditional_expression logical_or_expression logical_and_expression inclusive_or_expression
 %type <enode> exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression
 %type <enode> multiplicative_expression cast_expression unary_expression postfix_expression primary_expression expression
@@ -46,6 +47,7 @@
 %type <number> FLOAT_CONSTANT INT_CONSTANT constant
 %type <string> TYPEDEF_NAME T_IDENTIFIER STRING_LITERAL T_ASSIGNMENT_OP assignment_operator
 %type <idlist> identifier_list
+%type <ptrNode> pointer
 
 %start root
 
@@ -142,7 +144,7 @@ declarator:
 
 direct_declarator:
 		T_IDENTIFIER 										{$$ = new direct_declarator(*($1));}//Need node to check bindings and T_IDENTIFIER names
-		|'(' declarator ')' 								{ }								//works for dereferencing pointers
+		|'(' declarator ')' 								{ $$ = $2; }								//works for dereferencing pointers
 		| direct_declarator '[' ']' 						{$$ = new ArrayDeclaration($1);}//need node for array declaration   
 		| direct_declarator '[' constant_expression ']' 	{$$ = new ArrayDeclaration($1, $3);}//make a second constructer for declarations with expressions
 		| direct_declarator '(' parameter_type_list ')' 	{$$ = new FunctionDeclaration($1, $3);} 	//used for function definitions
@@ -156,7 +158,7 @@ initialiser_list:
 		;
 
 initialiser:
-		'{' initialiser_list '}' 				{$$ = new ObjectInitialiser($2);}//used for arrays 
+		'{' initialiser_list '}' 				{$$ = new ObjectInitialiser($2);}//used for arrays & structs
 		|'{' initialiser_list ',' '}'			{$$ = new ObjectInitialiser($2);}//
 		|assignment_expression					{$$ = new initialiser($1);} //assignment_expression is anything that would be on the RHS of an assignment operator. An expression is just a list of these, we can rename it.
 		;								//Also this can be a full expression with its own assignment operator but dw about that for now
@@ -255,7 +257,7 @@ unary_expression:  									//PAGE : 43
 		| '~' cast_expression											{$$ = new BitwiseNotOp($2);}
 		| '!' cast_expression											{$$ = new LogicalNotOp($2);}
 		| T_SIZEOF unary_expression										{$$ = new SizeOf($2);}
-		| T_SIZEOF '(' declaration_specifier_list ')'					{$$ = new SizeOf($3);}
+		| T_SIZEOF '(' type_name ')'									{$$ = new SizeOf($3);}
 		;
 
 postfix_expression: 
@@ -308,8 +310,9 @@ parameter_list:
 		;
 
 parameter_declaration:
-		declaration_specifier_list declarator			{$$ = new parameter_declaration($1, $2);}
-		| declaration_specifier_list					{$$ = new parameter_declaration($1);}
+		declaration_specifier_list declarator				{$$ = new parameter_declaration($1, $2);}
+		| declaration_specifier_list abstract_declarator	{$$ = new parameter_declaration($1, $2);}
+		| declaration_specifier_list						{$$ = new parameter_declaration($1);}
 		;
 
 identifier_list:
@@ -317,9 +320,9 @@ identifier_list:
 		| identifier_list ',' T_IDENTIFIER				{$$ = $1; $$->push(*($3));}
 		;
 
-pointer:
-		'*'
-		| '*' pointer
+pointer:	
+		'*'												{$$ = new Pointer();}
+		| '*' pointer									{$$ = $2; $$->inc();}
 		;
 
 argument_expression_list:
@@ -327,6 +330,28 @@ argument_expression_list:
 		| argument_expression_list ',' assignment_expression	{$$ = $1; $$->push($3);}
 		;
 
+type_name:
+		declaration_specifier_list
+		| declaration_specifier_list abstract_declarator
+		;
+
+abstract_declarator:
+		pointer
+		| direct_abstract_declarator
+		| pointer direct_abstract_declarator
+		;
+
+direct_abstract_declarator:
+		'(' abstract_declarator ')'
+		| '[' ']'
+		| '[' constant_expression ']'
+		| direct_abstract_declarator '[' ']'
+		| direct_abstract_declarator '[' constant_expression ']'
+		| '(' ')'
+		| '(' parameter_type_list ')'
+		| direct_abstract_declarator '(' ')'
+		| direct_abstract_declarator '(' parameter_type_list ')'
+		;
 
 //statements
 
