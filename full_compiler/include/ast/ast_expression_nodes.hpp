@@ -3,12 +3,6 @@
 
 #include "ast_base_nodes.hpp"
 
-//---------------------------------------------//
-//------------EXPRESSION-----------------------//
-//           Expression Nodes                  //
-//---------------------------------------------//
-
-
 
 class primary_expression : public ExpressionNode{
 	public:
@@ -449,5 +443,6 @@ class postfix_dec_init: public ExpressionNode{
     } 
     
 };
+
 
 #endif

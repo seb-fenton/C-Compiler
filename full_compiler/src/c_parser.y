@@ -176,13 +176,13 @@ constant_expression:
 		;
 
 assignment_expression:
-		conditional_expression									{$$ = $1;}		//this will go through all the operators that are used in evaulating an expression
-		| unary_expression assignment_operator assignment_expression {$$ = new assignment_expression($1, *$2, $3);}	//need to decide how ast will deal with expressions.  PAGE:53 in spec
+		conditional_expression											{$$ = $1;}		//this will go through all the operators that are used in evaulating an expression
+		| unary_expression assignment_operator assignment_expression 	{$$ = new assignment_expression($1, *$2, $3);}	//need to decide how ast will deal with expressions.  PAGE:53 in spec
 		;																									//specifcally how to make it easier to print assembly
 
 conditional_expression:
-		logical_or_expression											{$$ = $1;}	//this binds the highest and is thus first, 
-		| logical_or_expression '?' expression ':' conditional_expression {$$ = new conditional_expression($1,$3,$5);}	//the following expression rules just go in order of priority
+		logical_or_expression												{$$ = $1;}	//this binds the highest and is thus first, 
+		| logical_or_expression '?' expression ':' conditional_expression 	{$$ = new conditional_expression($1,$3,$5);}	//the following expression rules just go in order of priority
 		;
 
 logical_or_expression:
@@ -284,8 +284,8 @@ primary_expression:
 		;
 
 constant:
-		INT_CONSTANT			{$$ = $1;}
-		| FLOAT_CONSTANT		{$$ = $1;}
+		INT_CONSTANT													{$$ = $1;}
+		| FLOAT_CONSTANT												{$$ = $1;}
 		| ENUMERATION_CONSTANT  // Do this later
 		;
 

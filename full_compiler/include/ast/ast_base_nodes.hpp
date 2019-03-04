@@ -9,18 +9,12 @@
 #include <map>
 
 
-
-
-
-
-
-//----------BASE_CLASS---------//
 class Node{
 
 	public:
 		virtual void printTree(int n) = 0;
-		virtual void printPy(std::string fileName); //TODO - Implement this
-		virtual void printMips(std::string fileName); //TODO - Implement this
+		virtual void printPy(){ std::cout << "#python not implemented for this command\n";}
+		virtual void printMips(); //TODO - Implement this
 
 };
 typedef Node* NodePtr;
@@ -41,7 +35,7 @@ class BranchNode : public Node{
 
 		virtual ~BranchNode()  {}
 };
-
+typedef BranchNode* BranchPtr;
 
 
 #endif

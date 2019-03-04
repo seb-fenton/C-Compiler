@@ -6,14 +6,18 @@ int main(int argc, char* argv[]){
         return -1;
     }
 
-    if(argv[1] == "--translate"){
+    if(std::string(argv[1]) =="--translate"){
         Node* ast = parseAST(argv[2]); 
-        ast->printPy(argv[4]);
+        freopen(argv[4],"w",stdout);
+        ast->printPy();
+        fclose(stdout);
         return 0;
     }
-    else if(argv[1] == "-S"){
+    else if(std::string(argv[1]) == "-S"){
         Node* ast = parseAST(argv[2]);
-        ast->printMips(argv[4]);
+        freopen(argv[4],"w",stdout);
+        ast->printMips();
+        fclose(stdout);
         return 0;
     }
     else std::cerr << "invalid input format" << std::endl;
