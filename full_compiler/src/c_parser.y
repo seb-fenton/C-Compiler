@@ -39,7 +39,7 @@
 %type <node> declarator direct_declarator init_declarator initialiser declaration declaration_specifiers struct_declarator
 %type <node> external_declaration function_definition compound_statement statement parameter_declaration
 %type <node> block_item expression_statement selection_statement iteration_statement labeled_statement struct_declaration
-%type <node> jump_statement designation designator_list designator typedef_declaration struct_or_union_specifier type_name abstract_declarator direct_abstract_declarator
+%type <node> jump_statement typedef_declaration struct_or_union_specifier type_name abstract_declarator direct_abstract_declarator
 %type <enode> assignment_expression conditional_expression logical_or_expression logical_and_expression inclusive_or_expression
 %type <enode> exclusive_or_expression and_expression equality_expression relational_expression shift_expression additive_expression
 %type <enode> multiplicative_expression cast_expression unary_expression postfix_expression primary_expression expression

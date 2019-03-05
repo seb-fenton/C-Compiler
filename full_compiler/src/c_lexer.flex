@@ -1,6 +1,7 @@
 %option noyywrap
 %option stack
 %x COMMENT_BLOCK
+%x ENUMS
 %s TYPEDEFS
 
 %{
@@ -16,6 +17,7 @@
     int store_typedef();
     void create_typedef();
     int check_type();
+    int store_enum();
 %}
 
 
@@ -61,6 +63,7 @@ WHITESPACE          [ \t\r\n]+
 "const"		{ return T_CONST; }
 "volatile"	{ return T_VOLATILE; }
 "struct"    { return T_STRUCT; }
+"enum"      { yy_push_state(ENUMS); return T_ENUM;}
 
 "goto"		{ return T_GOTO; }
 "break"		{ return T_BREAK; }
@@ -118,6 +121,7 @@ WHITESPACE          [ \t\r\n]+
 
 <INITIAL>{IDENTIFIER}	{return check_type();} //Store variable names in bindings
 <TYPEDEFS>{IDENTIFIER} { return store_typedef(); } //when making bindings store all typdefs in context
+<ENUMS>{IDENTIFIER} { BEGIN(INITIAL); return store_enum();}
 
 {HEXPREFIX}{HEX}+{INTEGERSUFFIX}?                               {yylval.number=strtod(yytext, 0); return INT_CONSTANT; }
 {NONZERO}{DEC}*{INTEGERSUFFIX}?                                 {yylval.number=strtod(yytext, 0);  return INT_CONSTANT; }
@@ -150,10 +154,18 @@ void create_typedef(){
     ctx.type_defs[ctx.scopeLevel].push_back(ctx.temp_typedef);
 }
 
+int store_enum(){
+    yylval.string = new std::string(yytext);
+    ctx.enums[ctx.scopeLevel].push_back(*(yylval.string));
+    return T_IDENTIFIER;
+}
+
 int check_type(){
     yylval.string = new std::string(yytext);
     if(std::find(ctx.type_defs[ctx.scopeLevel].begin(),ctx.type_defs[ctx.scopeLevel].end(), *yylval.string) != ctx.type_defs[ctx.scopeLevel].end()){
         return TYPEDEF_NAME;
+    } else if(std::find(ctx.enums[ctx.scopeLevel].begin(),ctx.enums[ctx.scopeLevel].end(), *yylval.string) != ctx.enums[ctx.scopeLevel].end()){
+        return ENUMARATION_CONSTANT
     } else{
         return T_IDENTIFIER;
     }
