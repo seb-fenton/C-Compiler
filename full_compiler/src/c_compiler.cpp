@@ -9,7 +9,7 @@ int main(int argc, char* argv[]){
     if(std::string(argv[1]) =="--translate"){
         Node* ast = parseAST(argv[2]); 
         freopen(argv[4],"w",stdout);
-        ast->printPy();
+        ast->printPy(0);
         fclose(stdout);
         return 0;
     }
