@@ -10,6 +10,8 @@
   // that Bison generated code can call them.
   int yylex(void);
   void yyerror(const char *);
+  //to allow file input to AST
+  extern FILE *yyin;
 }
 %define parse.error verbose
 
@@ -417,9 +419,11 @@ jump_statement:
 
 BranchNode *g_root;
 
-Node *parseAST()
+Node *parseAST(char* fileName)
 {
   	g_root=0;
+	yyin = fopen(fileName, "r");
   	yyparse();
+  	fclose(yyin);
   	return g_root;
 }

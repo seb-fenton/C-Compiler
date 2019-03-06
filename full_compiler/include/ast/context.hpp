@@ -31,6 +31,16 @@ struct context{
 struct pyContext{
     int scopeLevel = 0;
 
+    union declarations 
+    {
+        int varInt;
+        double varDouble;
+        float varFloat;
+        //std::string varString;
+    };
+
+
+
     void incScope(){
         scopeLevel++;
     }
@@ -39,6 +49,7 @@ struct pyContext{
         scopeLevel--;
     }
 };
+
 
 static context ctx;
 
