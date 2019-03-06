@@ -30,7 +30,7 @@
 %token T_VOID T_CHAR T_SHORT T_INT T_LONG T_FLOAT T_DOUBLE T_SIGNED
 %token T_UNSIGNED T_TYPEDEF T_EXTERN T_STATIC T_AUTO T_REGISTER T_CONST T_VOLATILE T_STRUCT T_UNION
 %token T_GOTO T_BREAK T_CONTINUE T_CASE T_DEFAULT T_SWITCH T_IF T_ELSE 
-%token T_RETURN T_WHILE T_DO T_FOR T_SIZEOF
+%token T_RETURN T_WHILE T_DO T_FOR T_SIZEOF T_ENUM
 %token TYPEDEF_NAME T_IDENTIFIER ENUMERATION_CONSTANT
 
 //TODO: sort out which are branch nodes and which are normal, maybe introduce expression nodes
@@ -144,7 +144,7 @@ declarator:
 
 direct_declarator:
 		T_IDENTIFIER 										{$$ = new direct_declarator(*($1));}//Need node to check bindings and T_IDENTIFIER names
-		|'(' declarator ')' 								{ $$ = $2; }								//works for dereferencing pointers
+		|'(' declarator ')' 								{$$ = $2;}								//works for dereferencing pointers
 		| direct_declarator '[' ']' 						{$$ = new ArrayDeclaration($1);}//need node for array declaration   
 		| direct_declarator '[' constant_expression ']' 	{$$ = new ArrayDeclaration($1, $3);}//make a second constructer for declarations with expressions
 		| direct_declarator '(' parameter_type_list ')' 	{$$ = new FunctionDeclaration($1, $3);} 	//used for function definitions
@@ -243,7 +243,7 @@ multiplicative_expression:
 
 cast_expression:
 		unary_expression 												{$$ = $1;}	
-		| '(' declaration_specifier_list ')' cast_expression			{$$ = new cast_expression($2, $4);}	//all leads to getting the variable name at one point
+		| '(' type_name ')' cast_expression			{$$ = new cast_expression($2, $4);}	//all leads to getting the variable name at one point
 		;
 
 unary_expression:  									//PAGE : 43
@@ -331,23 +331,23 @@ argument_expression_list:
 		;
 
 type_name:
-		declaration_specifier_list
-		| declaration_specifier_list abstract_declarator
+		declaration_specifier_list								{$$ = new type_name($1);}
+		| declaration_specifier_list abstract_declarator		{$$ = new type_name($1, $2);}
 		;
 
 abstract_declarator:
-		pointer
-		| direct_abstract_declarator
-		| pointer direct_abstract_declarator
+		pointer													{$$ = new abstract_pointer($1);}
+		| direct_abstract_declarator							{$$ = new abstract_declarator($1);}
+		| pointer direct_abstract_declarator					{$$ = new abstract_declarator($2, $1);}
 		;
 
 direct_abstract_declarator:
-		'(' abstract_declarator ')'
-		| '[' ']'
-		| '[' constant_expression ']'
-		| direct_abstract_declarator '[' ']'
-		| direct_abstract_declarator '[' constant_expression ']'
-		| '(' ')'
+		'(' abstract_declarator ')'									{$$ = $2;}
+		| '[' ']'													{$$ = new AbstractArray();}
+		| '[' constant_expression ']'								{$$ = new AbstractArray(NULL, $2);}
+		| direct_abstract_declarator '[' ']'						{$$ = new AbstractArray($1, NULL);}
+		| direct_abstract_declarator '[' constant_expression ']'	{$$ = new AbstractArray($1, $3);}
+		| '(' ')'													//TODO: do it later.
 		| '(' parameter_type_list ')'
 		| direct_abstract_declarator '(' ')'
 		| direct_abstract_declarator '(' parameter_type_list ')'
