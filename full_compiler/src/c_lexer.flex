@@ -1,7 +1,6 @@
 %option noyywrap
 %option stack
 %x COMMENT_BLOCK
-%x ENUMS
 %s TYPEDEFS
 
 %{
@@ -17,7 +16,6 @@
     int store_typedef();
     void create_typedef();
     int check_type();
-    int store_enum();
 %}
 
 
@@ -46,24 +44,18 @@ WHITESPACE          [ \t\r\n]+
 
 "//"[^\n]*  {} //one-line comment
 
-"void"		{ return T_VOID; }
-"char"		{ return T_CHAR; }
-"short"		{ return T_SHORT; }
-"int"		{return T_INT; }
-"long"		{ return T_LONG; }
-"float"		{ return T_FLOAT; }
-"double"	{ return T_DOUBLE; }
-"signed"	{ return T_SIGNED; }
-"unsigned"	{ return T_UNSIGNED; }
-"typedef"	{ yy_push_state(TYPEDEFS); return T_TYPEDEF; }
-"extern"	{ return T_EXTERN; }
-"static"	{ return T_STATIC; }
-"auto"		{ return T_AUTO; }
-"register"	{ return T_REGISTER; }
-"const"		{ return T_CONST; }
-"volatile"	{ return T_VOLATILE; }
-"struct"    { return T_STRUCT; }
-"enum"      { yy_push_state(ENUMS); return T_ENUM;}
+"void"		{ctx.declaration = 1; return T_VOID; }
+"char"		{ctx.declaration = 1; return T_CHAR; }
+"short"		{ctx.declaration = 1; return T_SHORT; }
+"int"		{ctx.declaration = 1; return T_INT; }
+"long"		{ctx.declaration = 1; return T_LONG; }
+"float"		{ctx.declaration = 1; return T_FLOAT; }
+"double"	{ctx.declaration = 1; return T_DOUBLE; }
+"signed"	{ctx.declaration = 1; return T_SIGNED; }
+"unsigned"	{ctx.declaration = 1; return T_UNSIGNED; }
+"typedef"	{ctx.declaration = 1; yy_push_state(TYPEDEFS); return T_TYPEDEF; }
+"struct"    {ctx.declaration = 1; return T_STRUCT; }
+"enum"      {ctx.declaration = 1; return T_ENUM;}
 
 "goto"		{ return T_GOTO; }
 "break"		{ return T_BREAK; }
@@ -93,7 +85,7 @@ WHITESPACE          [ \t\r\n]+
 ">="			        { return GE_OP; }
 "=="			        { return EQ_OP; }
 "!="			        { return NE_OP; }
-<INITIAL>";"		    {return ';'; }
+<INITIAL>";"		    { return ';'; }
 <TYPEDEFS>";"			{ create_typedef(); BEGIN(INITIAL); return ';'; }
 ","					    { return ','; }
 ":"					    { return ':'; }
@@ -121,7 +113,6 @@ WHITESPACE          [ \t\r\n]+
 
 <INITIAL>{IDENTIFIER}	{return check_type();} //Store variable names in bindings
 <TYPEDEFS>{IDENTIFIER} { return store_typedef(); } //when making bindings store all typdefs in context
-<ENUMS>{IDENTIFIER} { BEGIN(INITIAL); return store_enum();}
 
 {HEXPREFIX}{HEX}+{INTEGERSUFFIX}?                               {yylval.number=strtod(yytext, 0); return INT_CONSTANT; }
 {NONZERO}{DEC}*{INTEGERSUFFIX}?                                 {yylval.number=strtod(yytext, 0);  return INT_CONSTANT; }
@@ -154,18 +145,10 @@ void create_typedef(){
     ctx.type_defs[ctx.scopeLevel].push_back(ctx.temp_typedef);
 }
 
-int store_enum(){
-    yylval.string = new std::string(yytext);
-    ctx.enums[ctx.scopeLevel].push_back(*(yylval.string));
-    return T_IDENTIFIER;
-}
-
 int check_type(){
     yylval.string = new std::string(yytext);
     if(std::find(ctx.type_defs[ctx.scopeLevel].begin(),ctx.type_defs[ctx.scopeLevel].end(), *yylval.string) != ctx.type_defs[ctx.scopeLevel].end()){
         return TYPEDEF_NAME;
-    } else if(std::find(ctx.enums[ctx.scopeLevel].begin(),ctx.enums[ctx.scopeLevel].end(), *yylval.string) != ctx.enums[ctx.scopeLevel].end()){
-        return ENUMERATION_CONSTANT;
     } else{
         return T_IDENTIFIER;
     }

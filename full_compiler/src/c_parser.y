@@ -35,9 +35,9 @@
 
 //TODO: sort out which are branch nodes and which are normal, maybe introduce expression nodes
 %type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list block_item_list declaration_list
-%type <bnode> argument_expression_list parameter_list initialiser_list struct_declaration_list struct_declarator_list
+%type <bnode> argument_expression_list parameter_list initialiser_list struct_declaration_list struct_declarator_list enumerator_list enumerator
 %type <node> declarator direct_declarator init_declarator initialiser declaration declaration_specifiers struct_declarator
-%type <node> external_declaration function_definition compound_statement statement parameter_declaration
+%type <node> external_declaration function_definition compound_statement statement parameter_declaration enum_specifier
 %type <node> block_item expression_statement selection_statement iteration_statement labeled_statement struct_declaration
 %type <node> jump_statement typedef_declaration struct_or_union_specifier type_name abstract_declarator direct_abstract_declarator
 %type <enode> assignment_expression conditional_expression logical_or_expression logical_and_expression inclusive_or_expression
@@ -69,8 +69,8 @@ translation_unit:
 		;
 
 external_declaration: 
-		function_definition {$$ = $1;} 	//create function node in next step not now
-		| declaration   	{$$ = $1;}	//create declaration node in next step
+		function_definition 	{$$ = $1;} 	//create function node in next step not now
+		| declaration   		{$$ = $1;}	//create declaration node in next step
 		| typedef_declaration 	{$$ = $1;}		//need to make this ourselves, ill explain it to you
 		;
 
@@ -99,6 +99,7 @@ declaration_specifiers: //we need to make this a class which holds the specifer 
     	|T_SIGNED					{$$ = new declaration_specifiers("signed");}
     	|T_UNSIGNED					{$$ = new declaration_specifiers("unsigned");}				
     	|struct_or_union_specifier	{$$ = $1;} //might want to make different classes for special cases
+		|enum_specifier			{$$ = $1;}
 		|TYPEDEF_NAME				{$$ = new TypdefSpecifier(*($1));}
 		;
 
@@ -128,6 +129,25 @@ struct_declarator:
 		| declarator ':' constant_expression					{$$ = new struct_declarator($1, $3);}
 		| declarator											{$$ = new struct_declarator($1);}
 		;
+
+enum_specifier:
+		T_ENUM '{' enumerator_list '}'
+		| T_ENUM T_IDENTIFIER '{' enumerator_list '}'
+		| T_ENUM T_IDENTIFIER
+		;
+
+enumerator_list:
+		 enumerator
+		| enumerator_list ',' enumerator
+		;
+
+
+enumerator:
+		T_IDENTIFIER
+		| T_IDENTIFIER '=' constant_expression
+		;
+
+
 
 
 init_declarator_list:
