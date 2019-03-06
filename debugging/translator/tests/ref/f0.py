@@ -1,7 +1,7 @@
 def main():
     return 10
 
-# Boilerplat
+# Boilerplate
 if __name__ == "__main__":
     import sys
     ret=main()

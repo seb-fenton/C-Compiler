@@ -11,4 +11,5 @@ Date,Effort,Developers,Milestones
 02/03,4h,SF,CreateAST
 03/03,2h,SF,MakeOverheadInfrastructure
 04/03,1h,SF,MakeOverheadInfrastructure
-40/03,6h,NG,CreateAST
+04/03,6h,NG,CreateAST
+06/03,9h,SF,CtoPython
