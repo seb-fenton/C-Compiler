@@ -197,7 +197,7 @@ logical_and_expression:
 
 inclusive_or_expression:
 		exclusive_or_expression											{$$ = $1;}
-		| logical_or_expression '|' exclusive_or_expression				{$$ = new InclusiveOrOp($1,$3);}
+		| inclusive_or_expression '|' exclusive_or_expression				{$$ = new InclusiveOrOp($1,$3);}
 		;
 
 
