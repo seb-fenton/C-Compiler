@@ -22,6 +22,20 @@ class translation_unit : public BranchNode{
 		}
 	}
 	~translation_unit() {}
+	void printPy(pyContext& context, std::ostream stream){
+        for(int i = 0; i < (int)branches.size(); i++){
+			branches[i]->printPy(context, stream);
+		}
+		tabprint(context.scopeLevel, stream);
+		stream << "if __name__ == \"__main__\":" << std::endl;
+		context.incScope();
+		tabprint(context.scopeLevel, stream);
+		stream << "import sys" << std::endl;
+		tabprint(context.scopeLevel, stream);
+		stream << "ret=main()" << std::endl;
+		tabprint(context.scopeLevel, stream);
+		stream << "sys.exit(ret)";
+    }
 };
 
 class declaration_specifier_list : public BranchNode{
@@ -117,6 +131,7 @@ class struct_declaration_list : public BranchNode {
 			branches[i]->printTree(n);
 		}
 	}
+
 };
 
 class struct_declarator_list : public BranchNode{
@@ -160,6 +175,12 @@ class declaration : public Node{
 		if(specifier_list != NULL){specifier_list->printTree(n+1);}
 		if(declarator_list != NULL)declarator_list->printTree(n+1);
 	}
+	void printPy(pyContext& context, std::ostream& stream){
+		specifier_list->printPy(context, stream);
+		declarator_list->printPy(context, stream);	
+		stream << std::endl;
+	}
+	
 };
 
 class declaration_specifiers : public Node{
@@ -173,9 +194,6 @@ class declaration_specifiers : public Node{
 		}
 		std::cout << "Declaration Specifier: " << type_name << std::endl;
 
-	}
-	void printPy(pyContext& context, std::ostream& stream){
-		stream << type_name;
 	}
 };
 
@@ -217,6 +235,10 @@ class declarator : public Node{
 		if(directDeclarator != NULL){directDeclarator->printTree(n+1);}
 		if(pointerPtr != NULL){pointerPtr->printTree(n+1);}
 	}
+	void printPy(pyContext& context, std::ostream& stream){
+		directDeclarator->printPy(context, stream);
+		pointerPtr->printPy(context, stream);
+	} //todopy - issue?
 };
 
 class direct_declarator : public Node{
@@ -248,6 +270,9 @@ class initialiser : public Node{
 		assignment->printTree(n);
 		std::cout << std::endl;
 	}
+	void printPy(pyContext& context, std::ostream& stream){
+		assignment->printPy(context, stream);
+	}
 };
 
 
@@ -267,8 +292,19 @@ class function_definition : public Node{
 		if(name != NULL){ name->printTree(n+1);}
 		if(decList != NULL){decList->printTree(n+1);}
 		if(statement != NULL){statement->printTree(n+1);}
-		
 	}
+	
+	void printPy(pyContext& context, std::ostream stream){
+        tabprint(context.scopeLevel, stream);
+		stream << "def ";
+        name->printPy(context, stream);
+		stream << std::endl;
+		context.incScope();
+		tabprint(context.scopeLevel, stream);
+		statement->printPy(context, stream);
+		context.decScope();
+		stream << std::endl;
+    }
 };
 
 class ArrayDeclaration : public Node{
@@ -323,6 +359,13 @@ class FunctionDeclaration : public Node{
 		if(argList != NULL){argList->printTree(n+1);}
 
 	}
+	void printPy(pyContext& context, std::ostream& stream){
+		funcName->printPy(context, stream);
+		stream << "(";
+		if(argList != NULL) argList->printPy(context, stream);
+		stream << ")";
+	}
+
 };
 
 class ObjectInitialiser : public Node{
@@ -335,6 +378,9 @@ class ObjectInitialiser : public Node{
 		}
 		std::cout<< "Object Initlialiser:" << std::endl;
 		if(initList != NULL){initList->printTree(n+1);}
+	}
+	void printPy(pyContext& context, std::ostream& stream){
+		initList->printPy(context, stream);
 	}
 };
 

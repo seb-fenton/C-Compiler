@@ -16,6 +16,13 @@ class compound_statement : public Node{
 		std::cout << "Compound Statement" << std::endl;
 		if(block_list != NULL) {block_list->printTree(n+1);}
 	}
+    void printPy(pyContext& context, std::ostream stream){
+        tabprint(context.scopeLevel, stream);
+        context.incScope();
+        block_list->printPy(context, stream); //TODO : - resolve global scope print!
+        context.decScope();
+        stream << std::endl;
+    }
 };
 
 class expression_statement: public Node{
@@ -61,7 +68,7 @@ class IfStatement : public Node{
         if(_true != NULL) {_true->printTree(n+1);}
         if(_false != NULL) {_false->printTree(n+1);}
 	}
-    void pyPrint(pyContext& context, std::ostream& stream){
+    void printPy(pyContext& context, std::ostream& stream){
         stream << std::endl;
         tabprint(context.scopeLevel, stream);
         stream << "if(";
@@ -113,6 +120,16 @@ class WhileStatement : public Node{
 		if(cond != NULL) {cond->printTree(n);}
         std::cout<< std::endl;
         if(stmt != NULL) {stmt->printTree(n+1);}
+    }
+    void printPy(pyContext& context, std::ostream& stream){
+        tabprint(context.scopeLevel, stream);
+        stream << "while(";
+        cond->printPy(context, stream);
+        stream << ")\n";
+        context.incScope();
+        tabprint(context.scopeLevel, stream);
+        cond->printPy(context, stream);
+        context.decScope();
     }
 };
 
@@ -234,6 +251,12 @@ class ReturnStatement : public Node{
         if(expr != NULL){expr->printTree(n);}
         std::cout<<std::endl;
     }
+    void printPy(pyContext& context, std::ostream& stream){
+        tabprint(context.scopeLevel, stream);
+        stream << "return";
+        if(expr!=NULL) expr->printPy(context, stream);
+        stream << "\n";
+	}
 };
 
 

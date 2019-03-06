@@ -8,6 +8,6 @@
 #include "ast/context.hpp"
 
 
-extern Node *parseAST();
+extern Node *parseAST(char* fileName);
 
 #endif

@@ -39,6 +39,12 @@ class BranchNode : public Node{
 		}
 
 		virtual ~BranchNode()  {}
+		
+		virtual void printPy(pyContext& context, std::ostream& stream){
+			for(int i = 0; i < (int)branches.size(); i++){
+				branches[i]->printPy(context, stream);
+			}
+		}
 };
 typedef BranchNode* BranchPtr;
 

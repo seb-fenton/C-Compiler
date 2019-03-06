@@ -11,7 +11,7 @@ class primary_expression : public ExpressionNode{
 	void printTree(int n) {
 		std::cout << identifier;
 	}
-	void pyPrint(pyContext& context, std::ostream& stream){
+	void printPy(pyContext& context, std::ostream& stream){
 		stream << identifier;
 	}
 };
@@ -23,7 +23,7 @@ class constantNode : public ExpressionNode{
 	void printTree(int n) {
 		std::cout << init;
 	}
-	void pyPrint(pyContext& context, std::ostream& stream){
+	void printPy(pyContext& context, std::ostream& stream){
 		stream << init;
 	}
 };
@@ -35,7 +35,7 @@ class stringNode : public ExpressionNode{
 	void printTree(int n) {
 		std::cout << init;
 	}
-	void pyPrint(pyContext& context, std::ostream& stream){
+	void printPy(pyContext& context, std::ostream& stream){
 		stream << "\"" << init << "\"";
 	}
 };
@@ -50,7 +50,7 @@ class assignment_expression : public ExpressionNode{
 		std::cout<< " " << op << " " ;
 		if(right != NULL){right->printTree(n);}
 	}
-	void pyPrint(pyContext& context, std::ostream& stream){
+	void printPy(pyContext& context, std::ostream& stream){
 		left->printPy(context, stream);
 		stream << op;
 		right->printPy(context, stream);	
@@ -80,7 +80,7 @@ class LogicalOrOp: public ExpressionNode{
 		std::cout << " || ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void pyPrint(pyContext& context, std::ostream& stream){
+	void printPy(pyContext& context, std::ostream& stream){
 		left->printPy(context, stream);
 		stream << "||";
 		right->printPy(context, stream);	
@@ -98,7 +98,7 @@ class LogicalAndOp: public ExpressionNode{
 		std::cout << " && ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void pyPrint(pyContext& context, std::ostream& stream){
+	void printPy(pyContext& context, std::ostream& stream){
 		left->printPy(context, stream);
 		stream << "&&";
 		right->printPy(context, stream);	
@@ -148,7 +148,7 @@ class EqualOp: public ExpressionNode{
 		std::cout << " == ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void pyPrint(pyContext& context, std::ostream& stream){
+	void printPy(pyContext& context, std::ostream& stream){
 		left->printPy(context, stream);
 		stream << "==";
 		right->printPy(context, stream);	
@@ -186,7 +186,7 @@ class LessThanOp: public ExpressionNode{
 		std::cout << " < ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void pyPrint(pyContext& context, std::ostream& stream){
+	void printPy(pyContext& context, std::ostream& stream){
 		left->printPy(context, stream);
 		stream << "<";
 		right->printPy(context, stream);	
@@ -246,9 +246,9 @@ class AddOp: public ExpressionNode{
 		std::cout << " + ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void pyPrint(pyContext& context, std::ostream& stream){
+	void printPy(pyContext& context, std::ostream& stream){
 		left->printPy(context, stream);
-		std::cout << "+";
+		stream << "+";
 		right->printPy(context, stream);	
 	}
 };
@@ -262,7 +262,7 @@ class SubOp: public ExpressionNode{
 		std::cout << " - ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void pyPrint(pyContext& context, std::ostream& stream){
+	void printPy(pyContext& context, std::ostream& stream){
 		left->printPy(context, stream);
 		stream << "-";
 		right->printPy(context, stream);	
@@ -278,7 +278,7 @@ class MultOp: public ExpressionNode{
 		std::cout << " * ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void pyPrint(pyContext& context, std::ostream& stream){
+	void printPy(pyContext& context, std::ostream& stream){
 		left->printPy(context, stream);
 		stream << "*";
 		right->printPy(context, stream);	
