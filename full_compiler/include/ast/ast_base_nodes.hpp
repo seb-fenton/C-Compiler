@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <vector>
 #include <map>
+#include <fstream>
 #include "context.hpp"
 
 
@@ -14,11 +15,11 @@ class Node{
 
 	public:
 		virtual void printTree(int n) = 0;
-		virtual void printPy(pyContext& context){}
-		virtual void tabprint(int scope){
-			for(int i = 0; i < scope; i++){std::cout << "\t";}
+		virtual void printPy(pyContext& context, std::ostream& stream){}
+		virtual void tabprint(int scope, std::ostream& stream){
+			for(int i = 0; i < scope; i++){stream << "\t";}
 		}
-		virtual void printMips(); //TODO - Implement this
+		virtual void printMips(){} //TODO - Implement this
 
 };
 typedef Node* NodePtr;

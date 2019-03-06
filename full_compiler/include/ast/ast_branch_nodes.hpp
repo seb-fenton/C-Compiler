@@ -174,8 +174,8 @@ class declaration_specifiers : public Node{
 		std::cout << "Declaration Specifier: " << type_name << std::endl;
 
 	}
-	void printPy(pyContext& context){
-		std::cout << type_name;
+	void printPy(pyContext& context, std::ostream& stream){
+		stream << type_name;
 	}
 };
 
@@ -194,11 +194,11 @@ class init_declarator : public Node{
 		if(declaratorPtr != NULL){declaratorPtr->printTree(n+1);}
 		if(initialiserPtr != NULL){initialiserPtr->printTree(n+1);}
 	}
-	void printPy(pyContext& context){
-		declaratorPtr->printPy(context);
-		std::cout << "=";
-		if(initialiserPtr == NULL) std::cout << "0";
-		else initialiserPtr->printPy(context);	
+	void printPy(pyContext& context, std::ostream& stream){
+		declaratorPtr->printPy(context, stream);
+		stream << "=";
+		if(initialiserPtr == NULL) stream << "0";
+		else initialiserPtr->printPy(context, stream);	
 	}
 };
 
@@ -231,8 +231,8 @@ class direct_declarator : public Node{
 		}
 		std::cout << "Direct Declarator: " << identifier << std::endl;
 	}
-	void printPy(pyContext& context){
-		std::cout << identifier;	
+	void printPy(pyContext& context, std::ostream& stream){
+		stream << identifier;	
 	}
 };
 

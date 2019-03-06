@@ -13,10 +13,9 @@ CPPFLAGS += -Wno-unused-function
 ###COMPILER RULES###
 compiler: bin/c_compiler
 
-bin/c_compiler : bin/c_compiler.o
-	mkdir -p bin
-	g++ $(CPPFLAGS) -o bin/c_compiler bin/c_compiler.o
+bin/c_compiler : bin/c_compiler.o src/c_parser.tab.o src/c_lexer.yy.o
 	make parser
+	g++ $(CPPFLAGS) -o bin/c_compiler bin/c_compiler.o src/c_parser.tab.o src/c_lexer.yy.o
 
 bin/c_compiler.o : src/c_compiler.cpp 
 	mkdir -p bin
@@ -28,7 +27,7 @@ bin/c_compiler.o : src/c_compiler.cpp
 parser: src/c_lexer.yy.cpp
 parsertest : bin/eval_expr
 
-bin/eval_expr : src/eval_parser.o src/c_parser.tab.o src/c_lexer.yy.o src/c_parser.tab.o
+bin/eval_expr : src/eval_parser.o src/c_parser.tab.o src/c_lexer.yy.o 
 	mkdir -p bin
 	g++ $(CPPFLAGS) -o bin/eval_expr $^
 
@@ -51,4 +50,5 @@ clean :
 	-rm -rf src/*.tab.hpp
 	-rm -rf src/*.tab.cpp
 	-rm -rf src/*.o
+	-rm -rf src/*.output
 	-rm -rf bin

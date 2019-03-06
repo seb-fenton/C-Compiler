@@ -10,5 +10,4 @@
 
 extern Node *parseAST();
 
-
 #endif

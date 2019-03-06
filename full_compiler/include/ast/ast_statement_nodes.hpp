@@ -61,24 +61,24 @@ class IfStatement : public Node{
         if(_true != NULL) {_true->printTree(n+1);}
         if(_false != NULL) {_false->printTree(n+1);}
 	}
-    void pyPrint(pyContext& context){
-        std::cout << std::endl;
-        tabprint(context.scopeLevel);
-        std::cout << "if(";
-        cond->printPy(context);
-        std::cout << "):\n";
+    void pyPrint(pyContext& context, std::ostream& stream){
+        stream << std::endl;
+        tabprint(context.scopeLevel, stream);
+        stream << "if(";
+        cond->printPy(context, stream);
+        stream << "):\n";
         context.incScope();
-        tabprint(context.scopeLevel);
-        _true->printPy(context);
+        tabprint(context.scopeLevel, stream);
+        _true->printPy(context, stream);
         context.decScope();
 
         if(_false!=NULL){
-            std::cout << std::endl;
-            tabprint(context.scopeLevel);
-            std::cout << "else():\n";
+            stream << std::endl;
+            tabprint(context.scopeLevel, stream);
+            stream << "else():\n";
             context.incScope();
-            tabprint(context.scopeLevel);
-            _false->printPy(context);
+            tabprint(context.scopeLevel, stream);
+            _false->printPy(context, stream);
             context.decScope();
         }
     }
