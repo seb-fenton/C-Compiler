@@ -18,7 +18,7 @@ bin/c_compiler : bin/c_compiler.o
 	g++ $(CPPFLAGS) -o bin/c_compiler bin/c_compiler.o
 	make parser
 
-bin/c_compiler.o : src/c_compiler.cpp
+bin/c_compiler.o : src/c_compiler.cpp 
 	mkdir -p bin
 	g++ $(CPPFLAGS) -c src/c_compiler.cpp -o bin/c_compiler.o
 

@@ -10,8 +10,8 @@
 #include <algorithm>
 
 struct context{
-    std::vector<std::vector<std::string>> type_defs = {{}};
-    std::vector<std::vector<std::string>> enums = {{}};
+    std::vector<std::vector<std::string> > type_defs = {{}};
+    std::vector<std::vector<std::string> > enums = {{}};
     int scopeLevel = 0;
     std::string temp_typedef;
 
@@ -26,6 +26,10 @@ struct context{
         enums.pop_back();
         scopeLevel--;
     }
+};
+
+struct pyContext{
+    //std::vector
 };
 
 static context ctx;

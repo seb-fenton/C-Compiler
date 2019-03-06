@@ -49,6 +49,9 @@
 %type <idlist> identifier_list
 %type <ptrNode> pointer
 
+%nonassoc NOELSE
+%nonassoc T_ELSE
+
 %start root
 
 %%
@@ -128,8 +131,8 @@ struct_declarator:
 
 
 init_declarator_list:
-		init_declarator	{$$ = new init_declarator_list($1);}						//same way as sbove do $$->push($1) to store the init_declarator in the list node
-		| init_declarator_list ',' init_declarator {$$ = $1; $$->push($3);}			
+		init_declarator											{$$ = new init_declarator_list($1);}	//same way as sbove do $$->push($1) to store the init_declarator in the list node
+		| init_declarator_list ',' init_declarator 				{$$ = $1; $$->push($3);}			
 		; 
 
 init_declarator:
@@ -281,7 +284,7 @@ primary_expression:
 constant:
 		INT_CONSTANT													{$$ = $1;}
 		| FLOAT_CONSTANT												{$$ = $1;}
-		| ENUMERATION_CONSTANT  // Do this later
+		| ENUMERATION_CONSTANT  {}// Do this later
 		;
 
 expression:
@@ -289,9 +292,9 @@ expression:
 		;
 		
 function_definition:
-		declaration_specifier_list declarator declaration_list compound_statement
+		declaration_specifier_list declarator declaration_list compound_statement		{/*TODO*/}
 		| declaration_specifier_list declarator compound_statement						{$$ = new function_definition($1, $2, $3);}
-		| declarator declaration_list compound_statement
+		| declarator declaration_list compound_statement								{/*TODO*/}
 		| declarator compound_statement													{$$ = new function_definition($1, $2);}
 		;
 
@@ -331,26 +334,26 @@ argument_expression_list:
 		;
 
 type_name:
-		declaration_specifier_list
-		| declaration_specifier_list abstract_declarator
+		declaration_specifier_list									{/*TODO*/}
+		| declaration_specifier_list abstract_declarator			{/*TODO*/}
 		;
 
 abstract_declarator:
-		pointer
-		| direct_abstract_declarator
-		| pointer direct_abstract_declarator
+		pointer														{/*TODO*/}
+		| direct_abstract_declarator								{/*TODO*/}
+		| pointer direct_abstract_declarator						{/*TODO*/}
 		;
 
 direct_abstract_declarator:
-		'(' abstract_declarator ')'
-		| '[' ']'
-		| '[' constant_expression ']'
-		| direct_abstract_declarator '[' ']'
-		| direct_abstract_declarator '[' constant_expression ']'
-		| '(' ')'
-		| '(' parameter_type_list ')'
-		| direct_abstract_declarator '(' ')'
-		| direct_abstract_declarator '(' parameter_type_list ')'
+		'(' abstract_declarator ')'									{/*TODO*/}
+		| '[' ']'													{/*TODO*/}
+		| '[' constant_expression ']'								{/*TODO*/}
+		| direct_abstract_declarator '[' ']'						{/*TODO*/}
+		| direct_abstract_declarator '[' constant_expression ']'	{/*TODO*/}
+		| '(' ')'													{/*TODO*/}
+		| '(' parameter_type_list ')'								{/*TODO*/}
+		| direct_abstract_declarator '(' ')'						{/*TODO*/}
+		| direct_abstract_declarator '(' parameter_type_list ')'	{/*TODO*/}
 		;
 
 //statements
@@ -386,7 +389,7 @@ expression_statement:
 
 selection_statement:
 		T_IF '(' expression ')' statement T_ELSE statement  {$$ = new IfStatement($3, $5, $7);}//Page: 77
-		| T_IF '(' expression ')' statement 				{$$ = new IfStatement($3, $5);}
+		| T_IF '(' expression ')' statement %prec NOELSE 	{$$ = new IfStatement($3, $5);}
 		| T_SWITCH '(' expression ')' statement				{$$ = new SwitchStatement($3, $5);}
 		;
 

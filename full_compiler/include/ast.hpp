@@ -9,7 +9,6 @@
 
 
 extern Node *parseAST();
-Node* parseAST(std::string fileName); //TODO - IMPLEMENT THIS
 
 
 #endif

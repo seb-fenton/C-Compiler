@@ -13,7 +13,10 @@ class Node{
 
 	public:
 		virtual void printTree(int n) = 0;
-		virtual void printPy(int scope); //TODO - Implement this
+		virtual void printPy(){}
+		virtual void tabprint(int scope){
+			for(int i = 0; i < scope; i++){std::cout << "\t";}
+		}
 		virtual void printMips(); //TODO - Implement this
 
 };

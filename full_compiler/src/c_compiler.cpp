@@ -1,5 +1,8 @@
 #include "../include/ast.hpp"
 
+extern Node *parseAST();
+
+
 int main(int argc, char* argv[]){
     if(argc != 5){ 
         std::cerr << "invalid input format" << std::endl;
@@ -7,14 +10,14 @@ int main(int argc, char* argv[]){
     }
 
     if(std::string(argv[1]) =="--translate"){
-        Node* ast = parseAST(argv[2]); 
+        Node* ast = parseAST(/*filename?*/); 
         freopen(argv[4],"w",stdout);
-        ast->printPy(0);
+        ast->printPy();
         fclose(stdout);
         return 0;
     }
     else if(std::string(argv[1]) == "-S"){
-        Node* ast = parseAST(argv[2]);
+        Node* ast = parseAST(/*filename?*/);
         freopen(argv[4],"w",stdout);
         ast->printMips();
         fclose(stdout);

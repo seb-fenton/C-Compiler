@@ -11,6 +11,9 @@ class primary_expression : public ExpressionNode{
 	void printTree(int n) {
 		std::cout << identifier;
 	}
+	void printPy(){
+		std::cout << identifier;
+	}
 };
 
 class constantNode : public ExpressionNode{
@@ -18,6 +21,9 @@ class constantNode : public ExpressionNode{
 	double init;
 	constantNode(double n): init(n) {}
 	void printTree(int n) {
+		std::cout << init;
+	}
+	void printPy(){
 		std::cout << init;
 	}
 };
@@ -28,6 +34,9 @@ class stringNode : public ExpressionNode{
 	stringNode(std::string n): init(n) {}
 	void printTree(int n) {
 		std::cout << init;
+	}
+	void printPy(){
+		std::cout << "\"" << init << "\"";
 	}
 };
 
@@ -40,6 +49,11 @@ class assignment_expression : public ExpressionNode{
 		if(left != NULL){left->printTree(n);}
 		std::cout<< " " << op << " " ;
 		if(right != NULL){right->printTree(n);}
+	}
+	void printPy(){
+		left->printPy();
+		std::cout << op;
+		right->printPy();	
 	}
 };	
 
@@ -66,6 +80,11 @@ class LogicalOrOp: public ExpressionNode{
 		std::cout << " || ";
 		if(right != NULL){right->printTree(n);}
 	}
+	void printPy(){
+		left->printPy();
+		std::cout << "||";
+		right->printPy();	
+	}
 };
 
 
@@ -78,6 +97,11 @@ class LogicalAndOp: public ExpressionNode{
 		if(left != NULL){left->printTree(n);}
 		std::cout << " && ";
 		if(right != NULL){right->printTree(n);}
+	}
+	void printPy(){
+		left->printPy();
+		std::cout << "&&";
+		right->printPy();	
 	}
 };
 
@@ -112,6 +136,7 @@ class AndOp: public ExpressionNode{
 		std::cout << " & ";
 		if(right != NULL){right->printTree(n);}
 	}
+
 };
 
 class EqualOp: public ExpressionNode{
@@ -120,8 +145,13 @@ class EqualOp: public ExpressionNode{
 	EqualOp(ExpPtr a, ExpPtr b): left(a), right(b){} 
 	void printTree(int n) {
 		if(left != NULL){left->printTree(n);}
-		std::cout << " = ";
+		std::cout << " == ";
 		if(right != NULL){right->printTree(n);}
+	}
+	void printPy(){
+		left->printPy();
+		std::cout << "==";
+		right->printPy();	
 	}
 };
 
@@ -155,6 +185,11 @@ class LessThanOp: public ExpressionNode{
 		if(left != NULL){left->printTree(n);}
 		std::cout << " < ";
 		if(right != NULL){right->printTree(n);}
+	}
+	void printPy(){
+		left->printPy();
+		std::cout << "<";
+		right->printPy();	
 	}
 };
 
@@ -211,6 +246,11 @@ class AddOp: public ExpressionNode{
 		std::cout << " + ";
 		if(right != NULL){right->printTree(n);}
 	}
+	void printPy(){
+		left->printPy();
+		std::cout << "+";
+		right->printPy();	
+	}
 };
 
 class SubOp: public ExpressionNode{
@@ -222,6 +262,11 @@ class SubOp: public ExpressionNode{
 		std::cout << " - ";
 		if(right != NULL){right->printTree(n);}
 	}
+	void printPy(){
+		left->printPy();
+		std::cout << "-";
+		right->printPy();	
+	}
 };
 
 class MultOp: public ExpressionNode{
@@ -232,6 +277,11 @@ class MultOp: public ExpressionNode{
 		if(left != NULL){left->printTree(n);}
 		std::cout << " * ";
 		if(right != NULL){right->printTree(n);}
+	}
+	void printPy(){
+		left->printPy();
+		std::cout << "*";
+		right->printPy();	
 	}
 };
 
