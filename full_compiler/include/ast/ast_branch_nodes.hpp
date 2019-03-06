@@ -426,5 +426,64 @@ class Pointer : public Node{
 	}
 };
 
+class type_name : public Node{
+	public:
+	NodePtr specList = NULL, abstractDec = NULL;
+	type_name(NodePtr _specList, NodePtr _abstractDec): specList(_specList), abstractDec(_abstractDec) {}
+	type_name(NodePtr _specList): specList(_specList) {}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Type Name " << std::endl;
+		if(specList != NULL){specList->printTree(n+1);}
+		if(abstractDec != NULL){abstractDec->printTree(n+1);}
+	}
+};
+
+class abstract_pointer : public Node{
+	public:
+	NodePtr ptr = NULL;
+	abstract_pointer(NodePtr _ptr): ptr(_ptr) {}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Abstract Pointer " << std::endl;
+		if(ptr != NULL){ptr->printTree(n+1);}
+	}
+};
+
+class abstract_declarator : public Node{
+	public:
+	NodePtr directAbstract = NULL, ptr = NULL; 
+	abstract_declarator(NodePtr _directAbstract, NodePtr _ptr): directAbstract(_directAbstract), ptr(_ptr) {}
+	abstract_declarator(NodePtr _directAbstract): directAbstract(_directAbstract) {}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Abstract Declarator" << std::endl;
+		if(ptr != NULL){ptr->printTree(n+1);}
+		if(directAbstract != NULL){ptr->printTree(n+1);}
+	}
+};
+
+class AbstractArray : public Node{
+	public:
+	NodePtr directAbstract = NULL;
+	ExpPtr size = NULL;
+	AbstractArray(){}
+	AbstractArray(NodePtr _directAbstract, ExpPtr _size): directAbstract(_directAbstract), size(_size) {}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Abstract Array" << std::endl;
+		if(directAbstract != NULL){directAbstract->printTree(n+1);}
+		if(size != NULL){std::cout<< "Size:";size->printTree(n+1); std::cout<< std::endl;}
+	}
+};
+
 
 #endif

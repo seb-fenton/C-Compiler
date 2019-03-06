@@ -165,7 +165,7 @@ int check_type(){
     if(std::find(ctx.type_defs[ctx.scopeLevel].begin(),ctx.type_defs[ctx.scopeLevel].end(), *yylval.string) != ctx.type_defs[ctx.scopeLevel].end()){
         return TYPEDEF_NAME;
     } else if(std::find(ctx.enums[ctx.scopeLevel].begin(),ctx.enums[ctx.scopeLevel].end(), *yylval.string) != ctx.enums[ctx.scopeLevel].end()){
-        return ENUMARATION_CONSTANT
+        return ENUMERATION_CONSTANT;
     } else{
         return T_IDENTIFIER;
     }
