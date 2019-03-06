@@ -29,7 +29,15 @@ struct context{
 };
 
 struct pyContext{
-    //std::vector
+    int scopeLevel = 0;
+
+    void incScope(){
+        scopeLevel++;
+    }
+
+    void decScope(){
+        scopeLevel--;
+    }
 };
 
 static context ctx;

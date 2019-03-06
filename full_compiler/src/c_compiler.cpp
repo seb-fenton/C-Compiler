@@ -12,7 +12,8 @@ int main(int argc, char* argv[]){
     if(std::string(argv[1]) =="--translate"){
         Node* ast = parseAST(/*filename?*/); 
         freopen(argv[4],"w",stdout);
-        ast->printPy();
+        pyContext context;
+        ast->printPy(context);
         fclose(stdout);
         return 0;
     }

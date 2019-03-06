@@ -61,6 +61,27 @@ class IfStatement : public Node{
         if(_true != NULL) {_true->printTree(n+1);}
         if(_false != NULL) {_false->printTree(n+1);}
 	}
+    void pyPrint(pyContext& context){
+        std::cout << std::endl;
+        tabprint(context.scopeLevel);
+        std::cout << "if(";
+        cond->printPy(context);
+        std::cout << "):\n";
+        context.incScope();
+        tabprint(context.scopeLevel);
+        _true->printPy(context);
+        context.decScope();
+
+        if(_false!=NULL){
+            std::cout << std::endl;
+            tabprint(context.scopeLevel);
+            std::cout << "else():\n";
+            context.incScope();
+            tabprint(context.scopeLevel);
+            _false->printPy(context);
+            context.decScope();
+        }
+    }
 };
 
 class SwitchStatement : public Node{

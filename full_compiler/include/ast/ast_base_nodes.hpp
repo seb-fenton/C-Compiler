@@ -7,13 +7,14 @@
 #include <initializer_list>
 #include <vector>
 #include <map>
+#include "context.hpp"
 
 
 class Node{
 
 	public:
 		virtual void printTree(int n) = 0;
-		virtual void printPy(){}
+		virtual void printPy(pyContext& context){}
 		virtual void tabprint(int scope){
 			for(int i = 0; i < scope; i++){std::cout << "\t";}
 		}

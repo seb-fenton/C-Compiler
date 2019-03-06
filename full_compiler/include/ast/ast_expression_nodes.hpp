@@ -11,7 +11,7 @@ class primary_expression : public ExpressionNode{
 	void printTree(int n) {
 		std::cout << identifier;
 	}
-	void printPy(){
+	void printPy(pyContext& context){
 		std::cout << identifier;
 	}
 };
@@ -23,7 +23,7 @@ class constantNode : public ExpressionNode{
 	void printTree(int n) {
 		std::cout << init;
 	}
-	void printPy(){
+	void printPy(pyContext& context){
 		std::cout << init;
 	}
 };
@@ -35,7 +35,7 @@ class stringNode : public ExpressionNode{
 	void printTree(int n) {
 		std::cout << init;
 	}
-	void printPy(){
+	void printPy(pyContext& context){
 		std::cout << "\"" << init << "\"";
 	}
 };
@@ -50,10 +50,10 @@ class assignment_expression : public ExpressionNode{
 		std::cout<< " " << op << " " ;
 		if(right != NULL){right->printTree(n);}
 	}
-	void printPy(){
-		left->printPy();
+	void printPy(pyContext& context){
+		left->printPy(context);
 		std::cout << op;
-		right->printPy();	
+		right->printPy(context);	
 	}
 };	
 
@@ -80,10 +80,10 @@ class LogicalOrOp: public ExpressionNode{
 		std::cout << " || ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void printPy(){
-		left->printPy();
+	void printPy(pyContext& context){
+		left->printPy(context);
 		std::cout << "||";
-		right->printPy();	
+		right->printPy(context);	
 	}
 };
 
@@ -98,10 +98,10 @@ class LogicalAndOp: public ExpressionNode{
 		std::cout << " && ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void printPy(){
-		left->printPy();
+	void printPy(pyContext& context){
+		left->printPy(context);
 		std::cout << "&&";
-		right->printPy();	
+		right->printPy(context);	
 	}
 };
 
@@ -148,10 +148,10 @@ class EqualOp: public ExpressionNode{
 		std::cout << " == ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void printPy(){
-		left->printPy();
+	void printPy(pyContext& context){
+		left->printPy(context);
 		std::cout << "==";
-		right->printPy();	
+		right->printPy(context);	
 	}
 };
 
@@ -186,10 +186,10 @@ class LessThanOp: public ExpressionNode{
 		std::cout << " < ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void printPy(){
-		left->printPy();
+	void printPy(pyContext& context){
+		left->printPy(context);
 		std::cout << "<";
-		right->printPy();	
+		right->printPy(context);	
 	}
 };
 
@@ -246,10 +246,10 @@ class AddOp: public ExpressionNode{
 		std::cout << " + ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void printPy(){
-		left->printPy();
+	void printPy(pyContext& context){
+		left->printPy(context);
 		std::cout << "+";
-		right->printPy();	
+		right->printPy(context);	
 	}
 };
 
@@ -262,10 +262,10 @@ class SubOp: public ExpressionNode{
 		std::cout << " - ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void printPy(){
-		left->printPy();
+	void printPy(pyContext& context){
+		left->printPy(context);
 		std::cout << "-";
-		right->printPy();	
+		right->printPy(context);	
 	}
 };
 
@@ -278,10 +278,10 @@ class MultOp: public ExpressionNode{
 		std::cout << " * ";
 		if(right != NULL){right->printTree(n);}
 	}
-	void printPy(){
-		left->printPy();
+	void printPy(pyContext& context){
+		left->printPy(context);
 		std::cout << "*";
-		right->printPy();	
+		right->printPy(context);	
 	}
 };
 
