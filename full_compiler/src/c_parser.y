@@ -37,9 +37,9 @@
 
 //TODO: sort out which are branch nodes and which are normal, maybe introduce expression nodes
 %type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list block_item_list declaration_list
-%type <bnode> argument_expression_list parameter_list initialiser_list struct_declaration_list struct_declarator_list enumerator_list enumerator
+%type <bnode> argument_expression_list parameter_list initialiser_list struct_declaration_list struct_declarator_list enumerator_list
 %type <node> declarator direct_declarator init_declarator initialiser declaration declaration_specifiers struct_declarator
-%type <node> external_declaration function_definition compound_statement statement parameter_declaration enum_specifier
+%type <node> external_declaration function_definition compound_statement statement parameter_declaration enum_specifier enumerator
 %type <node> block_item expression_statement selection_statement iteration_statement labeled_statement struct_declaration
 %type <node> jump_statement typedef_declaration struct_or_union_specifier type_name abstract_declarator direct_abstract_declarator
 %type <enode> assignment_expression conditional_expression logical_or_expression logical_and_expression inclusive_or_expression
@@ -133,24 +133,21 @@ struct_declarator:
 		;
 
 enum_specifier:
-		T_ENUM '{' enumerator_list '}'
-		| T_ENUM T_IDENTIFIER '{' enumerator_list '}'
-		| T_ENUM T_IDENTIFIER
+		T_ENUM '{' enumerator_list '}'							{$$ = new EnumConstants($3);}
+		| T_ENUM T_IDENTIFIER '{' enumerator_list '}'			{$$ = new EnumDeclaration(*($2), $4);}
+		| T_ENUM T_IDENTIFIER									{$$ = new EnumSpecifier(*($2));}
 		;
 
 enumerator_list:
-		 enumerator
-		| enumerator_list ',' enumerator
+		 enumerator												{$$ =  new enumerator_list($1);}
+		| enumerator_list ',' enumerator						{$$ = $1; $$->push($3);}
 		;
 
 
 enumerator:
-		T_IDENTIFIER
-		| T_IDENTIFIER '=' constant_expression
+		T_IDENTIFIER											{$$ = new enumerator(*($1));}
+		| T_IDENTIFIER '=' constant_expression					{$$ = new enumerator(*($1), $3);}
 		;
-
-
-
 
 init_declarator_list:
 		init_declarator											{$$ = new init_declarator_list($1);}	//same way as sbove do $$->push($1) to store the init_declarator in the list node

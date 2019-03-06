@@ -4,7 +4,7 @@
 int main(int argc, char *argv[])
 {
 
-    Node *ast=parseAST();
+    Node *ast=parseAST(NULL);
     
     
     ast->printTree(0);

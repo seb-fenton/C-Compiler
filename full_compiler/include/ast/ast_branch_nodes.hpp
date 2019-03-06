@@ -154,6 +154,16 @@ class declaration_list : public BranchNode{
 	}
 };
 
+class enumerator_list : public BranchNode{
+	public:
+	enumerator_list(NodePtr p){branches.push_back(p);}
+	void printTree(int n){
+		for(int i = 0; i < (int)branches.size(); i++){
+			branches[i]->printTree(n);
+		}
+	}
+};
+
 //---------------------------------------------//
 //------------Spec_Nodes-----------------------//
 //           Nodes with specific pointers      //
@@ -529,6 +539,66 @@ class AbstractArray : public Node{
 		std::cout << "Abstract Array" << std::endl;
 		if(directAbstract != NULL){directAbstract->printTree(n+1);}
 		if(size != NULL){std::cout<< "Size:";size->printTree(n+1); std::cout<< std::endl;}
+	}
+};
+
+class EnumConstants : public Node{
+	public:
+	NodePtr enumList;
+	EnumConstants(NodePtr _enumList): enumList(_enumList) {}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Enum Constants" << std::endl;
+		if(enumList != NULL){enumList->printTree(n+1);}
+	}
+};
+
+class EnumDeclaration : public EnumConstants {
+	public:
+	std::string id;
+	EnumDeclaration(std::string _id, NodePtr _enumList): EnumConstants(_enumList), id(_id) {}
+	virtual void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Enum Declaration: " << id << std::endl;
+		if(enumList != NULL){enumList->printTree(n+1);}
+	}
+};
+
+class EnumSpecifier : public Node {
+	public:
+	std::string id;
+	EnumSpecifier(std::string _id): id(_id) {}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Enum Specifier: " << id << std::endl;
+	}
+};
+ 
+class enumerator : public Node {
+	public:
+	std::string id;
+	ExpPtr val;
+	enumerator(std::string _id, ExpPtr _val): id(_id), val(_val) {}
+	enumerator(std::string _id): id(_id), val(NULL) {}
+	void printTree(int n){
+		for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+		}
+		std::cout << "Enum Constant Id: " << id << std::endl;
+		if(val != NULL){
+			for(int i = 0; i < n; i++){
+			std::cout<< "|\t" ;
+			}
+			std::cout << "Value";
+			val->printTree(n);
+			std::cout << std::endl; 
+		}
 	}
 };
 
