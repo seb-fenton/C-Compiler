@@ -16,8 +16,8 @@ class compound_statement : public Node{
 		std::cout << "Compound Statement" << std::endl;
 		if(block_list != NULL) {block_list->printTree(n+1);}
 	}
-    void printPy(pyContext& context, std::ostream stream){
-        tabprint(context.scopeLevel, stream);
+    void printPy(pyContext& context, std::ostream& stream){
+        //tabprint(context.scopeLevel, stream);
         context.incScope();
         block_list->printPy(context, stream); //TODO : - resolve global scope print!
         context.decScope();
@@ -37,6 +37,11 @@ class expression_statement: public Node{
         std::cout<< "Expression: ";
         if(stmt != NULL){stmt->printTree(n);}
         std::cout << std::endl;
+    }
+    void printPy(pyContext& context, std::ostream& stream){
+        tabprint(context.scopeLevel, stream);
+        stmt->printPy(context, stream); //TODO : - resolve global scope print!
+        stream << std::endl;
     }
 };
 
@@ -75,7 +80,7 @@ class IfStatement : public Node{
         cond->printPy(context, stream);
         stream << "):\n";
         context.incScope();
-        tabprint(context.scopeLevel, stream);
+        //tabprint(context.scopeLevel, stream);
         _true->printPy(context, stream);
         context.decScope();
 
@@ -84,7 +89,7 @@ class IfStatement : public Node{
             tabprint(context.scopeLevel, stream);
             stream << "else():\n";
             context.incScope();
-            tabprint(context.scopeLevel, stream);
+            //tabprint(context.scopeLevel, stream);
             _false->printPy(context, stream);
             context.decScope();
         }

@@ -22,7 +22,7 @@ class translation_unit : public BranchNode{
 		}
 	}
 	~translation_unit() {}
-	void printPy(pyContext& context, std::ostream stream){
+	void printPy(pyContext& context, std::ostream& stream){
         for(int i = 0; i < (int)branches.size(); i++){
 			branches[i]->printPy(context, stream);
 		}
@@ -304,13 +304,13 @@ class function_definition : public Node{
 		if(statement != NULL){statement->printTree(n+1);}
 	}
 	
-	void printPy(pyContext& context, std::ostream stream){
+	void printPy(pyContext& context, std::ostream& stream){
         tabprint(context.scopeLevel, stream);
 		stream << "def ";
         name->printPy(context, stream);
 		stream << std::endl;
 		context.incScope();
-		tabprint(context.scopeLevel, stream);
+		//tabprint(context.scopeLevel, stream);
 		statement->printPy(context, stream);
 		context.decScope();
 		stream << std::endl;
