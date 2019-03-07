@@ -14,3 +14,4 @@ DebugParser, AddParserASTSupport, 6h?, ALL, N, Debug parser using completed Lexe
 MakeTestSuite, , 5h, ALL, N, Create the test suite along with the test files
 MakeOverheadInfrastructure, ,3h, SF, N, Create infrastructure to allow for automated testing compliant to spec
 CtoPython, CreateAST, 15h, SF, Y, Create c to python translator
+CtoPythonDebugging, CtoPython, 5h, SF, Debug the translator and make to work with test suite

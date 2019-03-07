@@ -279,7 +279,10 @@ class direct_declarator : public Node{
 		std::cout << "Direct Declarator: " << identifier << std::endl;
 	}
 	void printPy(pyContext& context, std::ostream& stream){
-		stream << identifier;	
+		stream << identifier;
+		if(context.scopeLevel == 0) {
+			context.pythonBindings.push_back(identifier);
+		}	
 	}
 };
 
@@ -325,6 +328,14 @@ class function_definition : public Node{
 		stream << "def ";
         name->printPy(context, stream);
 		stream << ":" << std::endl;
+
+		if(context.pythonBindings.size() > 0){
+			for(int i = 0; i < context.pythonBindings.size(); i++){
+				tabprint(context.scopeLevel, stream);
+				stream << "global " << context.pythonBindings[i] << std::endl;
+			}
+		}
+
 		statement->printPy(context, stream);
 		context.decScope();
     }

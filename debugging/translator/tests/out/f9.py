@@ -12,7 +12,7 @@ def function(a,b):
 	return 13
 
 def main():
-	return function(6.94728e-310,6.94728e-310)+function(1,2)+function(4,3)+function(6,7)
+	return function(6.9398e-310,6.9398e-310)+function(1,2)+function(4,3)+function(6,7)
 
 # Boilerplate
 if __name__ == "__main__":
