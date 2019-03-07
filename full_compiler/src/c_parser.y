@@ -36,7 +36,7 @@
 %token TYPEDEF_NAME T_IDENTIFIER ENUMERATION_CONSTANT
 
 //TODO: sort out which are branch nodes and which are normal, maybe introduce expression nodes
-%type <bnode> translation_unit init_declarator_list declaration_specifier_list  parameter_type_list block_item_list declaration_list
+%type <bnode> translation_unit init_declarator_list declaration_specifier_list parameter_type_list block_item_list
 %type <bnode> argument_expression_list parameter_list initialiser_list struct_declaration_list struct_declarator_list enumerator_list
 %type <node> declarator direct_declarator init_declarator initialiser declaration declaration_specifiers struct_declarator
 %type <node> external_declaration function_definition compound_statement statement parameter_declaration enum_specifier enumerator
@@ -311,15 +311,8 @@ expression:
 		;
 		
 function_definition:
-		declaration_specifier_list declarator declaration_list compound_statement		{/*TODO*/}
-		| declaration_specifier_list declarator compound_statement						{$$ = new function_definition($1, $2, $3);}
-		| declarator declaration_list compound_statement								{/*TODO*/}
+		declaration_specifier_list declarator compound_statement						{$$ = new function_definition($1, $2, $3);}
 		| declarator compound_statement													{$$ = new function_definition($1, $2);}
-		;
-
-declaration_list:
-		declaration										{$$ = new declaration_list($1);}
-		| declaration_list declaration					{$$ = $1; $$->push($2);}
 		;
 
 parameter_type_list:			
