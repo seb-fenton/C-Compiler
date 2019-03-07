@@ -20,7 +20,6 @@ class Node{
 			for(int i = 0; i < scope; i++){stream << "\t";}
 		}
 		virtual void printMips(){} //TODO - Implement this
-
 };
 typedef Node* NodePtr;
 

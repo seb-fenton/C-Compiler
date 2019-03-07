@@ -23,7 +23,6 @@ int main(int argc, char* argv[]){
         //run print py
         ast->printPy(context, *os);
         stream.close();
-        std::cout << "succesful python";
         return 0;
     }
     else if(std::string(argv[1]) == "-S"){

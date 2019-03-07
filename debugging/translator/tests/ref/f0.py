@@ -1,9 +1,9 @@
 def main():
-    return 10
+    x=10
+    return x
 
 # Boilerplate
 if __name__ == "__main__":
     import sys
     ret=main()
     sys.exit(ret)
-

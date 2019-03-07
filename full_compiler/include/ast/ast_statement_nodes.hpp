@@ -17,11 +17,9 @@ class compound_statement : public Node{
 		if(block_list != NULL) {block_list->printTree(n+1);}
 	}
     void printPy(pyContext& context, std::ostream& stream){
-        //tabprint(context.scopeLevel, stream);
-        context.incScope();
+        //context.incScope();
         block_list->printPy(context, stream); //TODO : - resolve global scope print!
-        context.decScope();
-        stream << std::endl;
+        //context.decScope();
     }
 };
 
@@ -258,7 +256,7 @@ class ReturnStatement : public Node{
     }
     void printPy(pyContext& context, std::ostream& stream){
         tabprint(context.scopeLevel, stream);
-        stream << "return";
+        stream << "return ";
         if(expr!=NULL) expr->printPy(context, stream);
         stream << "\n";
 	}

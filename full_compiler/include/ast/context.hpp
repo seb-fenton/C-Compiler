@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <algorithm>
 
 struct context{
@@ -28,16 +29,7 @@ struct context{
 
 struct pyContext{
     int scopeLevel = 0;
-
-    union declarations 
-    {
-        int varInt;
-        double varDouble;
-        float varFloat;
-        //std::string varString;
-    };
-
-
+    std::vector<std::string> pythonBindings;
 
     void incScope(){
         scopeLevel++;

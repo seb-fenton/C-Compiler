@@ -453,6 +453,12 @@ class function_call: public ExpressionNode{
         if(list != NULL){list->printTree(n);}
 		std::cout << " }";
     }
+	void printPy(pyContext& context, std::ostream& stream){
+		expr->printPy(context, stream);
+		stream << "(";
+		list->printPy(context, stream);
+		stream << ")";
+	}
 };
 
 class DotMemberOp : public ExpressionNode{

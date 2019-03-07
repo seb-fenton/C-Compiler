@@ -1,16 +1,16 @@
-1,12c1
-< x=0
-< 
-< def main():
+4,5c4,5
 <     x=1
 <     return x
-< 
-< # Boilerplate
-< if __name__ == "__main__":
+---
+> 	x=1
+> 	return x
+9,12c9,11
 <     import sys
 <     ret=main()
 <     sys.exit(ret)
 < 
 ---
-> x=0
+> 	import sys
+> 	ret=main()
+> 	sys.exit(ret)
 \ No newline at end of file

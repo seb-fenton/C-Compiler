@@ -25,8 +25,10 @@ class translation_unit : public BranchNode{
 	void printPy(pyContext& context, std::ostream& stream){
         for(int i = 0; i < (int)branches.size(); i++){
 			branches[i]->printPy(context, stream);
+			stream << std::endl;
 		}
-		tabprint(context.scopeLevel, stream);
+		//tabprint(context.scopeLevel, stream);  - redundant
+		stream << "# Boilerplate" << std::endl;
 		stream << "if __name__ == \"__main__\":" << std::endl;
 		context.incScope();
 		tabprint(context.scopeLevel, stream);
@@ -80,6 +82,12 @@ class argument_expression_list : public BranchNode{
 		}
 		std::cout << "]";
 	}
+	void printPy(pyContext& context, std::ostream& stream){
+		for(int i = 0; i < branches.size(); i++){
+			branches[i]->printPy(context, stream);
+			if(i != branches.size()-1) stream << ",";
+		}
+	}
 };
 
 class parameter_list : public BranchNode{
@@ -92,6 +100,12 @@ class parameter_list : public BranchNode{
 		std::cout<< "Parameters: " << std::endl;
 		for(int i = 0; i < (int)branches.size(); i++){
 			branches[i]->printTree(n+1);
+		}
+	}
+	void printPy(pyContext& context, std::ostream& stream){
+		for(int i = 0; i < branches.size(); i++){
+			branches[i]->printPy(context, stream);
+			if(i != branches.size()-1) stream << ",";
 		}
 	}
 };
@@ -186,6 +200,7 @@ class declaration : public Node{
 		if(declarator_list != NULL)declarator_list->printTree(n+1);
 	}
 	void printPy(pyContext& context, std::ostream& stream){
+		tabprint(context.scopeLevel, stream);
 		specifier_list->printPy(context, stream);
 		declarator_list->printPy(context, stream);	
 		stream << std::endl;
@@ -248,7 +263,7 @@ class declarator : public Node{
 	void printPy(pyContext& context, std::ostream& stream){
 		directDeclarator->printPy(context, stream);
 		pointerPtr->printPy(context, stream);
-	} //todopy - issue?
+	} 
 };
 
 class direct_declarator : public Node{
@@ -306,14 +321,12 @@ class function_definition : public Node{
 	
 	void printPy(pyContext& context, std::ostream& stream){
         tabprint(context.scopeLevel, stream);
+		context.incScope();
 		stream << "def ";
         name->printPy(context, stream);
-		stream << std::endl;
-		context.incScope();
-		//tabprint(context.scopeLevel, stream);
+		stream << ":" << std::endl;
 		statement->printPy(context, stream);
 		context.decScope();
-		stream << std::endl;
     }
 };
 
@@ -351,6 +364,9 @@ class parameter_declaration : public Node{
 		std::cout<< "Parameter" << std::endl;
 		if(specifiers != NULL){specifiers->printTree(n+1);}
 		if(dec != NULL){dec->printTree(n+1);}
+	}
+	void printPy(pyContext& context, std::ostream& stream){
+		dec->printPy(context, stream);
 	}
 
 };

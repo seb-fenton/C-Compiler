@@ -1,12 +1,11 @@
-1,16c1
-< x=0
-< 
-< def f():
+4,6c4,5
 <     global x
 <     x=x+1
 <     return x
-< 
-< def main():
+---
+> 	x=x+1
+> 	return x
+9,16d7
 <     return f()+f()
 < 
 < # Boilerplate
@@ -15,6 +14,3 @@
 <     ret=main()
 <     sys.exit(ret)
 < 
----
-> x=0
-\ No newline at end of file

@@ -1,8 +1,8 @@
-1,12d0
-< def f():
+2c2
 <     return 10
-< 
-< def main():
+---
+> 	return 10
+5,12d4
 <     return f()
 < 
 < # Boilerplate
