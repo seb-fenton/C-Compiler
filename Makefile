@@ -12,13 +12,13 @@ CPPFLAGS += -Wno-unused-function
 ###COMPILER RULES###
 compiler: bin/c_compiler
 
-bin/c_compiler : bin/c_compiler.o full_compiler/src/c_parser.tab.o full_compiler/src/c_lexer.yy.o
+bin/c_compiler : full_compiler/include/ast/context.o full_compiler/src/c_compiler.o full_compiler/src/c_parser.tab.o full_compiler/src/c_lexer.yy.o
 	make parser
-	g++ $(CPPFLAGS) -o bin/c_compiler bin/c_compiler.o full_compiler/src/c_parser.tab.o full_compiler/src/c_lexer.yy.o
+	g++ $(CPPFLAGS) -o bin/c_compiler $^
 
-bin/c_compiler.o : full_compiler/src/c_compiler.cpp 
+full_compiler/src/c_compiler.o : full_compiler/src/c_compiler.cpp 
 	mkdir -p bin
-	g++ $(CPPFLAGS) -c full_compiler/src/c_compiler.cpp -o bin/c_compiler.o
+	g++ $(CPPFLAGS) -c full_compiler/src/c_compiler.cpp -o full_compiler/src/c_compiler.o
 
 
 
@@ -26,9 +26,12 @@ bin/c_compiler.o : full_compiler/src/c_compiler.cpp
 parser: full_compiler/src/c_lexer.yy.cpp
 parsertest : bin/eval_expr
 
-bin/eval_expr : full_compiler/src/eval_parser.o full_compiler/src/c_parser.tab.o full_compiler/src/c_lexer.yy.o 
+bin/eval_expr : full_compiler/include/ast/context.o full_compiler/src/eval_parser.o full_compiler/src/c_parser.tab.o full_compiler/src/c_lexer.yy.o
 	mkdir -p bin
 	g++ $(CPPFLAGS) -o bin/eval_expr $^
+
+full_compiler/include/ast/context.o: full_compiler/include/ast/context.cpp full_compiler/include/ast/context.hpp
+	g++ $(CPPFLAGS) -c full_compiler/include/ast/context.cpp -o full_compiler/include/ast/context.o
 
 full_compiler/src/c_lexer.yy.cpp : full_compiler/src/c_lexer.flex full_compiler/src/c_parser.tab.hpp
 	flex -o full_compiler/src/c_lexer.yy.cpp  full_compiler/src/c_lexer.flex
