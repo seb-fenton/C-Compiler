@@ -1,6 +1,6 @@
 ###CPPFLAG RULES###
 CPPFLAGS += -W -Wall -g 
-CPPFLAGS += -I include
+CPPFLAGS += -I full_compiler/include
 
 # This avoids error: ‘fileno’ was not declared in this scope
 CPPFLAGS += -std=c++0x
@@ -30,7 +30,7 @@ bin/eval_expr : full_compiler/src/eval_parser.o full_compiler/src/c_parser.tab.o
 	mkdir -p bin
 	g++ $(CPPFLAGS) -o bin/eval_expr $^
 
-src/c_lexer.yy.cpp : src/c_lexer.flex src/c_parser.tab.hpp
+full_compiler/src/c_lexer.yy.cpp : full_compiler/src/c_lexer.flex full_compiler/src/c_parser.tab.hpp
 	flex -o full_compiler/src/c_lexer.yy.cpp  full_compiler/src/c_lexer.flex
 
 full_compiler/src/c_parser.tab.cpp full_compiler/src/c_parser.tab.hpp : full_compiler/src/c_parser.y
@@ -51,3 +51,4 @@ clean :
 	-rm -rf full_compiler/src/*.o
 	-rm -rf full_compiler/src/*.output
 	-rm -rf bin
+	-rm -rf tmp

@@ -19,7 +19,7 @@ struct varData{
     int size; //used mainly for arrays but we can initlialise it for normal integers, to be used with the SizeOf command
 
     bool isTypdef = false;
-    NodePtr typedefLoc = NULL; //points to the declaration specifiers the typedef contains
+    //NodePtr typedefLoc = NULL; //points to the declaration specifiers the typedef contains
 
     int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
     //varData(int _val, int _size, int _offset,)
