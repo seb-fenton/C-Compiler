@@ -377,7 +377,7 @@ class parameter_declaration : public Node{
 		if(dec != NULL){dec->printTree(n+1);}
 	}
 	void printPy(pyContext& context, std::ostream& stream){
-		dec->printPy(context, stream);
+		if(dec != NULL) dec->printPy(context, stream);
 	}
 
 };

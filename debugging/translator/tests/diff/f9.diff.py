@@ -24,7 +24,7 @@
 12c15
 <     return function(0,0)+function(1,2)+function(4,3)+function(6,7)
 ---
-> 	return function(6.93093e-310,6.93093e-310)+function(1,2)+function(4,3)+function(6,7)
+> 	return function(6.9498e-310,6.9498e-310)+function(1,2)+function(4,3)+function(6,7)
 16,19c19,21
 <     import sys
 <     ret=main()
