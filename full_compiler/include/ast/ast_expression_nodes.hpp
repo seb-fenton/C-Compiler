@@ -454,9 +454,9 @@ class function_call: public ExpressionNode{
 		std::cout << " }";
     }
 	void printPy(pyContext& context, std::ostream& stream){
-		expr->printPy(context, stream);
+		if(expr !=NULL){expr->printPy(context, stream);} //shouldn't be needed but acts as a safeguard
 		stream << "(";
-		list->printPy(context, stream);
+		if(list !=NULL){list->printPy(context, stream);}
 		stream << ")";
 	}
 };
