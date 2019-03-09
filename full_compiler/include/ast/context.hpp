@@ -10,7 +10,31 @@
 #include <unordered_map>
 #include <algorithm>
 
-struct context{
+#include "ast_base_nodes.hpp"
+
+struct varData{
+    int val;
+
+    bool isArray = false;
+    int size; //used mainly for arrays but we can initlialise it for normal integers, to be used with the SizeOf command
+
+    bool isTypdef = false;
+    NodePtr typedefLoc = NULL; //points to the declaration specifiers the typedef contains
+
+    int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
+    //varData(int _val, int _size, int _offset,)
+};
+
+struct scope{
+    std::map<std::string, varData> bindings;
+
+    bool isFunc;    //true if in the highest scope of a function.
+    int returnData; //should only be used when isFunc is true.
+
+    scope(std::map<std::string, varData> _bindings): bindings(_bindings){}
+};
+
+struct lexContext{
     std::vector<std::vector<std::string> > type_defs = {{}};
     int scopeLevel = 0;
     std::string temp_typedef;
@@ -40,7 +64,24 @@ struct pyContext{
     }
 };
 
+struct compilerContext{
+    int scopeLevel = 0;
+    std::vector<scope> scopes;
+    std::map<std::string, varData> globalVars;
 
-static context ctx;
+    void incScope(){
+        scopes.push_back(scope(scopes[scopeLevel].bindings)); //when you enter a new scope, take the old scope bindings and put them into the new one
+        scopeLevel++;
+    }
+
+    void functionCall(){
+        scopes.push_back(globalVars); //when a function call occurs, only give it the global variables and not the previous scopes bindings
+        scopeLevel++;
+    }
+
+};
+
+
+static lexContext ctx;
 
 #endif
