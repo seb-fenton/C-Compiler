@@ -52,6 +52,7 @@ clean :
 	-rm -rf full_compiler/src/*.tab.hpp
 	-rm -rf full_compiler/src/*.tab.cpp
 	-rm -rf full_compiler/src/*.o
+	-rm -rf full_compiler/include/ast/*.o
 	-rm -rf full_compiler/src/*.output
 	-rm -rf bin
 	-rm -rf tmp
