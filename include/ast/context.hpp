@@ -10,7 +10,10 @@
 #include <unordered_map>
 #include <algorithm>
 
-#include "ast_base_nodes.hpp"
+class Node;
+typedef Node* NodePtr; //never use any member functions for this class
+
+
 
 struct varData{
     int val;
@@ -22,7 +25,7 @@ struct varData{
     //NodePtr typedefLoc = NULL; //points to the declaration specifiers the typedef contains
 
     int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
-    //varData(int _val, int _size, int _offset,)
+    //varData(int _val, int _size, int _offset,) figure out constructor
 };
 
 struct scope{
@@ -31,7 +34,7 @@ struct scope{
     bool isFunc;    //true if in the highest scope of a function.
     int returnData; //should only be used when isFunc is true.
 
-    scope(std::map<std::string, varData> _bindings): bindings(_bindings){}
+    scope(std::map<std::string, varData> _bindings);
 };
 
 struct lexContext{
@@ -40,28 +43,16 @@ struct lexContext{
     std::string temp_typedef;
     bool declaration = false;
 
-    void incScope(){
-        type_defs.push_back(type_defs[scopeLevel]);
-        scopeLevel++;
-    }
-
-    void decScope(){
-        type_defs.pop_back();
-        scopeLevel--;
-    }
+    void incScope();
+    void decScope();
 };
 
 struct pyContext{
     int scopeLevel = 0;
     std::vector<std::string> pythonBindings;
 
-    void incScope(){
-        scopeLevel++;
-    }
-
-    void decScope(){
-        scopeLevel--;
-    }
+    void incScope();
+    void decScope();
 };
 
 struct compilerContext{
@@ -69,16 +60,8 @@ struct compilerContext{
     std::vector<scope> scopes;
     std::map<std::string, varData> globalVars;
 
-    void incScope(){
-        scopes.push_back(scope(scopes[scopeLevel].bindings)); //when you enter a new scope, take the old scope bindings and put them into the new one
-        scopeLevel++;
-    }
-
-    void functionCall(){
-        scopes.push_back(globalVars); //when a function call occurs, only give it the global variables and not the previous scopes bindings
-        scopeLevel++;
-    }
-
+    void incScope();
+    void functionCall();
 };
 
 

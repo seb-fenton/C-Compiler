@@ -5,6 +5,7 @@
 #include "ast/ast_branch_nodes.hpp"
 #include "ast/ast_expression_nodes.hpp"
 #include "ast/ast_statement_nodes.hpp"
+#include "ast/ast_spec_nodes.hpp"
 #include "ast/context.hpp"
 
 
