@@ -11,7 +11,7 @@ int main(int argc, char* argv[]){
     if(std::string(argv[1]) =="--translate"){
         //create AST
         Node* ast = parseAST(argv[2]); 
-        ast->printTree(0);
+        //ast->printTree(0);
         
         //create context and ostream
         pyContext context;
