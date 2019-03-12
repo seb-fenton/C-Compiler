@@ -1,4 +1,4 @@
-#include "ast.hpp"
+#include "../include/ast.hpp"
 
 
 int main(int argc, char *argv[])

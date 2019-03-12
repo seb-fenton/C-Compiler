@@ -10,7 +10,6 @@
 #include <fstream>
 #include "context.hpp"
 
-
 class Node{
 
 	public:

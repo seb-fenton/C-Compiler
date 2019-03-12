@@ -1,8 +1,7 @@
-full_compiler/src/*.yy.cpp
-full_compiler/src/c_lexer.yy.o
-full_compiler/src/c_lexer_main.o
-full_compiler/bin/c_lexer
-full_compiler/src/c_parser.output
-full_compiler/input_test.txt
-full_compiler/output.txt
+src/*.yy.cpp
+src/c_lexer.yy.o
+src/c_lexer_main.o
+bin/c_lexer
+src/c_parser.output
 .vscode
+

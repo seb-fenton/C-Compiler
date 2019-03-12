@@ -25,7 +25,7 @@ echo "========================================"
 echo " Cleaning the temporaries and outputs"
 make clean
 echo " Force building translator"
-cd ../../full_compiler 
+cd ../../
 make compiler -B
 if [[ "$?" -ne 0 ]]; then
     echo "Build failed.";
@@ -45,7 +45,7 @@ for i in tests/in/*.c; do
     echo "Input file : ${i}"
     BASENAME=$(basename $i .c);
     touch tests/out/$BASENAME.py
-    ../../full_compiler/bin/c_compiler --translate ${i} -o tests/out/$BASENAME.py
+    ../../bin/c_compiler --translate ${i} -o tests/out/$BASENAME.py
     diff <(cat tests/ref/$BASENAME.py) <(cat tests/out/$BASENAME.py) > tests/diff/$BASENAME.diff.py
     if [[ "$?" -ne "0" ]]; then
         echo -e "\nERROR"
@@ -60,5 +60,5 @@ echo "########################################"
 echo "Passed ${PASSED} out of ${CHECKED}".
 echo ""
 
-cd ../../full_compiler
+cd ../../
 make clean
