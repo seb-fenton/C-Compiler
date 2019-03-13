@@ -13,7 +13,14 @@
 class Node;
 typedef Node* NodePtr; //never use any member functions for this class
 
+struct DeclaratorContext{
+    std::string id;
+    bool initliased = false;
+    int destReg; //should be an enum.
+    int size;
 
+    void purge();
+};
 
 struct varData{
     bool isArray = false;
@@ -23,7 +30,7 @@ struct varData{
     //NodePtr typedefLoc = NULL; //points to the declaration specifiers the typedef contains
 
     int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
-    //varData(int _size, int _offset) figure out constructor
+    varData(int _offset): offset(_offset) {} //let declarator increment $sp
 };
 
 struct scope{
@@ -57,6 +64,9 @@ struct compilerContext{
     bool freeRegs[32];
 
     std::map<std::string, varData>* currentBindings();
+
+    DeclaratorContext tempDeclarator; //can be used by declarators to keep track of info needed to add to bindings.
+    
 };
 
 
