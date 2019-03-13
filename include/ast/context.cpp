@@ -55,3 +55,7 @@ void funcScope::incScope(){
 void compilerContext::newFunc(){
     functions.push_back(funcScope());
 }
+
+std::map<std::string, varData>* compilerContext::currentBindings(){
+    return &functions.back().scopes.back().bindings;
+}

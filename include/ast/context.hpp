@@ -16,8 +16,6 @@ typedef Node* NodePtr; //never use any member functions for this class
 
 
 struct varData{
-    int val;
-
     bool isArray = false;
     int size; //used mainly for arrays but we can initlialise it for normal integers, to be used with the SizeOf command
 
@@ -25,7 +23,7 @@ struct varData{
     //NodePtr typedefLoc = NULL; //points to the declaration specifiers the typedef contains
 
     int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
-    //varData(int _val, int _size, int _offset,) figure out constructor
+    //varData(int _size, int _offset) figure out constructor
 };
 
 struct scope{
@@ -55,8 +53,14 @@ struct compilerContext{
 
     void newFunc(); //NOTE $fp should point to previous functions last element, this makes it possible to do $fp + memUsed to go back to the start address.
     void endFunc();
+
+    bool freeRegs[32];
+
+    std::map<std::string, varData>* currentBindings();
 };
 
+
+ //------------------------------------------------------------------------------------------------------------//
 
 struct lexContext{
     std::vector<std::vector<std::string> > type_defs = {{}};
