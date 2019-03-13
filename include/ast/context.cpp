@@ -37,18 +37,21 @@ void pyContext::decScope(){
 //----------------Scope_Struct-----------------//
 //---------------------------------------------//
 
-scope::scope(std::map<std::string, varData> _bindings): bindings(_bindings){}
+scope::scope(std::map<std::string, varData>& _bindings): bindings(_bindings){}
+
+//---------------------------------------------//
+//----------------funcScope_Struct-------------//
+//---------------------------------------------//
+
+void funcScope::incScope(){
+    scopes.push_back(scope(scopes[scopeLevel].bindings)); //when you enter a new scope, take the old scope bindings and put them into the new one
+    scopeLevel++;
+}
 
 //---------------------------------------------//
 //----------------Compiler_Context-------------//
 //---------------------------------------------//
 
-void compilerContext::incScope(){
-        scopes.push_back(scope(scopes[scopeLevel].bindings)); //when you enter a new scope, take the old scope bindings and put them into the new one
-        scopeLevel++;
-    }
-
-void compilerContext::functionCall(){
-        scopes.push_back(globalVars); //when a function call occurs, only give it the global variables and not the previous scopes bindings
-        scopeLevel++;
-    }
+void compilerContext::newFunc(){
+    functions.push_back(funcScope());
+}

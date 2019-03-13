@@ -170,7 +170,7 @@ direct_declarator:
 		| direct_declarator '[' ']' 						{$$ = new ArrayDeclaration($1);}//need node for array declaration   
 		| direct_declarator '[' constant_expression ']' 	{$$ = new ArrayDeclaration($1, $3);}//make a second constructer for declarations with expressions
 		| direct_declarator '(' parameter_type_list ')' 	{$$ = new FunctionDeclaration($1, $3);} 	//used for function definitions
-		| direct_declarator '(' identifier_list ')' 		{$$ = new FunctionDeclaration($1, $3);} 
+		| direct_declarator '(' identifier_list ')' 		{$$ = new FunctionDeclaration($1, $3);}  //R&K style?
 		| direct_declarator '(' ')' 						{$$ = new FunctionDeclaration($1);}	//used for function calls with no args
 		;
 

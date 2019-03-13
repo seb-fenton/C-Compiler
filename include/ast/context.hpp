@@ -29,13 +29,34 @@ struct varData{
 };
 
 struct scope{
-    std::map<std::string, varData> bindings;
+    std::map<std::string, varData> bindings;  
 
-    bool isFunc;    //true if in the highest scope of a function.
-    int returnData; //should only be used when isFunc is true.
-
-    scope(std::map<std::string, varData> _bindings);
+    scope(std::map<std::string, varData>& _bindings);
 };
+
+struct funcScope{
+    int scopeLevel = 0;
+    int returnData; //might not be needed
+
+    std::vector<scope> scopes;
+    std::map<std::string, varData> parameters;
+
+    int memUsed = 0; //should be incremented as you add new bindings
+    void incScope();
+    funcScope(){};
+    funcScope(std::map<std::string, varData>& _parameters): parameters(_parameters) {} //the function definition node should pack the info correctly
+};
+
+
+struct compilerContext{
+    
+    std::vector<funcScope> functions;
+    std::map<std::string, varData> globalVars;
+
+    void newFunc(); //NOTE $fp should point to previous functions last element, this makes it possible to do $fp + memUsed to go back to the start address.
+    void endFunc();
+};
+
 
 struct lexContext{
     std::vector<std::vector<std::string> > type_defs = {{}};
@@ -54,16 +75,6 @@ struct pyContext{
     void incScope();
     void decScope();
 };
-
-struct compilerContext{
-    int scopeLevel = 0;
-    std::vector<scope> scopes;
-    std::map<std::string, varData> globalVars;
-
-    void incScope();
-    void functionCall();
-};
-
 
 static lexContext ctx;
 
