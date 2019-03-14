@@ -69,6 +69,8 @@ struct compilerContext{
     
 };
 
+static compilerContext comCtx;
+
 
  //------------------------------------------------------------------------------------------------------------//
 
@@ -91,5 +93,6 @@ struct pyContext{
 };
 
 static lexContext ctx;
+
 
 #endif

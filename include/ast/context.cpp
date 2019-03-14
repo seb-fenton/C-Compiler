@@ -32,7 +32,7 @@ void pyContext::decScope(){
 //---------------------------------------------//
 
 void DeclaratorContext::purge(){
-    id.clear;
+    id.clear();
     initliased = false;
 }
 

@@ -28,7 +28,7 @@ int main(int argc, char* argv[]){
     else if(std::string(argv[1]) == "-S"){
         //create AST
         Node* ast = parseAST(argv[2]);
-        ast->printMips();
+        ast->printMips(comCtx);
         return 0;
     }
     else std::cerr << "invalid input format" << std::endl;

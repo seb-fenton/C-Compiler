@@ -2,7 +2,7 @@
 #define AST_BRANCH_NODES_HPP
 
 #include "ast_base_nodes.hpp"
-
+#include "context.hpp"
 //---------------------------------------------//
 //------------BranchNodeS---------------------//
 //        Nodes with branches in them          //
@@ -37,7 +37,12 @@ class translation_unit : public BranchNode{
 		stream << "ret=main()" << std::endl;
 		tabprint(context.scopeLevel, stream);
 		stream << "sys.exit(ret)";
-    }
+  }
+	void printMIPS(compilerContext& ctx){
+		for(int i = 0; i < (int)branches.size(); i++){
+			branches[i]->printMips(ctx);
+		}
+	}
 };
 
 class declaration_specifier_list : public BranchNode{
