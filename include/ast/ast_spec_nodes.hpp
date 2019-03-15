@@ -3,6 +3,7 @@
 
 #include "ast_base_nodes.hpp"
 #include "ast_branch_nodes.hpp"
+#include "context.hpp"
 
 //---------------------------------------------//
 //------------Spec_Nodes-----------------------//
@@ -31,6 +32,8 @@ class declaration : public Node{
 		declarator_list->printPy(context, stream);	
 		stream << std::endl;
 	}
+
+	void printMips(compilerContext& ctx);
 	
 };
 
@@ -46,6 +49,8 @@ class declaration_specifiers : public Node{
 		std::cout << "Declaration Specifier: " << type_name << std::endl;
 
 	}
+	
+	void printMips(compilerContext& ctx);
 };
 
 class init_declarator : public Node{

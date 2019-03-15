@@ -57,6 +57,7 @@ class declaration_specifier_list : public BranchNode{
 			branches[i]->printTree(n);
 		}
 	}
+	void printMips(compilerContext& ctx);
 	~declaration_specifier_list() {}
 };
 
