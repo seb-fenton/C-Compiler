@@ -34,6 +34,12 @@ void pyContext::decScope(){
 void DeclaratorContext::purge(){
     id.clear();
     initliased = false;
+    int size = 0;
+}
+
+void DeclaratorContext::nextElement(){
+    id.clear();
+    initliased = false;
 }
 
 //---------------------------------------------//

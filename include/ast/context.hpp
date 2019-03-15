@@ -16,10 +16,11 @@ typedef Node* NodePtr; //never use any member functions for this class
 struct DeclaratorContext{
     std::string id;
     bool initliased = false;
-    int destReg; //should be an enum.
+    //int destReg; //should be an enum.
     int size; //declaration specifier determines this
 
     void purge();
+    void nextElement();
 };
 
 struct varData{

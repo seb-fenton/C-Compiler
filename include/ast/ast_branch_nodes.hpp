@@ -73,6 +73,7 @@ class init_declarator_list : public BranchNode{
 			branches[i]->printTree(n);
 		}
 	}
+	void printMips(compilerContext& ctx);
 	~init_declarator_list() {}
 };
 

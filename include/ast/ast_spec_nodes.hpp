@@ -49,7 +49,7 @@ class declaration_specifiers : public Node{
 		std::cout << "Declaration Specifier: " << type_name << std::endl;
 
 	}
-	
+
 	void printMips(compilerContext& ctx);
 };
 
@@ -74,6 +74,7 @@ class init_declarator : public Node{
 		if(initialiserPtr == NULL) stream << "0";
 		else initialiserPtr->printPy(context, stream);	
 	}
+	void printMips(compilerContext& ctx);
 };
 
 class declarator : public Node{
