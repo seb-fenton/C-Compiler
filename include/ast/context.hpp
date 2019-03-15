@@ -17,7 +17,7 @@ struct DeclaratorContext{
     std::string id;
     bool initliased = false;
     int destReg; //should be an enum.
-    int size;
+    int size; //declaration specifier determines this
 
     void purge();
 };
