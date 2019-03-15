@@ -3,8 +3,8 @@
 make compiler -B 
 
 input_dir="test_deliverable/test_cases"
-
 working="bin/compiler"
+
 mkdir -p ${working}
 
 
@@ -21,8 +21,6 @@ for i in ${input_dir}/*.c ; do
         
     # Compile to assembly using 
     $compiler -S $i -o ${working}/$base-got.s
-
-
 	mips-linux-gnu-gcc -march=mips1 -mfp32 -w -O0 -static  ${working}/$base-got.s -o ${working}/$base-got	
 
     # Run the tested compiler assembly version
@@ -40,3 +38,5 @@ for i in ${input_dir}/*.c ; do
     fi
 
 done
+
+make clean

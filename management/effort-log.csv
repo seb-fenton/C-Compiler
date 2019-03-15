@@ -7,6 +7,7 @@ Date,Effort,Developers,Milestones
 27/02,3h,NG,AddParserASTSupport
 27/02,2.5h,NG,CreateAST
 28/02,2h,NG,CreateAST
+28/02,3h,NG,PrintFunctionForNodes
 01/03,3h,SF,DebugLexer
 02/03,4h,SF,CreateAST
 03/03,2h,SF,MakeOverheadInfrastructure
@@ -14,4 +15,6 @@ Date,Effort,Developers,Milestones
 04/03,6h,NG,CreateAST
 06/03,9h,SF,CtoPython
 07/03,6h,SF,CtoPython
+09/03,2h,SF,CreateTestSuite
 09/03,2h,SF,CreateTestCasesTestSuite
+11/03,2h,SF,CtoPythonDebugging

@@ -1,7 +1,5 @@
 #include "ast.hpp"
 
-
-
 int main(int argc, char* argv[]){
     if(argc != 5){ 
         std::cerr << "invalid input format" << std::endl;
@@ -11,7 +9,6 @@ int main(int argc, char* argv[]){
     if(std::string(argv[1]) =="--translate"){
         //create AST
         Node* ast = parseAST(argv[2]); 
-        //ast->printTree(0);
         
         //create context and ostream
         pyContext context;
@@ -28,7 +25,17 @@ int main(int argc, char* argv[]){
     else if(std::string(argv[1]) == "-S"){
         //create AST
         Node* ast = parseAST(argv[2]);
-        ast->printMips(comCtx);
+
+        //create context and ostream
+        compilerContext comCtx;
+        std::ostream* os = &std::cout;
+        std::ofstream stream;
+        stream.open(argv[4]);
+        os = &stream;
+
+        //run print mips
+        ast->printMips(comCtx, *os);
+        stream.close();
         return 0;
     }
     else std::cerr << "invalid input format" << std::endl;
