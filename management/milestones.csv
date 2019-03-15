@@ -7,12 +7,15 @@ DebugLexer, WriteLexerTypedefs, 5h, SF, N, Test Lexer by creating fake context h
 AddTypedefExtremeCaseSupport, DebugLexer, 4h, SF, N, Add support for extreme typdef use cases
 AddParserRules, WriteLexerTypedefs, 4h, NG, Y, Create Parser template with basic rules
 AddParserASTSupport,AddParserRules, 6h?, ALL, N, Add AST support in Parser rules
-CreateAST, , 15h, ALL, N, Create AST with nodes
-???CreateASTEval, , 15h, ALL, N, Create evaluate function for AST
-PrintFunctionForNodes, , 1h, SF, N, Create printfunction for AST nodes
+CreateAST, , 15h, ALL, Y, Create AST with nodes
+PrintFunctionForNodes, , 3h, NG, N, Create printfunction for AST nodes
 DebugParser, AddParserASTSupport, 6h?, ALL, N, Debug parser using completed Lexer
-MakeTestSuite, , 5h, ALL, N, Create the test suite along with the test files
-MakeOverheadInfrastructure, ,3h, SF, N, Create infrastructure to allow for automated testing compliant to spec
+MakeTestSuite, , 2h, ALL, N, Create the test suite 
+CreateTestCasesTestSuite, MakeTestSuite, 2h, SF, Y, Create the test_deliverable cases
+MakeOverheadInfrastructure, ,3h, SF, Y, Create infrastructure to allow for automated testing compliant to spec
 CtoPython, CreateAST, 15h, SF, Y, Create c to python translator
-CtoPythonDebugging, CtoPython, 5h, SF, Debug the translator and make to work with test suite
-CreateTestCasesTestSuite, , 2h, SF, Create the test_deliverable cases
+CtoPythonDebugging, CtoPython, 5h, SF, N, Debug the translator and make to work with test suite
+MipsContext, CreateAST, 6h, NG, N, Create the context structs for CodeGen
+MipsExpressions, CreateAST, ??h, ALL, N, Create mips code for expressions
+MipsStatements, CreateAST, ??h, ALL, N, Create mips code for expressions
+MipsBranches, CreateAST, ??h, ALL, N, Create mips code for expressions
