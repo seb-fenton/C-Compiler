@@ -47,7 +47,9 @@ class translation_unit : public BranchNode{
 
 class declaration_specifier_list : public BranchNode{
 	public:
-	declaration_specifier_list(NodePtr p){branches.push_back(p);}
+	declaration_specifier_list(NodePtr p);
+	~declaration_specifier_list();
+
 	void printTree(int n) {
 		/*for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
@@ -58,12 +60,12 @@ class declaration_specifier_list : public BranchNode{
 		}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
-	~declaration_specifier_list() {}
 };
 
 class init_declarator_list : public BranchNode{
 	public:
-	init_declarator_list(NodePtr p){branches.push_back(p);} //branches contain init_declarator nodes
+	init_declarator_list(NodePtr p); //branches contain init_declarator nodes
+
 	void printTree(int n) {
 		/*for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
@@ -73,12 +75,13 @@ class init_declarator_list : public BranchNode{
 			branches[i]->printTree(n);
 		}
 	}
+	void printMips(compilerContext& ctx, std::ostream& stream);
 	~init_declarator_list() {}
 };
 
 class argument_expression_list : public BranchNode{
 	public:
-	argument_expression_list(NodePtr p){branches.push_back(p);}
+	argument_expression_list(NodePtr p);
 	void printTree(int n){
 		std::cout<< "Arguments: [";
 		for(int i = 0; i < (int)branches.size(); i++){

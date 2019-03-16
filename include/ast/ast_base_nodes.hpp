@@ -13,6 +13,8 @@
 class Node{
 
 	public:
+		virtual ~Node() {};
+
 		virtual void printTree(int n) = 0;
 		virtual void printPy(pyContext& context, std::ostream& stream){}
 		virtual void tabprint(int scope, std::ostream& stream){
@@ -24,6 +26,8 @@ typedef Node* NodePtr;
 
 class ExpressionNode : public Node{
 	public:
+    virtual ~ExpressionNode()  {};
+
 		void addOperands(int one, int two, int three, std::ostream& stream){
 			stream << "add $" << one << ",$" << two << ",$" << three << std::endl;
 		}

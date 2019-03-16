@@ -34,6 +34,16 @@ void pyContext::decScope(){
 void DeclaratorContext::purge(){
     id.clear();
     initliased = false;
+    int size = 0;
+}
+
+void DeclaratorContext::nextElement(){
+    id.clear();
+    initliased = false;
+}
+
+int DeclaratorContext::totSize(){
+    return size * elements;
 }
 
 //---------------------------------------------//
@@ -67,4 +77,8 @@ void compilerContext::newFunc(){
 
 std::map<std::string, varData>* compilerContext::currentBindings(){
     return &functions.back().scopes.back().bindings;
+}
+
+void compilerContext::addToStack(int size, std::ostream& os){
+    os << "addiu $sp, $sp, " << -size << std::endl;
 }

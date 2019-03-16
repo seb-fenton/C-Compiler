@@ -33,14 +33,14 @@ class declaration : public Node{
 		stream << std::endl;
 	}
 
-	//void printMips(compilerContext& ctx, std::ostream& stream);
-	
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class declaration_specifiers : public Node{
 	public:
+	declaration_specifiers(std::string s);
+
 	std::string type_name;
-	declaration_specifiers(std::string s): type_name(s) {}
 
 	void printTree(int n) {
 		for(int i = 0; i < n; i++){
@@ -57,8 +57,8 @@ class init_declarator : public Node{
 	public:
 	NodePtr declaratorPtr = NULL , initialiserPtr = NULL;
 
-	init_declarator(NodePtr declarator, NodePtr initial): declaratorPtr(declarator), initialiserPtr(initial) {}
-	init_declarator(NodePtr declarator): declaratorPtr(declarator) {}
+	init_declarator(NodePtr declarator, NodePtr initial);
+	init_declarator(NodePtr declarator);
 
 	void printTree(int n) {
 		for(int i = 0; i < n; i++){
@@ -74,14 +74,15 @@ class init_declarator : public Node{
 		if(initialiserPtr == NULL) stream << "0";
 		else initialiserPtr->printPy(context, stream);	
 	}
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class declarator : public Node{
 	public:
 	NodePtr directDeclarator = NULL , pointerPtr = NULL;
 
-	declarator(NodePtr direct, NodePtr pointer): directDeclarator(direct), pointerPtr(pointer) {}
-	declarator(NodePtr direct): directDeclarator(direct) {}
+	declarator(NodePtr direct, NodePtr pointer);
+	declarator(NodePtr direct);
 
 	void printTree(int n) {
 		for(int i = 0; i < n; i++){
@@ -99,9 +100,10 @@ class declarator : public Node{
 
 class direct_declarator : public Node{
 	public:
-	std::string identifier;
 	//TODO: Need to adapt so that it has functions which turn this class into array declarators and function calls
-	direct_declarator(std::string s): identifier(s) {}
+	direct_declarator(std::string s);
+
+	std::string identifier;
 
 	void printTree(int n) {
 		for(int i = 0; i < n; i++){
@@ -115,12 +117,16 @@ class direct_declarator : public Node{
 			context.pythonBindings.push_back(identifier);
 		}	
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class initialiser : public Node{
 	public:
+	initialiser(ExpPtr a);
+
 	ExpPtr assignment;
-	initialiser(ExpPtr a): assignment(a) {}
+	
 	void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
@@ -132,6 +138,8 @@ class initialiser : public Node{
 	void printPy(pyContext& context, std::ostream& stream){
 		assignment->printPy(context, stream);
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 
@@ -142,6 +150,7 @@ class function_definition : public Node{
 	function_definition(NodePtr varName, NodePtr _statement):name(varName), statement(_statement) {
 		type = new declaration_specifier_list(new declaration_specifiers("int"));
 	}
+	
 	void printTree(int n) {
 		for(int i = 0; i < n; i++){
 			std::cout<< "|\t" ;
