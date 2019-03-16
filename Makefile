@@ -13,7 +13,7 @@ CPPFLAGS += -Wno-unused-function
 ###COMPILER RULES###
 compiler: bin/c_compiler
 
-bin/c_compiler : include/ast/context.o src/c_compiler.o src/c_parser.tab.o src/c_lexer.yy.o
+bin/c_compiler : include/ast/context.o include/ast/ast_spec_nodes.o include/ast/ast_branch_nodes.o src/c_compiler.o src/c_parser.tab.o src/c_lexer.yy.o 
 	make parser
 	g++ $(CPPFLAGS) -o bin/c_compiler $^
 
@@ -25,11 +25,18 @@ src/c_compiler.o : src/c_compiler.cpp
 
 ###PARSER RULES###
 parser: src/c_lexer.yy.cpp
-parsertest : bin/eval_expr
 
-bin/eval_expr : include/ast/context.o src/eval_parser.o src/c_parser.tab.o src/c_lexer.yy.o
-	mkdir -p bin
-	g++ $(CPPFLAGS) -o bin/eval_expr $^
+#parsertest : bin/eval_expr
+
+#bin/eval_expr : include/ast/context.o src/eval_parser.o src/c_parser.tab.o src/c_lexer.yy.o
+#	mkdir -p bin
+#	g++ $(CPPFLAGS) -o bin/eval_expr $^
+
+include/ast/ast_branch_nodes.o: include/ast/ast_branch_nodes.cpp include/ast/ast_branch_nodes.hpp
+	g++ $(CPPFLAGS) -c include/ast/ast_branch_nodes.cpp -o include/ast/ast_branch_nodes.o
+
+include/ast/ast_spec_nodes.o: include/ast/ast_spec_nodes.cpp include/ast/ast_spec_nodes.hpp
+	g++ $(CPPFLAGS) -c include/ast/ast_spec_nodes.cpp -o include/ast/ast_spec_nodes.o
 
 include/ast/context.o: include/ast/context.cpp include/ast/context.hpp
 	g++ $(CPPFLAGS) -c include/ast/context.cpp -o include/ast/context.o
