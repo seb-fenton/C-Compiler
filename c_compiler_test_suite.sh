@@ -3,38 +3,36 @@
 make compiler -B 
 
 input_dir="test_deliverable/test_cases"
-working="bin/compiler"
+working="bin/working"
 
 mkdir -p ${working}
 
 
 for i in ${input_dir}/*.c ; do
 
-    base=$(echo $i | sed -E -e "s|${input_dir}/([^.]+)[.]c|\1|g");
+    base=$(echo $i | sed -E -e "s|${input_dir}/([^.]+[^_driver])[.]c|\1|g")
 
-    # Compile the reference C version
-    gcc $i -std=c90 -ansi -o $working/$base
-    
-    # Run the reference C version
-    $working/$base
-    REF_C_OUT=$?
-        
-    # Compile to assembly using 
-    $compiler -S $i -o ${working}/$base-got.s
-	mips-linux-gnu-gcc -march=mips1 -mfp32 -w -O0 -static  ${working}/$base-got.s -o ${working}/$base-got	
+    base_drivers=$(echo $i | sed -E -e "s|${input_dir}/([^.]+[_driver])[.]c|\1|g")
 
-    # Run the tested compiler assembly version
-    qemu-mips ${working}/$base-got
-    GOT_P_OUT=$?
-    
-    if [[ $REF_C_OUT -ne $GOT_P_OUT ]] ; then
-        echo -e "${wht}$base.c ${red}[FAIL] ${wht}Expected ${REF_C_OUT} got ${GOT_P_OUT}"
+    echo -e "$base"
+
+    bin/c_compiler -S $input_dir/$base.c -o $working/$base.s
+
+    mips-linux-gnu-gcc -mfp32 -o $working/$base.o -c $working/$base.s
+
+    mips-linux-gnu-gcc -mfp32 -static -o $working/$base $working/$base.o $working/$base_drivers.c
+
+    qemu-mips test_program
+
+    GOT_OUT=$?
+
+    if [[ $GOT_OUT -ne 0 ]] ; then
+        echo -e "${wht}$base.c ${red}[FAIL] ${wht}Expected 0 got $GOT_OUT"
 
     else
-        echo -e "${wht}$base.c ${grn}[PASS]""${red}"
+        echo -e "${wht}$base.c [PASS]"
 
-	rm tmp/compiler/$base-got.s
-	rm tmp/compiler/$base
+    rm bin/working/*
     fi
 
 done

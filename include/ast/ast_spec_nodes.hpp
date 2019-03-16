@@ -33,7 +33,7 @@ class declaration : public Node{
 		stream << std::endl;
 	}
 
-	void printMips(compilerContext& ctx);
+	//void printMips(compilerContext& ctx, std::ostream& stream);
 	
 };
 
@@ -50,7 +50,7 @@ class declaration_specifiers : public Node{
 
 	}
 	
-	void printMips(compilerContext& ctx);
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class init_declarator : public Node{

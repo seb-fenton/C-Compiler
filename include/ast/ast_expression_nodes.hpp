@@ -251,6 +251,22 @@ class AddOp: public ExpressionNode{
 		stream << "+";
 		right->printPy(context, stream);	
 	}
+	void printMips(compilerContext& ctx, std::ostream& stream){
+		stream << std::endl;
+		storeOperand(3,stream);
+		storeOperand(4,stream);
+
+		left->printMips(ctx,stream);
+		addOperands(3,2,0,stream);
+
+		right->printMips(ctx,stream);
+		addOperands(4,2,0,stream);
+		
+		addOperands(2,4,3,stream);
+
+		loadOperand(3,stream);
+		loadOperand(4,stream); 
+	}
 };
 
 class SubOp: public ExpressionNode{
@@ -266,6 +282,22 @@ class SubOp: public ExpressionNode{
 		left->printPy(context, stream);
 		stream << "-";
 		right->printPy(context, stream);	
+	}
+	void printMips(compilerContext& ctx, std::ostream& stream){
+		stream << std::endl;
+		storeOperand(3,stream);
+		storeOperand(4,stream);
+
+		left->printMips(ctx,stream);
+		addOperands(3,2,0,stream);
+
+		right->printMips(ctx,stream);
+		addOperands(4,2,0,stream);
+		
+		//SUBSTITUTE 3 FROM 4
+		
+		loadOperand(3,stream);
+		loadOperand(4,stream); 
 	}
 };
 

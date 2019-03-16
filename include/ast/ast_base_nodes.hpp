@@ -24,7 +24,15 @@ typedef Node* NodePtr;
 
 class ExpressionNode : public Node{
 	public:
-
+		void addOperands(int one, int two, int three, std::ostream& stream){
+			stream << "add $" << one << ",$" << two << ",$" << three << std::endl;
+		}
+		void storeOperand(int operand, std::ostream& stream){
+			stream << "sw $" << operand << ",0($sp)" << std::endl;
+		}
+		void loadOperand(int operand, std::ostream& stream){
+			stream << "lw $" << operand << ",0($sp)" << std::endl;
+		}
 };
 typedef ExpressionNode* ExpPtr;
 

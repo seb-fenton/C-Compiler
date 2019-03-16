@@ -61,6 +61,8 @@ struct compilerContext{
     void newFunc(); //NOTE $fp should point to previous functions last element, this makes it possible to do $fp + memUsed to go back to the start address.
     void endFunc();
 
+    int calculateOffset();
+
     bool freeRegs[32];
 
     std::map<std::string, varData>* currentBindings();
