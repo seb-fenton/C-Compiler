@@ -18,7 +18,10 @@ struct DeclaratorContext{
     bool initliased = false;
     //int destReg; //should be an enum.
     int size; //declaration specifier determines this
+    int elements = 1; // usually for arrays, set to 1 by default for normal declaration
+    int offset;
 
+    int totSize();
     void purge();
     void nextElement();
 };
@@ -65,6 +68,7 @@ struct compilerContext{
     bool freeRegs[32];
 
     std::map<std::string, varData>* currentBindings();
+    void addToStack(int size, std::ostream& os);
 
     DeclaratorContext tempDeclarator; //can be used by declarators to keep track of info needed to add to bindings.
     

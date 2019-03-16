@@ -42,6 +42,10 @@ void DeclaratorContext::nextElement(){
     initliased = false;
 }
 
+int DeclaratorContext::totSize(){
+    return size * elements;
+}
+
 //---------------------------------------------//
 //----------------Vardata_Struct---------------//
 //---------------------------------------------//
@@ -73,4 +77,8 @@ void compilerContext::newFunc(){
 
 std::map<std::string, varData>* compilerContext::currentBindings(){
     return &functions.back().scopes.back().bindings;
+}
+
+void compilerContext::addToStack(int size, std::ostream& os){
+    os << "addiu $sp, $sp, " << -size << std::endl;
 }

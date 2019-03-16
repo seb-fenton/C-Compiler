@@ -33,7 +33,7 @@ class declaration : public Node{
 		stream << std::endl;
 	}
 
-	void printMips(compilerContext& ctx);
+	void printMips(compilerContext& ctx, std::ostream& os);
 	
 };
 
@@ -50,7 +50,7 @@ class declaration_specifiers : public Node{
 
 	}
 
-	void printMips(compilerContext& ctx);
+	void printMips(compilerContext& ctx, std::ostream& os);
 };
 
 class init_declarator : public Node{
@@ -74,7 +74,7 @@ class init_declarator : public Node{
 		if(initialiserPtr == NULL) stream << "0";
 		else initialiserPtr->printPy(context, stream);	
 	}
-	void printMips(compilerContext& ctx);
+	void printMips(compilerContext& ctx, std::ostream& os);
 };
 
 class declarator : public Node{
@@ -116,6 +116,8 @@ class direct_declarator : public Node{
 			context.pythonBindings.push_back(identifier);
 		}	
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& os);
 };
 
 class initialiser : public Node{
@@ -133,6 +135,8 @@ class initialiser : public Node{
 	void printPy(pyContext& context, std::ostream& stream){
 		assignment->printPy(context, stream);
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& os);
 };
 
 

@@ -38,7 +38,7 @@ class translation_unit : public BranchNode{
 		tabprint(context.scopeLevel, stream);
 		stream << "sys.exit(ret)";
   }
-	void printMIPS(compilerContext& ctx, std::ostream& os){
+	void printMips(compilerContext& ctx, std::ostream& os){
 		for(int i = 0; i < (int)branches.size(); i++){
 			branches[i]->printMips(ctx, os);
 		}
@@ -57,7 +57,7 @@ class declaration_specifier_list : public BranchNode{
 			branches[i]->printTree(n);
 		}
 	}
-	void printMips(compilerContext& ctx);
+	void printMips(compilerContext& ctx, std::ostream& os);
 	~declaration_specifier_list() {}
 };
 
@@ -73,7 +73,7 @@ class init_declarator_list : public BranchNode{
 			branches[i]->printTree(n);
 		}
 	}
-	void printMips(compilerContext& ctx);
+	void printMips(compilerContext& ctx, std::ostream& os);
 	~init_declarator_list() {}
 };
 
