@@ -32,7 +32,6 @@ int main(int argc, char* argv[]){
         std::ofstream stream;
         stream.open(argv[4]);
         os = &stream;
-
         //run print mips
         ast->printMips(comCtx, *os);
         stream.close();

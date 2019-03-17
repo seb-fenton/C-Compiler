@@ -38,15 +38,16 @@ struct varData{
 
     int elements = 1;
     int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
-    varData(int _offset, int _elements); //let declarator increment $sp
+    varData(){}
+    varData(int _offset, int _elements, bool _isArray); //let declarator increment $sp
 };
 
 struct scope{
-    std::map<std::string, varData> bindings;  
+    std::map<std::string, varData> bindings; 
     int stackOffset;
 
-    scope(std::map<std::string, varData>& _bindings, int _stackOffset);
-    void addToBindings(std::string id, int offset, int elements);
+    scope(std::map<std::string, varData> _bindings, int _stackOffset);
+    void addToBindings(std::string id, int offset, int elements, bool isArray);
 };
 
 struct funcScope{
@@ -68,7 +69,7 @@ struct compilerContext{
     std::vector<funcScope> functions;
     std::map<std::string, varData> globalVars;
 
-    void newFunc(std::ostream& stream); //NOTE $fp should point to previous functions last element, this makes it possible to do $fp + memUsed to go back to the start address.
+    void setup(std::ostream& stream); //NOTE $fp should point to previous functions last element, this makes it possible to do $fp + memUsed to go back to the start address.
     void endFunc(std::ostream& stream);
     bool funcDef = false;
 
@@ -79,6 +80,7 @@ struct compilerContext{
 
     std::map<std::string, varData>* currentBindings();
     scope* currentScope();
+    funcScope* currentFunc();
     void addToStack(int size, std::ostream& stream);
 
     DeclaratorContext tempDeclarator; //can be used by declarators to keep track of info needed to add to bindings.

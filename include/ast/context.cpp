@@ -35,6 +35,9 @@ void DeclaratorContext::purge(){
     id.clear();
     initliased = false;
     int size = 0;
+    offset = 0;
+    elements = 1;
+    isArray = false;
 }
 
 void DeclaratorContext::nextElement(){
@@ -53,16 +56,16 @@ int DeclaratorContext::totSize(){
 //----------------Vardata_Struct---------------//
 //---------------------------------------------//
 
-varData::varData(int _offset, int _elements): offset(_offset), elements(_elements){}
+varData::varData(int _offset, int _elements, bool _isArray): offset(_offset), elements(_elements), isArray(_isArray){}
 
 //---------------------------------------------//
 //----------------Scope_Struct-----------------//
 //---------------------------------------------//
 
-scope::scope(std::map<std::string, varData>& _bindings, int _stackOffset): bindings(_bindings), stackOffset(_stackOffset){}
+scope::scope(std::map<std::string, varData> _bindings, int _stackOffset): bindings(_bindings), stackOffset(_stackOffset){}
 
-void scope::addToBindings(std::string id, int offset, int elements){
-    bindings[id] = varData(offset, elements);
+void scope::addToBindings(std::string id, int offset, int elements, bool isArray){
+    bindings[id] = varData(offset, elements, isArray);
 }
 
 //---------------------------------------------//
@@ -72,8 +75,13 @@ void scope::addToBindings(std::string id, int offset, int elements){
 funcScope::funcScope(std::ostream& stream){}
 
 void funcScope::incScope(){
-    scopes.push_back(scope(scopes[scopeLevel].bindings, memUsed)); //when you enter a new scope, take the old scope bindings and put them into the new one
-    scopeLevel++;
+    if(scopes.size() == 0){
+        scopes.push_back(scope(parameters, memUsed));
+        scopeLevel++;
+    }else{
+        scopes.push_back(scope(scopes[scopeLevel-1].bindings, memUsed)); //when you enter a new scope, take the old scope bindings and put them into the new one
+        scopeLevel++;
+    }
 }
 
 void funcScope::decScope(std::ostream& stream){
@@ -89,18 +97,19 @@ void funcScope::decScope(std::ostream& stream){
 //----------------Compiler_Context-------------//
 //---------------------------------------------//
 
-void compilerContext::newFunc(std::ostream& stream){
+void compilerContext::setup(std::ostream& stream){
     addToStack(8, stream);
     stream << "sw $fp, 0($sp)" << std::endl;
     stream << "sw $31, 4($sp)" << std::endl;
-    functions.push_back(funcScope(stream));
     
 }
 
 void compilerContext::endFunc(std::ostream& stream){
     stream << "move $sp, $fp" << std::endl; //$fp needs to be reset in func call.
-    stream << "lw $31, -4($sp)" << std::endl; 
+    stream << "lw $31, -4($sp) \nnop" << std::endl; 
     stream << "j $31"<< std::endl; 
+    stream << std::endl;
+    stream << std::endl;  
     functions.pop_back();
 }
 
@@ -112,9 +121,13 @@ scope* compilerContext::currentScope(){
     return &functions.back().scopes.back();
 }
 
+funcScope* compilerContext::currentFunc(){
+    return &functions.back();
+}
+
 void compilerContext::addToStack(int size, std::ostream& stream){
-    stream << "addiu $sp, $sp, " << -size << std::endl;
     if(functions.size()> 0){
+        stream << "addiu $sp, $sp, " << -size << std::endl;
         functions.back().memUsed += size;
     }
 }

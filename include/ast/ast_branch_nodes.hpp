@@ -38,7 +38,7 @@ class translation_unit : public BranchNode{
 		tabprint(context.scopeLevel, stream);
 		stream << "sys.exit(ret)";
   }
-	void printMIPS(compilerContext& ctx, std::ostream& stream){
+	void printMips(compilerContext& ctx, std::ostream& stream){
 		for(int i = 0; i < (int)branches.size(); i++){
 			branches[i]->printMips(ctx, stream);
 		}
