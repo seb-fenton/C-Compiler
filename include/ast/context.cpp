@@ -82,3 +82,13 @@ std::map<std::string, varData>* compilerContext::currentBindings(){
 void compilerContext::addToStack(int size, std::ostream& os){
     os << "addiu $sp, $sp, " << -size << std::endl;
 }
+
+std::string compilerContext::generateUniqueLabel(){
+    std::stringstream temp;
+    temp.str("label");
+    temp << labelGen;
+
+    labelGen++;
+
+    return temp.str();
+}

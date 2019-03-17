@@ -9,6 +9,8 @@
 #include <map>
 #include <unordered_map>
 #include <algorithm>
+#include <sstream>
+
 
 class Node;
 typedef Node* NodePtr; //never use any member functions for this class
@@ -66,6 +68,9 @@ struct compilerContext{
     void endFunc();
 
     int calculateOffset();
+
+    int labelGen = 0;
+    std::string generateUniqueLabel();
 
     bool freeRegs[32];
 
