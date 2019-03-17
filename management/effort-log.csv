@@ -14,9 +14,14 @@ Date,Effort,Developers,Milestones
 04/03,1h,SF,MakeOverheadInfrastructure
 04/03,6h,NG,CreateAST
 06/03,9h,SF,CtoPython
+06/03,3h,NG,MipsContext
 07/03,6h,SF,CtoPython
 09/03,2h,SF,MakeTestSuite
 09/03,2h,SF,CreateTestCasesTestSuite
 11/03,2h,SF,CtoPythonDebugging
+11/03,3h,NG,MipsContext
+15/03,2h,NG,MipsContext
 16/03,2h,SF,MipsExpressions
+16/03,4h,NG,MipsOverhead
+17/03,4h,NG,MipsOverhead
 17/03,4h,SF,MipsExpressions
