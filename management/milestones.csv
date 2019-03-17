@@ -10,12 +10,12 @@ AddParserASTSupport,AddParserRules, 6h?, ALL, N, Add AST support in Parser rules
 CreateAST, , 15h, ALL, Y, Create AST with nodes
 PrintFunctionForNodes, , 3h, NG, N, Create printfunction for AST nodes
 DebugParser, AddParserASTSupport, 6h?, ALL, N, Debug parser using completed Lexer
-MakeTestSuite, , 2h, ALL, N, Create the test suite 
+MakeTestSuite, , 2h, SF, Y, Create the test suite 
 CreateTestCasesTestSuite, MakeTestSuite, 2h, SF, Y, Create the test_deliverable cases
 MakeOverheadInfrastructure, ,3h, SF, Y, Create infrastructure to allow for automated testing compliant to spec
 CtoPython, CreateAST, 15h, SF, Y, Create c to python translator
 CtoPythonDebugging, CtoPython, 5h, SF, N, Debug the translator and make to work with test suite
 MipsContext, CreateAST, 6h, NG, N, Create the context structs for CodeGen
-MipsExpressions, CreateAST, ??h, ALL, N, Create mips code for expressions
-MipsStatements, CreateAST, ??h, ALL, N, Create mips code for expressions
-MipsBranches, CreateAST, ??h, ALL, N, Create mips code for expressions
+MipsExpressions, CreateAST, 15h, SF, N, Create mips code for expressions
+MipsStatements, CreateAST, ??h, ALL, N, Create mips code for statements
+MipsBranches, CreateAST, ??h, ALL, N, Create mips code for branches
