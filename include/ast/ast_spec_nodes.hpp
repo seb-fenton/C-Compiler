@@ -145,7 +145,7 @@ class initialiser : public Node{
 
 class function_definition : public Node{
 	public:
-	NodePtr type = NULL, name = NULL, statement = NULL, decList = NULL;
+	NodePtr type = NULL, name = NULL, statement = NULL;
 	function_definition(NodePtr specifiers, NodePtr varName, NodePtr _statement): type(specifiers), name(varName), statement(_statement) {}
 	function_definition(NodePtr varName, NodePtr _statement):name(varName), statement(_statement) {
 		type = new declaration_specifier_list(new declaration_specifiers("int"));
@@ -158,7 +158,6 @@ class function_definition : public Node{
 		std::cout << "Function Definition" << std::endl;
 		if(type != NULL){ type->printTree(n+1);}
 		if(name != NULL){ name->printTree(n+1);}
-		if(decList != NULL){decList->printTree(n+1);}
 		if(statement != NULL){statement->printTree(n+1);}
 	}
 	
@@ -179,6 +178,8 @@ class function_definition : public Node{
 		statement->printPy(context, stream);
 		context.decScope();
     }
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class ArrayDeclaration : public Node{
@@ -201,6 +202,8 @@ class ArrayDeclaration : public Node{
 			std::cout << std::endl;
 		}
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class parameter_declaration : public Node{
@@ -220,6 +223,7 @@ class parameter_declaration : public Node{
 		dec->printPy(context, stream);
 	}
 
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class FunctionDeclaration : public Node{
@@ -243,6 +247,7 @@ class FunctionDeclaration : public Node{
 		stream << ")";
 	}
 
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class ObjectInitialiser : public Node{

@@ -31,6 +31,7 @@ init_declarator::init_declarator(NodePtr declarator, NodePtr initial): declarato
 init_declarator::init_declarator(NodePtr declarator): declaratorPtr(declarator) {}
 
 void init_declarator::printMips(compilerContext& ctx, std::ostream& stream){
+    //need to do something different for arrays
     if(declaratorPtr != NULL){declaratorPtr->printMips(ctx, stream);}
     ctx.addToStack(ctx.tempDeclarator.totSize(), stream);
     ctx.tempDeclarator.offset = ctx.functions.back().memUsed; //setting the offset
@@ -38,6 +39,7 @@ void init_declarator::printMips(compilerContext& ctx, std::ostream& stream){
         initialiserPtr->printMips(ctx, stream);
         stream << "sw $2, 0($sp)" << std::endl;   
     }
+    ctx.currentScope()->addToBindings(ctx.tempDeclarator.id, ctx.tempDeclarator.offset, ctx.tempDeclarator.elements);
 }
 
 
@@ -46,7 +48,10 @@ void init_declarator::printMips(compilerContext& ctx, std::ostream& stream){
 direct_declarator::direct_declarator(std::string s): identifier(s) {}
 
 void direct_declarator::printMips(compilerContext& ctx, std::ostream& stream){
-    ctx.tempDeclarator.id = identifier;
+    if(!ctx.funcDef){ctx.tempDeclarator.id = identifier;}
+    else{
+        stream << identifier << ":" << std::endl;
+    }
 }
 
 
@@ -58,3 +63,45 @@ void initialiser::printMips(compilerContext& ctx, std::ostream& stream){
 //initialiser
 
 initialiser::initialiser(ExpPtr a): assignment(a) {}
+
+//ArrayDeclaration
+
+void ArrayDeclaration::printMips(compilerContext& ctx, std::ostream& stream){
+    ctx.tempDeclarator.isArray = true;
+    if(size != NULL){
+    //ctx.tempDeclarator.elements = size->eval(); need to make eval function to calculate size of arrays at compile time
+    }
+    else{
+        ctx.tempDeclarator.elements = 0; //represents empty array
+    }
+}
+
+
+//function definition
+void function_definition::printMips(compilerContext& ctx, std::ostream& stream){
+    ctx.newFunc(stream);
+    ctx.funcDef = true;
+    //if(type != NULL){type->printMips(ctx, stream);}
+    if(name != NULL){name->printMips(ctx, stream);} //prints a label
+    ctx.funcDef = false;
+    if(statement != NULL){statement->printMips(ctx, stream);} //prints actual statement
+    ctx.endFunc(stream);
+}
+
+//FunctionDeclaration
+void FunctionDeclaration::printMips(compilerContext& ctx, std::ostream& stream){
+    if(funcName != NULL){funcName->printMips(ctx, stream);}
+    if(argList != NULL){argList->printMips(ctx, stream);}
+}
+
+void parameter_declaration::printMips(compilerContext& ctx, std::ostream& stream){
+    bool temp = ctx.funcDef;
+    ctx.funcDef = false;
+    if(specifiers != NULL){specifiers->printMips(ctx, stream);}
+    if(dec != NULL){dec->printMips(ctx, stream);}
+    ctx.tempDeclarator.offset = -(ctx.functions.back().parameters.size()*4);
+    ctx.functions.back().parameters[ctx.tempDeclarator.id] = varData(ctx.tempDeclarator.offset, ctx.tempDeclarator.elements);
+    ctx.tempDeclarator.purge();
+    ctx.funcDef = temp;
+}
+

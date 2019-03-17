@@ -117,6 +117,8 @@ class parameter_list : public BranchNode{
 			if(i != branches.size()-1) stream << ",";
 		}
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class identifier_list : public Node{
@@ -134,6 +136,8 @@ class identifier_list : public Node{
 		}
 		std::cout << std::endl;
 	}
+
+	
 };
 
 class initialiser_list : public BranchNode{
