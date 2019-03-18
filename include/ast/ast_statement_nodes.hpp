@@ -6,7 +6,7 @@
 
 class compound_statement : public Node{
     public:
-    NodePtr block_list;
+    NodePtr block_list = NULL;
     compound_statement(){}
     compound_statement(NodePtr block): block_list(block) {}
     void printTree(int n) {
@@ -21,6 +21,8 @@ class compound_statement : public Node{
         block_list->printPy(context, stream); //TODO : - resolve global scope print!
         //context.decScope();
     }
+
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class expression_statement: public Node{
@@ -53,6 +55,8 @@ class block_item_list : public BranchNode{
             branches[i]->printTree(n);
         }
 	}
+
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class IfStatement : public Node{

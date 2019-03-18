@@ -15,7 +15,8 @@ CreateTestCasesTestSuite, MakeTestSuite, 2h, SF, Y, Create the test_deliverable 
 MakeOverheadInfrastructure, ,3h, SF, Y, Create infrastructure to allow for automated testing compliant to spec
 CtoPython, CreateAST, 15h, SF, Y, Create c to python translator
 CtoPythonDebugging, CtoPython, 5h, SF, N, Debug the translator and make to work with test suite
-MipsContext, CreateAST, 6h, NG, N, Create the context structs for CodeGen
+MipsContext, CreateAST, 6h, NG, Y, Create the context structs for CodeGen
+MipsOverhead, MipsContext, 8h, Codegen for declarations, functions etc.
 MipsExpressions, CreateAST, 15h, SF, N, Create mips code for expressions
 MipsStatements, CreateAST, ??h, ALL, N, Create mips code for statements
 MipsBranches, CreateAST, ??h, ALL, N, Create mips code for branches

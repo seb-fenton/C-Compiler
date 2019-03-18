@@ -21,8 +21,8 @@ init_declarator_list::init_declarator_list(NodePtr p){branches.push_back(p);} //
 
 void init_declarator_list::printMips(compilerContext& ctx, std::ostream& stream){
     for(int i = 0; i < (int)branches.size(); i++){
-			branches[i]->printMips(ctx, stream);
-            ctx.tempDeclarator.nextElement();
+		branches[i]->printMips(ctx, stream);
+        ctx.tempDeclarator.nextElement();
 	}
 }
 
@@ -30,3 +30,11 @@ void init_declarator_list::printMips(compilerContext& ctx, std::ostream& stream)
 //argument_declarator_list
 
 argument_expression_list::argument_expression_list(NodePtr p){branches.push_back(p);}
+
+//parameter list
+
+void parameter_list::printMips(compilerContext& ctx, std::ostream& stream){
+	for(int i = 0; i < (int)branches.size(); i++){
+		branches[i]->printMips(ctx, stream);
+	}
+}

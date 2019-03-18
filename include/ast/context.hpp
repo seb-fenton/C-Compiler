@@ -22,6 +22,7 @@ struct DeclaratorContext{
     int size; //declaration specifier determines this
     int elements = 1; // usually for arrays, set to 1 by default for normal declaration
     int offset;
+    bool isArray = false;
 
     int totSize();
     void purge();
@@ -35,28 +36,32 @@ struct varData{
     bool isTypdef = false;
     //NodePtr typedefLoc = NULL; //points to the declaration specifiers the typedef contains
 
+    int elements = 1;
     int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
-    varData(int _offset): offset(_offset) {} //let declarator increment $sp
+    varData(){}
+    varData(int _offset, int _elements, bool _isArray); //let declarator increment $sp
 };
 
 struct scope{
-    std::map<std::string, varData> bindings;  
+    std::map<std::string, varData> bindings; 
+    int stackOffset;
 
-    scope(std::map<std::string, varData>& _bindings);
+    scope(std::map<std::string, varData> _bindings, int _stackOffset);
+    void addToBindings(std::string id, int offset, int elements, bool isArray);
 };
 
 struct funcScope{
     int scopeLevel = 0;
-    int returnData; //might not be needed
 
     std::vector<scope> scopes;
     std::map<std::string, varData> parameters;
 
     int memUsed = 0; //should be incremented as you add new bindings
     void incScope();
-    funcScope(){};
-    funcScope(std::map<std::string, varData>& _parameters): parameters(_parameters) {} //the function definition node should pack the info correctly
-};
+    void decScope(std::ostream& stream);
+    funcScope(std::ostream& stream);
+     //the function definition node should pack the info correctly
+};  //for a function with parameters.
 
 
 struct compilerContext{
@@ -64,10 +69,9 @@ struct compilerContext{
     std::vector<funcScope> functions;
     std::map<std::string, varData> globalVars;
 
-    void newFunc(); //NOTE $fp should point to previous functions last element, this makes it possible to do $fp + memUsed to go back to the start address.
-    void endFunc();
-
-    int calculateOffset();
+    void setup(std::ostream& stream); //NOTE $fp should point to previous functions last element, this makes it possible to do $fp + memUsed to go back to the start address.
+    void endFunc(std::ostream& stream);
+    bool funcDef = false;
 
     int labelGen = 0;
     std::string generateUniqueLabel();
@@ -75,6 +79,8 @@ struct compilerContext{
     bool freeRegs[32];
 
     std::map<std::string, varData>* currentBindings();
+    scope* currentScope();
+    funcScope* currentFunc();
     void addToStack(int size, std::ostream& stream);
 
     DeclaratorContext tempDeclarator; //can be used by declarators to keep track of info needed to add to bindings.
