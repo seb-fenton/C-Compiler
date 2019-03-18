@@ -113,7 +113,7 @@ class direct_declarator : public Node{
 	}
 	void printPy(pyContext& context, std::ostream& stream){
 		stream << identifier;
-		if(context.scopeLevel == 0) {
+		if(context.scopeLevel == 0 && !funcDefPy) {
 			context.pythonBindings.push_back(identifier);
 		}	
 	}
@@ -241,6 +241,7 @@ class FunctionDeclaration : public Node{
 
 	}
 	void printPy(pyContext& context, std::ostream& stream){
+		funcName->funcDefPy = true;
 		funcName->printPy(context, stream);
 		stream << "(";
 		if(argList != NULL) argList->printPy(context, stream);

@@ -15,6 +15,9 @@ class Node{
 	public:
 		virtual ~Node() {};
 
+		bool funcDefPy = false;
+
+
 		virtual void printTree(int n) = 0;
 		virtual void printPy(pyContext& context, std::ostream& stream){}
 		virtual void tabprint(int scope, std::ostream& stream){

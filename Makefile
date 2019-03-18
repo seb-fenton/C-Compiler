@@ -13,11 +13,7 @@ CPPFLAGS += -Wno-unused-function
 ###COMPILER RULES###
 compiler: bin/c_compiler
 
-<<<<<<< HEAD
-bin/c_compiler : include/ast/context.o include/ast/ast_spec_nodes.o include/ast/ast_branch_nodes.o include/ast/ast_expression_nodes.o src/c_compiler.o src/c_parser.tab.o src/c_lexer.yy.o 
-=======
 bin/c_compiler : include/ast/context.o include/ast/ast_spec_nodes.o include/ast/ast_branch_nodes.o include/ast/ast_expression_nodes.o include/ast/ast_statement_nodes.o src/c_compiler.o src/c_parser.tab.o src/c_lexer.yy.o 
->>>>>>> b577940f35eabd483f51017418999b7a55f4e09d
 	make parser
 	g++ $(CPPFLAGS) -o bin/c_compiler $^
 
@@ -42,12 +38,9 @@ include/ast/ast_branch_nodes.o: include/ast/ast_branch_nodes.cpp include/ast/ast
 include/ast/ast_spec_nodes.o: include/ast/ast_spec_nodes.cpp include/ast/ast_spec_nodes.hpp
 	g++ $(CPPFLAGS) -c include/ast/ast_spec_nodes.cpp -o include/ast/ast_spec_nodes.o
 
-<<<<<<< HEAD
-=======
 include/ast/ast_statement_nodes.o: include/ast/ast_statement_nodes.cpp include/ast/ast_statement_nodes.hpp
 	g++ $(CPPFLAGS) -c include/ast/ast_statement_nodes.cpp -o include/ast/ast_statement_nodes.o
 
->>>>>>> b577940f35eabd483f51017418999b7a55f4e09d
 include/ast/ast_expression_nodes.o: include/ast/ast_expression_nodes.cpp include/ast/ast_expression_nodes.hpp
 	g++ $(CPPFLAGS) -c include/ast/ast_expression_nodes.cpp -o include/ast/ast_expression_nodes.o
 

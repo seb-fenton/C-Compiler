@@ -8,7 +8,7 @@ int main(int argc, char* argv[]){
 
     if(std::string(argv[1]) =="--translate"){
         //create AST
-        Node* ast = parseAST(argv[2]); 
+        Node* ast = parseAST(argv[2]);
         
         //create context and ostream
         pyContext context;
@@ -32,6 +32,7 @@ int main(int argc, char* argv[]){
         std::ofstream stream;
         stream.open(argv[4]);
         os = &stream;
+        
         //run print mips
         ast->printMips(comCtx, *os);
         std::cout << "succesful print" << std::endl;
