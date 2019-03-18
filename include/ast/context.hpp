@@ -29,6 +29,11 @@ struct DeclaratorContext{
     void nextElement();
 };
 
+struct WhileContext{ //needed for continue and break
+    std::string start, end;
+    WhileContext(std::string _start, std::string _end): start(_start), end(_end){}
+};
+
 struct varData{
     bool isArray = false;
     int size; //used mainly for arrays but we can initlialise it for normal integers, to be used with the SizeOf command
@@ -55,6 +60,7 @@ struct funcScope{
 
     std::vector<scope> scopes;
     std::map<std::string, varData> parameters;
+    std::vector<WhileContext> whileLoops;
 
     int memUsed = 0; //should be incremented as you add new bindings
     void incScope();
@@ -75,6 +81,7 @@ struct compilerContext{
 
     int labelGen = 0;
     std::string generateUniqueLabel();
+    std::string generateLabel(std::string s);
 
     bool freeRegs[32];
 

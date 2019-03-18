@@ -79,7 +79,8 @@ void funcScope::incScope(){
         scopes.push_back(scope(parameters, memUsed));
         scopeLevel++;
     }else{
-        scopes.push_back(scope(scopes[scopeLevel-1].bindings, memUsed)); //when you enter a new scope, take the old scope bindings and put them into the new one
+        scopes.push_back(scopes.back()); //when you enter a new scope, take the old scope bindings and put them into the new one
+        scopes.back().stackOffset = memUsed;
         scopeLevel++;
     }
 }
@@ -140,4 +141,10 @@ std::string compilerContext::generateUniqueLabel(){
     labelGen++;
 
     return temp.str();
+}
+
+std::string compilerContext::generateLabel(std::string s){
+    s = s + std::to_string(labelGen);
+    labelGen++;
+    return s;
 }
