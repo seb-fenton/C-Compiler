@@ -83,6 +83,9 @@ void function_definition::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.functions.push_back(funcScope(stream)); //creates function
     if(name != NULL){name->printMips(ctx, stream);} //prints a label
     ctx.setup(stream);
+    for(int i = 0; i < ctx.currentFunc()->parameters.size(); i++){
+        stream << "sw $" << (i+4) << ", " << (i*4) << "($fp)" << std::endl;  
+    }
     //if(type != NULL){type->printMips(ctx, stream);}
     ctx.funcDef = false;
     if(statement != NULL){statement->printMips(ctx, stream);} //prints actual statement
