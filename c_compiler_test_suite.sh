@@ -14,8 +14,6 @@ for i in ${input_dir}/*.c ; do
 
     base_drivers=$(echo $i | sed -E -e "s|${input_dir}/([^.]+[_driver])[.]c|\1|g")
 
-    echo -e "$base"
-
     bin/c_compiler -S $input_dir/$base.c -o $working/$base.s
 
     mips-linux-gnu-gcc -mfp32 -o $working/$base.o -c $working/$base.s

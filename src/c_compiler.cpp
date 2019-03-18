@@ -35,6 +35,7 @@ int main(int argc, char* argv[]){
 
         //run print mips
         ast->printMips(comCtx, *os);
+        std::cout << "succesful print" << std::endl;
         stream.close();
         return 0;
     }

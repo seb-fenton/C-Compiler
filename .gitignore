@@ -4,4 +4,6 @@ src/c_lexer_main.o
 bin/c_lexer
 src/c_parser.output
 .vscode
-
+Vagrantfile
+ubuntu-xenial-16.04-cloudimg-console.log
+.vagrant

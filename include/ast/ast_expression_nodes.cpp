@@ -422,7 +422,8 @@ void DivOp::printMips(compilerContext& ctx, std::ostream& stream){
 	addOperands(9,2,0,stream);
 
     stream << "div $8,$9" << std::endl;
-    stream << "addu $2,$lo,$0" << std::endl;
+    stream << "mflo $8" << std::endl;
+    stream << "addu $2,$8,$0" << std::endl;
 
 	loadOperand(8,stream);
 	loadOperand(9,stream); 
@@ -443,7 +444,8 @@ void ModulusOp::printMips(compilerContext& ctx, std::ostream& stream){
 	addOperands(9,2,0,stream);
 
     stream << "div $8,$9" << std::endl;
-    stream << "addu $2,$hi,$0" << std::endl;
+    stream << "mflo $8" << std::endl;
+    stream << "addu $2,$8,$0" << std::endl;
 
 	loadOperand(8,stream);
 	loadOperand(9,stream); 
