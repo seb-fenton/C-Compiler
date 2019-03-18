@@ -96,6 +96,8 @@ class IfStatement : public Node{
             context.decScope();
         }
     }
+
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class SwitchStatement : public Node{
@@ -138,6 +140,8 @@ class WhileStatement : public Node{
         cond->printPy(context, stream);
         context.decScope();
     }
+
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class DoStatement : public Node{

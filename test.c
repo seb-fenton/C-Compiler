@@ -1,9 +1,7 @@
 int main(){
-    int r;
+    int x;
+    while(x>5){
+        int x;
+    }
 }
 
-int f(){
-    int z;
-    {int r;}
-    int x;
-}
