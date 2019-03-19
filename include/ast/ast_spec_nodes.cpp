@@ -50,6 +50,8 @@ direct_declarator::direct_declarator(std::string s): identifier(s) {}
 void direct_declarator::printMips(compilerContext& ctx, std::ostream& stream){
     if(!ctx.funcDef){ctx.tempDeclarator.id = identifier;}
     else{
+        stream << ".text" << std::endl;
+        stream << ".global " << identifier << std::endl << std::endl;
         stream << identifier << ":" << std::endl;
     }
 }
@@ -67,7 +69,6 @@ initialiser::initialiser(ExpPtr a): assignment(a) {}
 //ArrayDeclaration
 
 void ArrayDeclaration::printMips(compilerContext& ctx, std::ostream& stream){
-    ctx.tempDeclarator.isArray = true;
     if(size != NULL){
     //ctx.tempDeclarator.elements = size->eval(); need to make eval function to calculate size of arrays at compile time
     }
@@ -105,7 +106,7 @@ void parameter_declaration::printMips(compilerContext& ctx, std::ostream& stream
     if(specifiers != NULL){specifiers->printMips(ctx, stream);}
     if(dec != NULL){dec->printMips(ctx, stream);}
     ctx.tempDeclarator.offset = -(ctx.currentFunc()->parameters.size()*4);
-    ctx.currentFunc()->parameters[ctx.tempDeclarator.id] = varData(ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.isArray);
+    ctx.currentFunc()->parameters[ctx.tempDeclarator.id] = varData(ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.size);
     ctx.tempDeclarator.purge();
     ctx.funcDef = temp;
     

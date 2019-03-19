@@ -1,3 +1,6 @@
+.text
+.global main
+
 main:
 addiu $sp, $sp, -8
 sw $fp, 0($sp)

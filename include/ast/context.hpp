@@ -22,7 +22,6 @@ struct DeclaratorContext{
     int size; //declaration specifier determines this
     int elements = 1; // usually for arrays, set to 1 by default for normal declaration
     int offset;
-    bool isArray = false;
 
     int totSize();
     void purge();
