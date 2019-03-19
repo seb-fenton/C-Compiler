@@ -33,13 +33,13 @@ init_declarator::init_declarator(NodePtr declarator): declaratorPtr(declarator) 
 void init_declarator::printMips(compilerContext& ctx, std::ostream& stream){
     //need to do something different for arrays
     if(declaratorPtr != NULL){declaratorPtr->printMips(ctx, stream);}
+    ctx.tempDeclarator.offset = ctx.functions.back().memUsed + 4; //setting the offset
     ctx.addToStack(ctx.tempDeclarator.totSize(), stream);
-    ctx.tempDeclarator.offset = ctx.functions.back().memUsed; //setting the offset
     if(initialiserPtr != NULL){
         initialiserPtr->printMips(ctx, stream);
         stream << "sw $2, 0($sp)" << std::endl;   
     }
-    ctx.currentScope()->addToBindings(ctx.tempDeclarator.id, ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.isArray);
+    ctx.currentScope()->addToBindings(ctx.tempDeclarator.id, ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.size);
 }
 
 

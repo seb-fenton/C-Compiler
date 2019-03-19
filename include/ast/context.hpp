@@ -29,13 +29,12 @@ struct DeclaratorContext{
     void nextElement();
 };
 
-struct WhileContext{ //needed for continue and break
-    std::string start, end;
-    WhileContext(std::string _start, std::string _end): start(_start), end(_end){}
+struct LoopContext{ //needed for continue and break
+    std::string cont, brk ;
+    LoopContext(std::string _cont, std::string _brk): cont(_cont), brk(_brk){}
 };
 
 struct varData{
-    bool isArray = false;
     int size; //used mainly for arrays but we can initlialise it for normal integers, to be used with the SizeOf command
 
     bool isTypdef = false;
@@ -44,7 +43,7 @@ struct varData{
     int elements = 1;
     int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
     varData(){}
-    varData(int _offset, int _elements, bool _isArray); //let declarator increment $sp
+    varData(int _offset, int _elements, int _size); //let declarator increment $sp
 };
 
 struct scope{
@@ -52,7 +51,7 @@ struct scope{
     int stackOffset;
 
     scope(std::map<std::string, varData> _bindings, int _stackOffset);
-    void addToBindings(std::string id, int offset, int elements, bool isArray);
+    void addToBindings(std::string id, int offset, int elements, int size);
 };
 
 struct funcScope{
@@ -60,7 +59,7 @@ struct funcScope{
 
     std::vector<scope> scopes;
     std::map<std::string, varData> parameters;
-    std::vector<WhileContext> whileLoops;
+    std::vector<LoopContext> LoopsLabels;
 
     int memUsed = 0; //should be incremented as you add new bindings
     void incScope();

@@ -158,6 +158,8 @@ class DoStatement : public Node{
         std::cout<< std::endl;
         if(stmt != NULL) {stmt->printTree(n+1);}
     }
+
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class ForStatement : public Node{
@@ -181,6 +183,8 @@ class ForStatement : public Node{
         std::cout<<std::endl;
         if(stmt != NULL) {stmt->printTree(n+1);}
     }
+
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class LabelStatement : public Node{
@@ -236,6 +240,8 @@ class ContinueStatement : public Node{
 		}
 		std::cout << "Continue Statement: " << std::endl;
     }
+
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class BreakStatement : public Node{
@@ -247,6 +253,7 @@ class BreakStatement : public Node{
 		}
 		std::cout << "Break Statement: " << std::endl;
     }
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class ReturnStatement : public Node{
@@ -268,6 +275,8 @@ class ReturnStatement : public Node{
         if(expr!=NULL) expr->printPy(context, stream);
         stream << "\n";
 	}
+
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 

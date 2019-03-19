@@ -56,7 +56,7 @@ int DeclaratorContext::totSize(){
 //----------------Vardata_Struct---------------//
 //---------------------------------------------//
 
-varData::varData(int _offset, int _elements, bool _isArray): offset(_offset), elements(_elements), isArray(_isArray){}
+varData::varData(int _offset, int _elements, int _size): offset(_offset), elements(_elements), size(_size){}
 
 //---------------------------------------------//
 //----------------Scope_Struct-----------------//
@@ -64,8 +64,8 @@ varData::varData(int _offset, int _elements, bool _isArray): offset(_offset), el
 
 scope::scope(std::map<std::string, varData> _bindings, int _stackOffset): bindings(_bindings), stackOffset(_stackOffset){}
 
-void scope::addToBindings(std::string id, int offset, int elements, bool isArray){
-    bindings[id] = varData(offset, elements, isArray);
+void scope::addToBindings(std::string id, int offset, int elements, int size){
+    bindings[id] = varData(offset, elements, size);
 }
 
 //---------------------------------------------//
@@ -109,8 +109,7 @@ void compilerContext::endFunc(std::ostream& stream){
     stream << "move $sp, $fp" << std::endl; //$fp needs to be reset in func call.
     stream << "lw $31, -4($sp) \nnop" << std::endl; 
     stream << "j $31"<< std::endl; 
-    stream << std::endl;
-    stream << std::endl;  
+    stream << std::endl; 
     functions.pop_back();
 }
 
