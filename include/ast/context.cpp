@@ -129,6 +129,13 @@ void compilerContext::addToStack(int size, std::ostream& stream){
     }
 }
 
+void compilerContext::removeFromStack(int size, std::ostream& stream){
+    if(functions.size()> 0){
+        stream << "addiu $sp, $sp, " << size << std::endl;
+        functions.back().memUsed -= size;
+    }
+}
+
 std::string compilerContext::generateUniqueLabel(){
     std::stringstream temp;
     temp.str("label");

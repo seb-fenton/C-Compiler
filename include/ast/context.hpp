@@ -76,6 +76,7 @@ struct compilerContext{
     void setup(std::ostream& stream); //NOTE $fp should point to previous functions last element, this makes it possible to do $fp + memUsed to go back to the start address.
     void endFunc(std::ostream& stream);
     bool funcDef = false;
+    bool funcCall = false;
 
     int labelGen = 0;
     std::string generateUniqueLabel();
@@ -87,6 +88,7 @@ struct compilerContext{
     scope* currentScope();
     funcScope* currentFunc();
     void addToStack(int size, std::ostream& stream);
+    void removeFromStack(int size, std::ostream& stream);
 
     DeclaratorContext tempDeclarator; //can be used by declarators to keep track of info needed to add to bindings.
     

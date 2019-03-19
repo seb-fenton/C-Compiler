@@ -5,8 +5,7 @@
 //primary_expression
 
 void primary_expression::printMips(compilerContext& ctx, std::ostream& stream){
-    std::map<std::string, varData>* temp = ctx.currentBindings();
-    int retrieveVariable = ctx.currentFunc()->memUsed - (temp->find(identifier))->second.offset;
+    int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
     stream << "lw $2," << retrieveVariable << "($sp)" << std::endl;
 }
 
@@ -14,15 +13,16 @@ void primary_expression::printMips(compilerContext& ctx, std::ostream& stream){
 //constantNode
 
 void constantNode::printMips(compilerContext& ctx, std::ostream& stream){
-    stream << "addiu $2,$0," << (int)init;
+    stream << "addiu $2,$0," << (int)init << std::endl;
 }
 
 
 //conditional_expression
 
 void conditional_expression::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     Cond->printMips(ctx,stream);
 
@@ -44,17 +44,19 @@ void conditional_expression::printMips(compilerContext& ctx, std::ostream& strea
 
     stream << tempLabelFalse << ": nop" << std::endl;
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //LogicalOrOp
 
 void LogicalOrOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -65,17 +67,19 @@ void LogicalOrOp::printMips(compilerContext& ctx, std::ostream& stream){
     //TODO : WHAT DO WE DO FOR LOGICAL Or
     stream << "or $2,$8,$9" << std::endl;
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //LogicalAndOp
 
 void LogicalAndOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -86,17 +90,19 @@ void LogicalAndOp::printMips(compilerContext& ctx, std::ostream& stream){
     //TODO : WHAT DO WE DO FOR LOGICAL AND
     stream << "and $2,$8,$9" << std::endl;
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //OrOp
 
 void InclusiveOrOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -106,17 +112,19 @@ void InclusiveOrOp::printMips(compilerContext& ctx, std::ostream& stream){
 
     stream << "or $2,$8,$9" << std::endl;
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //XorOp
 
 void ExclusiveOrOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -126,17 +134,19 @@ void ExclusiveOrOp::printMips(compilerContext& ctx, std::ostream& stream){
 
     stream << "xor $2,$8,$9" << std::endl;
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //AndOp
 
 void AndOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -146,17 +156,19 @@ void AndOp::printMips(compilerContext& ctx, std::ostream& stream){
 
     stream << "and $2,$8,$9" << std::endl;
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //EOp
 
 void EqualOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -180,17 +192,19 @@ void EqualOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << tempLabel << ": addiu $2,$0,1" << std::endl;
     stream << tempLabelSkip << ": nop" << std::endl;*/
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //NEOp
 
 void NotEqualOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -215,17 +229,19 @@ void NotEqualOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << tempLabelSkip << ": nop" << std::endl;*/
 
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //GTOp
 
 void GreaterThanOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -249,17 +265,19 @@ void GreaterThanOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << tempLabel << ": addiu $2,$0,1" << std::endl;
     stream << tempLabelSkip << ": nop" << std::endl;*/
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //LTOp
 
 void LessThanOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -269,17 +287,19 @@ void LessThanOp::printMips(compilerContext& ctx, std::ostream& stream){
 
     stream << "slt $2,$8,$9" << std::endl;                // checks if $8 < $9
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //LTEOp
 
 void LessThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -307,17 +327,19 @@ void LessThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
 
 
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //GTEOp
 
 void GreaterThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -342,17 +364,19 @@ void GreaterThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << tempLabel << ": addiu $2,$0,1" << std::endl;
     stream << tempLabelSkip << ": nop" << std::endl;*/
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //LeftShiftOp
 
 void LeftShiftOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -362,17 +386,19 @@ void LeftShiftOp::printMips(compilerContext& ctx, std::ostream& stream){
 
     stream << "sllv $2,$8,$9" << std::endl;
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //RightShiftOp
 
 void RightShiftOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -382,37 +408,41 @@ void RightShiftOp::printMips(compilerContext& ctx, std::ostream& stream){
 
     stream << "srav $2,$8,$9" << std::endl;
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //AddOp
 
 void AddOp::printMips(compilerContext& ctx, std::ostream& stream){
-	storeOperand(3,stream);
-	storeOperand(4,stream);
+    ctx.addToStack(8, stream);
+	storeOperand(8, 4,stream);
+	storeOperand(9, 0,stream);
 
 	left->printMips(ctx,stream);
-	addOperands(3,2,0,stream);
+	addOperands(8,2,0,stream);
 
 	right->printMips(ctx,stream);
-	addOperands(4,2,0,stream);
+	addOperands(9,2,0,stream);
 		
-	addOperands(2,4,3,stream);
+	addOperands(2,8,9,stream);
 
-	loadOperand(3,stream);
-	loadOperand(4,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //SubOp
 
 void SubOp::printMips(compilerContext& ctx, std::ostream& stream){
-	storeOperand(8,stream);
-	storeOperand(9,stream);
+    ctx.addToStack(8, stream);
+	storeOperand(8, 4,stream);
+	storeOperand(9, 0,stream);
 
 	left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -422,17 +452,19 @@ void SubOp::printMips(compilerContext& ctx, std::ostream& stream){
 		
 	stream << "sub $2,$8,$9" << std::endl;
 		
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //MultOp
 
 void MultOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4, stream);
+    storeOperand(9, 0, stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -443,17 +475,19 @@ void MultOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "mult $8,$9" << std::endl;
     stream << "mflo $2" << std::endl;
 
-	loadOperand(8,stream);
-	loadOperand(9,stream);
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl; 
+    ctx.removeFromStack(8, stream);
 }
 
 
 //DivOp
 
 void DivOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -464,17 +498,19 @@ void DivOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "div $8,$9" << std::endl;
     stream << "mflo $2" << std::endl;
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
 //ModOp
 
 void ModulusOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-    storeOperand(9, stream);
+    ctx.addToStack(8, stream);
+    storeOperand(8, 4,stream);
+    storeOperand(9, 0,stream);
 
     left->printMips(ctx,stream);
 	addOperands(8,2,0,stream);
@@ -485,9 +521,10 @@ void ModulusOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "div $8,$9" << std::endl;
     stream << "mflo $2" << std::endl;
 
-	loadOperand(8,stream);
-	loadOperand(9,stream); 
+	loadOperand(8, 4, stream);
+	loadOperand(9, 0, stream); 
     stream << std::endl;
+    ctx.removeFromStack(8, stream);
 }
 
 
@@ -502,14 +539,16 @@ void PreIncOp::printMips(compilerContext& ctx, std::ostream& stream){
 //PreDecOp
 
 void PreDecOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
+    ctx.addToStack(4, stream);
+    storeOperand(8, 0,stream);
 
     expr->printMips(ctx,stream);
     
     stream << "addiu $8,$0,1" << std::endl;
     stream << "subu $2,$2,$8" << std::endl;
 
-    loadOperand(8,stream); 
+    loadOperand(4, 0, stream); 
+    ctx.removeFromStack(4, stream);
 }
 
 
@@ -524,12 +563,21 @@ void PostIncOp::printMips(compilerContext& ctx, std::ostream& stream){
 //PostDecOp
 
 void PostDecOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
+    ctx.addToStack(4, stream);
+    storeOperand(8, 0,stream);
 
     expr->printMips(ctx,stream);
     
     stream << "addiu $8,$0,1" << std::endl;
     stream << "subu $2,$2,$8" << std::endl;
 
-    loadOperand(8,stream); 
+    loadOperand(8, 0, stream);
+    ctx.removeFromStack(4, stream);
+}
+
+void function_call::printMips(compilerContext& ctx, std::ostream& stream){
+    ctx.funcCall = true;
+    //print arguments
+    if(list != NULL){list->printMips(ctx, stream);}
+    if(expr != NULL){expr->printMips(ctx, stream);}
 }

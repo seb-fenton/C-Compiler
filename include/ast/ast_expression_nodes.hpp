@@ -485,6 +485,8 @@ class function_call: public ExpressionNode{
 		if(list !=NULL){list->printPy(context, stream);}
 		stream << ")";
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class DotMemberOp : public ExpressionNode{
