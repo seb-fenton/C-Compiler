@@ -90,6 +90,7 @@ void function_definition::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.funcDef = false;
     if(statement != NULL){statement->printMips(ctx, stream);} //prints actual statement
     ctx.endFunc(stream);
+    ctx.functions.pop_back();
 }
 
 //FunctionDeclaration

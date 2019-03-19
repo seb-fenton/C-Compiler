@@ -110,7 +110,6 @@ void compilerContext::endFunc(std::ostream& stream){
     stream << "lw $31, -4($sp) \nnop" << std::endl; 
     stream << "j $31"<< std::endl; 
     stream << std::endl; 
-    functions.pop_back();
 }
 
 std::map<std::string, varData>* compilerContext::currentBindings(){

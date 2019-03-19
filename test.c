@@ -1,7 +1,8 @@
 int main(){
-    int x;
-    while(x>5){
-        int x;
+    int i;
+    for(i = 5; i < 10; i++){
+        int r;
     }
+    return i;
 }
 
