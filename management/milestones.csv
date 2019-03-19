@@ -16,7 +16,7 @@ MakeOverheadInfrastructure, ,3h, SF, Y, Create infrastructure to allow for autom
 CtoPython, CreateAST, 15h, SF, Y, Create c to python translator
 CtoPythonDebugging, CtoPython, 5h, SF, N, Debug the translator and make to work with test suite
 MipsContext, CreateAST, 6h, NG, Y, Create the context structs for CodeGen
-MipsOverhead, MipsContext, 8h, Codegen for declarations, functions etc.
-MipsExpressions, CreateAST, 15h, SF, N, Create mips code for expressions
-MipsStatements, CreateAST, ??h, ALL, N, Create mips code for statements
-MipsBranches, CreateAST, ??h, ALL, N, Create mips code for branches
+MipsOverhead, MipsContext, 8h, NG, Codegen for declarations, functions etc.
+MipsExpressions, CreateAST, 15h, SF, Y, Create mips code for basic-intermediate expressions
+MipsStatements, CreateAST, ??h, ALL, N, Create mips code for basic-intermediate statements
+MipsBranches, CreateAST, ??h, ALL, N, Create mips code for basic-intermediate branches

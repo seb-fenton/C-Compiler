@@ -17,6 +17,7 @@ class primary_expression : public ExpressionNode{
 	void printPy(pyContext& context, std::ostream& stream){
 		stream << identifier;
 	}
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class constantNode : public ExpressionNode{
@@ -29,6 +30,7 @@ class constantNode : public ExpressionNode{
 	void printPy(pyContext& context, std::ostream& stream){
 		stream << init;
 	}
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class stringNode : public ExpressionNode{
@@ -383,7 +385,7 @@ class PostDecOp: public ExpressionNode{
     }
 	void printMips(compilerContext& ctx, std::ostream& stream);
 };
-
+//TODO : BEGIN
 class RefOp: public ExpressionNode{
 	public:
 	ExpPtr expr = NULL;
@@ -437,7 +439,7 @@ class LogicalNotOp: public ExpressionNode{
         if(expr != NULL){std::cout<< "!" ;expr->printTree(n);}
     }
 };
-
+//TODO : END
 
 class SizeOf: public ExpressionNode{
     public: 

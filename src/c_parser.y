@@ -303,7 +303,7 @@ primary_expression:
 constant:
 		INT_CONSTANT													{$$ = $1;}
 		| FLOAT_CONSTANT												{$$ = $1;}
-		| ENUMERATION_CONSTANT  {}// Do this later
+		| ENUMERATION_CONSTANT  {}// Do this later				
 		;
 
 expression:
