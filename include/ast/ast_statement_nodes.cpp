@@ -107,3 +107,7 @@ void ContinueStatement::printMips(compilerContext& ctx, std::ostream& stream){
 void BreakStatement::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "b " << ctx.currentFunc()->LoopsLabels.back().brk << " \nnop" << std::endl;
 }
+
+void expression_statement::printMips(compilerContext& ctx, std::ostream& stream){
+    if(stmt != NULL){stmt->printMips(ctx,stream);}
+}

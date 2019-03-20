@@ -1,4 +1,6 @@
-int f(int num){
-   return f(num-1);
+int f(){
+   int x;
+   x = 2;
+   return x;
 }
 

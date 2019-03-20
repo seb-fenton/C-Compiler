@@ -31,6 +31,8 @@ class constantNode : public ExpressionNode{
 		stream << init;
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+
+	int eval();
 };
 
 class stringNode : public ExpressionNode{
@@ -60,6 +62,7 @@ class assignment_expression : public ExpressionNode{
 		stream << op;
 		right->printPy(context, stream);	
 	}
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };	
 
 class conditional_expression: public ExpressionNode{
@@ -74,6 +77,8 @@ class conditional_expression: public ExpressionNode{
 		if(FalseExp != NULL){FalseExp->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+
+	int eval();
 };
 
 class LogicalOrOp: public ExpressionNode{
@@ -92,6 +97,8 @@ class LogicalOrOp: public ExpressionNode{
 		right->printPy(context, stream);	
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+
+	int eval();
 };
 
 class LogicalAndOp: public ExpressionNode{
@@ -110,6 +117,8 @@ class LogicalAndOp: public ExpressionNode{
 		right->printPy(context, stream);	
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+
+	int eval();
 };
 
 class InclusiveOrOp: public ExpressionNode{
@@ -122,6 +131,7 @@ class InclusiveOrOp: public ExpressionNode{
 		if(right != NULL){right->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class ExclusiveOrOp: public ExpressionNode{
@@ -134,6 +144,7 @@ class ExclusiveOrOp: public ExpressionNode{
 		if(right != NULL){right->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class AndOp: public ExpressionNode{
@@ -146,6 +157,7 @@ class AndOp: public ExpressionNode{
 		if(right != NULL){right->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class EqualOp: public ExpressionNode{
@@ -163,6 +175,7 @@ class EqualOp: public ExpressionNode{
 		right->printPy(context, stream);	
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class NotEqualOp: public ExpressionNode{
@@ -175,6 +188,7 @@ class NotEqualOp: public ExpressionNode{
 		if(right != NULL){right->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class GreaterThanOp: public ExpressionNode{
@@ -187,6 +201,7 @@ class GreaterThanOp: public ExpressionNode{
 		if(right != NULL){right->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class LessThanOp: public ExpressionNode{
@@ -204,6 +219,7 @@ class LessThanOp: public ExpressionNode{
 		right->printPy(context, stream);	
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class LessThanEqOp: public ExpressionNode{
@@ -216,6 +232,7 @@ class LessThanEqOp: public ExpressionNode{
 		if(right != NULL){right->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class GreaterThanEqOp: public ExpressionNode{
@@ -228,6 +245,7 @@ class GreaterThanEqOp: public ExpressionNode{
 		if(right != NULL){right->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class LeftShiftOp: public ExpressionNode{
@@ -240,6 +258,7 @@ class LeftShiftOp: public ExpressionNode{
 		if(right != NULL){right->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class RightShiftOp: public ExpressionNode{
@@ -252,6 +271,7 @@ class RightShiftOp: public ExpressionNode{
 		if(right != NULL){right->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class AddOp: public ExpressionNode{
@@ -269,6 +289,7 @@ class AddOp: public ExpressionNode{
 		right->printPy(context, stream);	
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class SubOp: public ExpressionNode{
@@ -286,6 +307,7 @@ class SubOp: public ExpressionNode{
 		right->printPy(context, stream);	
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class MultOp: public ExpressionNode{
@@ -303,6 +325,7 @@ class MultOp: public ExpressionNode{
 		right->printPy(context, stream);	
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class DivOp: public ExpressionNode{
@@ -315,6 +338,7 @@ class DivOp: public ExpressionNode{
 		if(right != NULL){right->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class  ModulusOp: public ExpressionNode{
@@ -327,6 +351,7 @@ class  ModulusOp: public ExpressionNode{
 		if(right != NULL){right->printTree(n);}
 	}
 	void printMips(compilerContext& ctx, std::ostream& stream);
+	int eval();
 };
 
 class cast_expression: public ExpressionNode{
@@ -414,6 +439,8 @@ class UAddOp: public ExpressionNode{
         if(expr != NULL){std::cout<< "+" ;expr->printTree(n);}
     }
 	void printMips(compilerContext& ctx, std::ostream& stream);
+
+	int eval();
 };
 
 class USubOp: public ExpressionNode{
@@ -424,6 +451,8 @@ class USubOp: public ExpressionNode{
         if(expr != NULL){std::cout<< "-" ;expr->printTree(n);}
     }
 	void printMips(compilerContext& ctx, std::ostream& stream);
+
+	int eval();
 };
 
 class BitwiseNotOp: public ExpressionNode{
@@ -434,6 +463,8 @@ class BitwiseNotOp: public ExpressionNode{
         if(expr != NULL){std::cout<< "~" ;expr->printTree(n);}
     }	
 	void printMips(compilerContext& ctx, std::ostream& stream);
+
+	int eval();
 };
 
 class LogicalNotOp: public ExpressionNode{
@@ -444,6 +475,8 @@ class LogicalNotOp: public ExpressionNode{
         if(expr != NULL){std::cout<< "!" ;expr->printTree(n);}
     }	
 	void printMips(compilerContext& ctx, std::ostream& stream);
+
+	int eval();
 };
 
 class SizeOf: public ExpressionNode{

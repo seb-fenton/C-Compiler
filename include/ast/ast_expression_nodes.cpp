@@ -31,7 +31,11 @@ void primary_expression::printMips(compilerContext& ctx, std::ostream& stream){
 //constantNode
 
 void constantNode::printMips(compilerContext& ctx, std::ostream& stream){
-    stream << "addiu $2,$0," << (int)init << std::endl;
+    stream << "addiu $2,$0," << floor(init) << std::endl;
+}
+
+int constantNode::eval(){
+    return init;
 }
 
 
@@ -68,6 +72,16 @@ void conditional_expression::printMips(compilerContext& ctx, std::ostream& strea
     ctx.removeFromStack(8, stream);
 }
 
+int conditional_expression::eval(){
+    if(Cond != NULL){
+        if(Cond->eval()){
+            if(TrueExp != NULL){return TrueExp->eval();}
+        }else{
+            if(FalseExp != NULL){return FalseExp->eval();}
+        }
+    }
+}
+
 
 //LogicalOrOp
 
@@ -102,6 +116,12 @@ void LogicalOrOp::printMips(compilerContext& ctx, std::ostream& stream){
 }
 
 
+int LogicalOrOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() || right->eval());
+    }
+}
+
 //LogicalAndOp
 
 void LogicalAndOp::printMips(compilerContext& ctx, std::ostream& stream){
@@ -134,6 +154,11 @@ void LogicalAndOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int LogicalAndOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() && right->eval());
+    }
+}
 
 //OrOp
 
@@ -156,6 +181,11 @@ void InclusiveOrOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int InclusiveOrOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() | right->eval());
+    }
+}
 
 //XorOp
 
@@ -176,6 +206,12 @@ void ExclusiveOrOp::printMips(compilerContext& ctx, std::ostream& stream){
 	loadOperand(9, 0, stream); 
     stream << std::endl;
     ctx.removeFromStack(8, stream);
+}
+
+int ExclusiveOrOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() ^ right->eval());
+    }
 }
 
 
@@ -200,6 +236,11 @@ void AndOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int AndOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() & right->eval());
+    }
+}
 
 //EOp
 
@@ -218,12 +259,17 @@ void EqualOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "slti $2,$2, 1" << std::endl;
     stream << "andi $2,$2,0x00ff" << std::endl;
 
-	loadOperand(8, 0, stream);
+	loadOperand(8, 4, stream);
 	loadOperand(9, 0, stream);
     stream << std::endl;
     ctx.removeFromStack(8, stream);
 }
 
+int EqualOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() == right->eval());
+    }
+}
 
 //NEOp
 
@@ -242,12 +288,17 @@ void NotEqualOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "slt $2,$0,$2" << std::endl;
     stream << "andi $2,$2,0x00ff" << std::endl;
 
-	loadOperand(8, 0, stream);
+	loadOperand(8, 4, stream);
 	loadOperand(9, 0, stream);
     stream << std::endl;
     ctx.removeFromStack(8, stream);
 }
 
+int NotEqualOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() != right->eval());
+    }
+}
 
 //GTOp
 
@@ -271,6 +322,12 @@ void GreaterThanOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int GreaterThanOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() > right->eval());
+    }
+}
+
 
 //LTOp
 
@@ -292,6 +349,13 @@ void LessThanOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << std::endl;
     ctx.removeFromStack(8, stream);
 }
+
+int LessThanOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() < right->eval());
+    }
+}
+
 
 
 //LTEOp
@@ -317,6 +381,11 @@ void LessThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int LessThanEqOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() <= right->eval());
+    }
+}
 
 //GTEOp
 
@@ -341,6 +410,11 @@ void GreaterThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int GreaterThanEqOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() >= right->eval());
+    }
+}
 
 //LeftShiftOp
 
@@ -363,6 +437,11 @@ void LeftShiftOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int LeftShiftOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() << right->eval());
+    }
+}
 
 //RightShiftOp
 
@@ -385,6 +464,11 @@ void RightShiftOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int RightShiftOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() >> right->eval());
+    }
+}
 
 //AddOp
 
@@ -407,6 +491,11 @@ void AddOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int AddOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() + right->eval());
+    }
+}
 
 //SubOp
 
@@ -429,6 +518,11 @@ void SubOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int SubOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() - right->eval());
+    }
+}
 
 //MultOp
 
@@ -452,6 +546,11 @@ void MultOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int MultOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() * right->eval());
+    }
+}
 
 //DivOp
 
@@ -475,6 +574,11 @@ void DivOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.removeFromStack(8, stream);
 }
 
+int DivOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() / right->eval());
+    }
+}
 
 //ModOp
 
@@ -496,6 +600,12 @@ void ModulusOp::printMips(compilerContext& ctx, std::ostream& stream){
 	loadOperand(9, 0, stream); 
     stream << std::endl;
     ctx.removeFromStack(8, stream);
+}
+
+int ModulusOp::eval(){
+    if(left != NULL && right != NULL){
+        return (left->eval() % right->eval());
+    }
 }
 
 
@@ -538,6 +648,12 @@ void UAddOp::printMips(compilerContext& ctx, std::ostream& stream){
     expr->printMips(ctx, stream);
 }
 
+int UAddOp::eval(){
+    if(expr != NULL){
+        return expr->eval();
+    }
+}
+
 
 //USubOp
 
@@ -546,6 +662,11 @@ void USubOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "subu $2,$0,$2" << std::endl;
 }
 
+int USubOp::eval(){
+    if(expr != NULL){
+        return -(expr->eval());
+    }
+}
 
 //BitwiseNotOp
 
@@ -554,9 +675,26 @@ void BitwiseNotOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "nor $2,$0,$2" << std::endl;
 }
 
+int BitwiseNotOp::eval(){
+    if(expr != NULL){
+        return ~(expr->eval());
+    }
+}
 
 //LogicalNotOp
 
+void LogicalNotOp::printMips(compilerContext& ctx, std::ostream& stream){
+    expr->printMips(ctx, stream);
+    stream << "sltu $2,$2,1" << std::endl << "andi $2,$2,0x00ff" << std::endl;
+}
+
+int LogicalNotOp::eval(){
+    if(expr != NULL){
+        return !(expr->eval());
+    }
+}
+
+//-------------
 
 void function_call::printMips(compilerContext& ctx, std::ostream& stream){
     //print arguments
@@ -569,21 +707,17 @@ void function_call::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.funcCall = false;
 }
 
-void LogicalNotOp::printMips(compilerContext& ctx, std::ostream& stream){
-    expr->printMips(ctx, stream);
-    stream << "sltu $2,$2,1" << std::endl << "andi $2,$2,0x00ff" << std::endl;
-}
-
 void array_call::printMips(compilerContext& ctx, std::ostream& stream){
     if(ctx.getAddr){
         ctx.addToStack(8, stream);
         storeOperand(8, 4,stream);
         storeOperand(9, 0,stream);
 
-        array->printMips(ctx, stream);
+        if(array != NULL){array->printMips(ctx, stream);}
         addOperands(8,2,0,stream);
 
-        idx->printMips(ctx, stream);
+        ctx.getAddr = false; //maybe need to set it back to true?
+        if(idx != NULL){idx->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
 
         stream << "sll $9, $9, 2" << std::endl;
@@ -599,11 +733,11 @@ void array_call::printMips(compilerContext& ctx, std::ostream& stream){
         storeOperand(9, 0,stream);
 
         ctx.getAddr = true;
-        array->printMips(ctx, stream);
+        if(array != NULL){array->printMips(ctx, stream);}
         addOperands(8,2,0,stream);
         ctx.getAddr = false;
 
-        idx->printMips(ctx, stream);
+        if(idx != NULL){idx->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
 
         stream << "sll $9, $9, 2" << std::endl;
@@ -614,5 +748,24 @@ void array_call::printMips(compilerContext& ctx, std::ostream& stream){
 	    loadOperand(9, 0, stream); 
         ctx.removeFromStack(8, stream);
     }
+}
 
+//assignment_expression
+void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream){
+    if(op == "="){
+        ctx.addToStack(4, stream);
+        storeOperand(8, 0,stream);
+
+        if(right != NULL){right->printMips(ctx, stream);}
+        addOperands(8,2,0,stream);
+
+        ctx.getAddr = true;
+        if(left != NULL){left->printMips(ctx, stream);}
+        ctx.getAddr = false;
+        
+        stream << "sw $8, 0($2)" << std::endl;
+        loadOperand(8, 0, stream);
+        ctx.removeFromStack(4, stream);
+    }
+        
 }

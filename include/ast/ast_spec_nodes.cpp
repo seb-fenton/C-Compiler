@@ -41,10 +41,11 @@ void init_declarator::printMips(compilerContext& ctx, std::ostream& stream){
         stream << "\t.global " << ctx.tempDeclarator.id << std::endl;
         stream << "\t.type " << ctx.tempDeclarator.id << ", @object" << std::endl;
         stream << ctx.tempDeclarator.id << ":" << std::endl;
-        ctx.currentScope()->addToBindings(ctx.tempDeclarator.id, 0, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, true); //add global flag
+        ctx.globalVars[ctx.tempDeclarator.id] = varData(0, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, true);//add global flag
         if(initialiserPtr != NULL){
             initialiserPtr->printMips(ctx, stream);   
         }
+        stream << std::endl;
     }else{
         if(declaratorPtr != NULL){declaratorPtr->printMips(ctx, stream);}
         ctx.tempDeclarator.offset = ctx.functions.back().memUsed + 4; //setting the offset
@@ -72,6 +73,7 @@ void direct_declarator::printMips(compilerContext& ctx, std::ostream& stream){
         stream << ".ent " << identifier << std::endl;
         stream << ".type " << identifier << ", @function" << std::endl << std::endl;
         stream << identifier << ":" << std::endl;
+        ctx.funcName = identifier;
     }
 }
 
@@ -82,8 +84,8 @@ void initialiser::printMips(compilerContext& ctx, std::ostream& stream){
             assignment->printMips(ctx, stream);
             stream << "sw $2,"<<  (ctx.currentFunc()->memUsed - ctx.tempDeclarator.offset) <<"($sp)" << std::endl;
         }else{
-            //int temp = assignment->eval() implemente val function
-            //stream << "\t.word " << temp << std::endl;
+            int temp = assignment->eval(); //implemente val function
+            stream << "\t.word " << temp << std::endl;
         }
     }
 }
@@ -98,7 +100,7 @@ initialiser::initialiser(ExpPtr a): assignment(a) {}
 void ArrayDeclaration::printMips(compilerContext& ctx, std::ostream& stream){
     if(varName != NULL){varName->printMips(ctx, stream);}
     if(size != NULL){
-    //ctx.tempDeclarator.elements = size->eval(); need to make eval function to calculate size of arrays at compile time
+    ctx.tempDeclarator.elements = size->eval(); 
     }
     else{
         ctx.tempDeclarator.elements = 0; //represents empty array
@@ -120,6 +122,8 @@ void function_definition::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.funcDef = false;
     if(statement != NULL){statement->printMips(ctx, stream);} //prints actual statement
     ctx.endFunc(stream);
+    stream << ".end " << ctx.funcName << std::endl;
+    ctx.funcName.clear();
     ctx.functions.pop_back();
 }
 

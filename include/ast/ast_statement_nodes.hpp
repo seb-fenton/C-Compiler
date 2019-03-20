@@ -43,6 +43,8 @@ class expression_statement: public Node{
         stmt->printPy(context, stream); //TODO : - resolve global scope print!
         stream << std::endl;
     }
+
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class block_item_list : public BranchNode{

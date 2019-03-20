@@ -81,6 +81,7 @@ struct compilerContext{
     bool funcCall = false;
     bool globalDefs = false;
     bool getAddr = false;
+    std::string funcName; //used for .end flag at the end of assembly
 
     int labelGen = 0;
     std::string generateUniqueLabel();
