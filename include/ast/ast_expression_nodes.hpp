@@ -385,7 +385,7 @@ class PostDecOp: public ExpressionNode{
     }
 	void printMips(compilerContext& ctx, std::ostream& stream);
 };
-//TODO : BEGIN
+
 class RefOp: public ExpressionNode{
 	public:
 	ExpPtr expr = NULL;
@@ -394,6 +394,7 @@ class RefOp: public ExpressionNode{
         if(expr != NULL){std::cout<< "&" ;expr->printTree(n);}
     }
 };
+//do we need this?
 
 class PtrOp: public ExpressionNode{
 	public:
@@ -403,6 +404,7 @@ class PtrOp: public ExpressionNode{
         if(expr != NULL){std::cout<< "->" ;expr->printTree(n);}
     }
 };
+//do we need this?
 
 class UAddOp: public ExpressionNode{
 	public:
@@ -411,6 +413,7 @@ class UAddOp: public ExpressionNode{
 	void printTree(int n){
         if(expr != NULL){std::cout<< "+" ;expr->printTree(n);}
     }
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class USubOp: public ExpressionNode{
@@ -420,6 +423,7 @@ class USubOp: public ExpressionNode{
 	void printTree(int n){
         if(expr != NULL){std::cout<< "-" ;expr->printTree(n);}
     }
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class BitwiseNotOp: public ExpressionNode{
@@ -428,7 +432,8 @@ class BitwiseNotOp: public ExpressionNode{
 	BitwiseNotOp(ExpPtr a): expr(a){}
 	void printTree(int n){
         if(expr != NULL){std::cout<< "~" ;expr->printTree(n);}
-    }
+    }	
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class LogicalNotOp: public ExpressionNode{
@@ -437,9 +442,9 @@ class LogicalNotOp: public ExpressionNode{
 	LogicalNotOp(ExpPtr a): expr(a){}
 	void printTree(int n){
         if(expr != NULL){std::cout<< "!" ;expr->printTree(n);}
-    }
+    }	
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
-//TODO : END
 
 class SizeOf: public ExpressionNode{
     public: 

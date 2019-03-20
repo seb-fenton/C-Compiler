@@ -62,8 +62,18 @@ void LogicalOrOp::printMips(compilerContext& ctx, std::ostream& stream){
 	right->printMips(ctx,stream);
 	addOperands(9,2,0,stream);
 
-    //TODO : WHAT DO WE DO FOR LOGICAL Or
-    stream << "or $2,$8,$9" << std::endl;
+    std::string tempLabelOne = ctx.generateUniqueLabel();
+    std::string tempLabelTwo = ctx.generateUniqueLabel();
+    std::string tempLabelThree = ctx.generateUniqueLabel();
+
+    stream << "bne $8,$0," << tempLabelOne << std::endl << "nop" << std::endl;
+    stream << "beq $9,$0," << tempLabelTwo << std::endl << "nop" << std::endl;
+    
+    stream << tempLabelOne << ": li $2,1" << std::endl << "b " << tempLabelThree << std::endl << "nop" << std::endl;
+
+    stream << tempLabelTwo << ": move $2,$0" << std::endl;
+
+    stream << tempLabelThree << ":" << std::endl;
 
 	loadOperand(8,stream);
 	loadOperand(9,stream); 
@@ -83,8 +93,18 @@ void LogicalAndOp::printMips(compilerContext& ctx, std::ostream& stream){
 	right->printMips(ctx,stream);
 	addOperands(9,2,0,stream);
 
-    //TODO : WHAT DO WE DO FOR LOGICAL AND
-    stream << "and $2,$8,$9" << std::endl;
+    std::string tempLabelOne = ctx.generateUniqueLabel();
+    std::string tempLabelTwo = ctx.generateUniqueLabel();
+
+    stream << "beq $8,$0," << tempLabelOne << std::endl << "nop" << std::endl;
+    stream << "beq $9,$0," << tempLabelOne << std::endl << "nop" << std::endl;
+    
+    stream << ": li $2,1" << std::endl << "b " << tempLabelTwo << std::endl << "nop" << std::endl;
+
+    stream << tempLabelOne << "move $2, $0" << std::endl;
+
+    stream << tempLabelTwo << ":" << std::endl;
+
 
 	loadOperand(8,stream);
 	loadOperand(9,stream); 
@@ -168,18 +188,6 @@ void EqualOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "slti $2,$2, 1" << std::endl;
     stream << "andi $2,$2,0x00ff" << std::endl;
 
-    /*std::string tempLabel = ctx.generateUniqueLabel();
-    std::string tempLabelSkip = ctx.generateUniqueLabel();
-
-    stream << "beq $8,$9," << tempLabel << std::endl;
-    stream << "nop" << std::endl;                         // needed?
-    
-    stream << "jump " << tempLabelSkip << std::endl;      // else goes to tempLabelSkip
-    stream << "nop" << std::endl;                         // needed?
-
-    stream << tempLabel << ": addiu $2,$0,1" << std::endl;
-    stream << tempLabelSkip << ": nop" << std::endl;*/
-
 	loadOperand(8,stream);
 	loadOperand(9,stream); 
     stream << std::endl;
@@ -202,19 +210,6 @@ void NotEqualOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "slt $2,$0,$2" << std::endl;
     stream << "andi $2,$2,0x00ff" << std::endl;
 
-    /*std::string tempLabel = ctx.generateUniqueLabel();
-    std::string tempLabelSkip = ctx.generateUniqueLabel();
-
-    stream << "bne $8,$9," << tempLabel << std::endl;
-    stream << "nop" << std::endl;                         // needed?
-    
-    stream << "jump " << tempLabelSkip << std::endl;      // else goes to tempLabelSkip
-    stream << "nop" << std::endl;                         // needed?
-
-    stream << tempLabel << ": addiu $2,$0,1" << std::endl;
-    stream << tempLabelSkip << ": nop" << std::endl;*/
-
-
 	loadOperand(8,stream);
 	loadOperand(9,stream); 
     stream << std::endl;
@@ -235,19 +230,6 @@ void GreaterThanOp::printMips(compilerContext& ctx, std::ostream& stream){
 
     stream << "slt $2,$8,$9" << std::endl;                // checks if $8 < $9
     stream << "andi $2,$2,0x00ff" << std::endl;         //magic?
-
-    /*std::string tempLabel = ctx.generateUniqueLabel();
-    std::string tempLabelSkip = ctx.generateUniqueLabel();
-
-    //stream << "beq $8,$9," << tempLabelSkip << std::endl;
-    
-    /*stream << "beq $2,0," << tempLabel << std::endl;      // if $8 > $9, goes to tempLabel
-    
-    stream << "jump " << tempLabelSkip << std::endl;      // else goes to tempLabelSkip
-    stream << "nop" << std::endl;                         // needed?
-
-    stream << tempLabel << ": addiu $2,$0,1" << std::endl;
-    stream << tempLabelSkip << ": nop" << std::endl;*/
 
 	loadOperand(8,stream);
 	loadOperand(9,stream); 
@@ -291,22 +273,6 @@ void LessThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "xori $2,$2,0x1" << std::endl;            //magically works?
     stream << "andi $2,$2,0x00ff" << std::endl;
 
-    /*std::string tempLabel = ctx.generateUniqueLabel();
-    std::string tempLabelSkip = ctx.generateUniqueLabel();
-
-
-
-    stream << "beq $8,$9," << tempLabel << std::endl;     // if $s0 = $s2, goes to tempLabel
-    
-    stream << "jump " << tempLabelSkip << std::endl;      // else goes to tempLabelSkip
-    stream << "nop" << std::endl;                         // needed?
-
-    stream << tempLabel << ": addiu $2,$0,1" << std::endl;
-    stream << tempLabelSkip << ": nop" << std::endl;*/
-
-
-
-
 	loadOperand(8,stream);
 	loadOperand(9,stream); 
     stream << std::endl;
@@ -328,19 +294,6 @@ void GreaterThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "slt $2,$9,$8" << std::endl;                // checks if $8 > $9
     stream << "xori $2,$2,0x1" << std::endl;            //magically works?
     stream << "andi $2,$2,0x00ff" << std::endl;
-
-
-    /*std::string tempLabel = ctx.generateUniqueLabel();
-    std::string tempLabelSkip = ctx.generateUniqueLabel();
-
-    stream << "beq $2,0," << tempLabel << std::endl;      // if $8 > $9, goes to tempLabel
-    stream << "beq $8,$9," << tempLabel << std::endl;     // if $s0 = $s2, goes to tempLabel - TODO : Redundant??
-    
-    stream << "jump " << tempLabelSkip << std::endl;      // else goes to tempLabelSkip
-    stream << "nop" << std::endl;                         // needed?
-
-    stream << tempLabel << ": addiu $2,$0,1" << std::endl;
-    stream << tempLabelSkip << ": nop" << std::endl;*/
 
 	loadOperand(8,stream);
 	loadOperand(9,stream); 
@@ -438,7 +391,7 @@ void MultOp::printMips(compilerContext& ctx, std::ostream& stream){
 	addOperands(8,2,0,stream);
 
 	right->printMips(ctx,stream);
-	addOperands(9,2,0,stream);
+	addOperands(9,2,0,stream); //not necessary; for clarity
 
     stream << "mult $8,$9" << std::endl;
     stream << "mflo $2" << std::endl;
@@ -459,7 +412,7 @@ void DivOp::printMips(compilerContext& ctx, std::ostream& stream){
 	addOperands(8,2,0,stream);
 
 	right->printMips(ctx,stream);
-	addOperands(9,2,0,stream);
+	addOperands(9,2,0,stream); //not necessary; for clarity
 
     stream << "div $8,$9" << std::endl;
     stream << "mflo $2" << std::endl;
@@ -502,14 +455,8 @@ void PreIncOp::printMips(compilerContext& ctx, std::ostream& stream){
 //PreDecOp
 
 void PreDecOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-
     expr->printMips(ctx,stream);
-    
-    stream << "addiu $8,$0,1" << std::endl;
-    stream << "subu $2,$2,$8" << std::endl;
-
-    loadOperand(8,stream); 
+    stream << "addiu $2,$2,-1" << std::endl;
 }
 
 
@@ -524,12 +471,38 @@ void PostIncOp::printMips(compilerContext& ctx, std::ostream& stream){
 //PostDecOp
 
 void PostDecOp::printMips(compilerContext& ctx, std::ostream& stream){
-    storeOperand(8, stream);
-
     expr->printMips(ctx,stream);
-    
-    stream << "addiu $8,$0,1" << std::endl;
-    stream << "subu $2,$2,$8" << std::endl;
+    stream << "addiu $2,$2,-1" << std::endl;
+}
 
-    loadOperand(8,stream); 
+
+
+//UAddOp
+
+void UAddOp::printMips(compilerContext& ctx, std::ostream& stream){
+    expr->printMips(ctx, stream);
+}
+
+
+//USubOp
+
+void USubOp::printMips(compilerContext& ctx, std::ostream& stream){
+    expr->printMips(ctx, stream);
+    stream << "subu $2,$0,$2" << std::endl;
+}
+
+
+//BitwiseNotOp
+
+void BitwiseNotOp::printMips(compilerContext& ctx, std::ostream& stream){
+    expr->printMips(ctx, stream);
+    stream << "nor $2,$0,$2" << std::endl;
+}
+
+
+//LogicalNotOp
+
+void LogicalNotOp::printMips(compilerContext& ctx, std::ostream& stream){
+    expr->printMips(ctx, stream);
+    stream << "sltu $2,$2,1" << std::endl << "andi $2,$2,0x00ff" << std::endl;
 }
