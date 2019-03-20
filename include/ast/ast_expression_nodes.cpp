@@ -576,15 +576,43 @@ void LogicalNotOp::printMips(compilerContext& ctx, std::ostream& stream){
 
 void array_call::printMips(compilerContext& ctx, std::ostream& stream){
     if(ctx.getAddr){
+        ctx.addToStack(8, stream);
+        storeOperand(8, 4,stream);
+        storeOperand(9, 0,stream);
+
         array->printMips(ctx, stream);
-        //int temp = idx->eval();
-        //stream << "addi $2, $2, " << (temp*4) std::endl;
+        addOperands(8,2,0,stream);
+
+        idx->printMips(ctx, stream);
+        addOperands(9,2,0,stream);
+
+        stream << "sll $9, $9, 2" << std::endl;
+
+        addOperands(2,8,9,stream);
+        loadOperand(8, 4, stream);
+	    loadOperand(9, 0, stream); 
+        ctx.removeFromStack(8, stream);
+        stream << std::endl;
     }else{
+        ctx.addToStack(8, stream);
+        storeOperand(8, 4,stream);
+        storeOperand(9, 0,stream);
+
         ctx.getAddr = true;
         array->printMips(ctx, stream);
+        addOperands(8,2,0,stream);
         ctx.getAddr = false;
-        //int temp = idx->eval();
-        //stream << "lw $2, " << (temp*4) << "($2)" << std::endl;
+
+        idx->printMips(ctx, stream);
+        addOperands(9,2,0,stream);
+
+        stream << "sll $9, $9, 2" << std::endl;
+
+        addOperands(2,8,9,stream);
+        stream << "lw $2, 0($2)" << std::endl;
+        loadOperand(8, 4, stream);
+	    loadOperand(9, 0, stream); 
+        ctx.removeFromStack(8, stream);
     }
 
 }
