@@ -7,6 +7,19 @@
 void primary_expression::printMips(compilerContext& ctx, std::ostream& stream){
     if(ctx.funcCall){
         stream << "jal " << identifier << std::endl;
+    }else if((*ctx.currentBindings())[identifier].global){
+        if(ctx.getAddr){
+            stream << "lui $2, %hi(" << identifier << ")" << std::endl;
+            stream << "addi $2, $2, %lo(" << identifier << ")" << std::endl;
+        }
+        else{
+            stream << "lui $2, %hi(" << identifier << ")" << std::endl;
+            stream << "lw $2, %lo(" << identifier << ")($2) \nnop" << std::endl;
+        }
+    }
+    else if(ctx.getAddr){
+        int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
+        stream << "addi $2, $sp, " << retrieveVariable << std::endl;
     }
     else{
         int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
@@ -43,11 +56,11 @@ void conditional_expression::printMips(compilerContext& ctx, std::ostream& strea
     FalseExp->printMips(ctx, stream);
 
     stream << "jump " << tempLabelFalse << std::endl;
-    stream << tempLabelTrue << ": nop" << std::endl;
+    stream << tempLabelTrue << ": \nnop" << std::endl;
 
     TrueExp->printMips(ctx, stream);
 
-    stream << tempLabelFalse << ": nop" << std::endl;
+    stream << tempLabelFalse << ": \nnop" << std::endl;
 
 	loadOperand(8, 4, stream);
 	loadOperand(9, 0, stream); 
@@ -76,9 +89,9 @@ void LogicalOrOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "bne $8,$0," << tempLabelOne << std::endl << "nop" << std::endl;
     stream << "beq $9,$0," << tempLabelTwo << std::endl << "nop" << std::endl;
     
-    stream << tempLabelOne << ": li $2,1" << std::endl << "b " << tempLabelThree << std::endl << "nop" << std::endl;
+    stream << tempLabelOne << ": \nli $2,1" << std::endl << "b " << tempLabelThree << std::endl << "nop" << std::endl;
 
-    stream << tempLabelTwo << ": move $2,$0" << std::endl;
+    stream << tempLabelTwo << ": \nmove $2,$0" << std::endl;
 
     stream << tempLabelThree << ":" << std::endl;
 
@@ -108,9 +121,9 @@ void LogicalAndOp::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "beq $8,$0," << tempLabelOne << std::endl << "nop" << std::endl;
     stream << "beq $9,$0," << tempLabelOne << std::endl << "nop" << std::endl;
     
-    stream << ": li $2,1" << std::endl << "b " << tempLabelTwo << std::endl << "nop" << std::endl;
+    stream << "li $2,1" << std::endl << "b " << tempLabelTwo << std::endl << "nop" << std::endl;
 
-    stream << tempLabelOne << "move $2, $0" << std::endl;
+    stream << tempLabelOne << ": \nmove $2, $0" << std::endl;
 
     stream << tempLabelTwo << ":" << std::endl;
 
@@ -546,10 +559,11 @@ void BitwiseNotOp::printMips(compilerContext& ctx, std::ostream& stream){
 
 
 void function_call::printMips(compilerContext& ctx, std::ostream& stream){
-    ctx.funcCall = true;
     //print arguments
-    stream << "move $fp, $sp" << std::endl; //move frame pointer down to stack pointer
+     //move frame pointer down to stack pointer
     if(list != NULL){list->printMips(ctx, stream);}
+    stream << "move $fp, $sp" << std::endl;
+    ctx.funcCall = true;
     if(expr != NULL){expr->printMips(ctx, stream);}
     stream << "lw $fp, " << (ctx.currentFunc()->memUsed - 8) << "($sp)" << std::endl; //reset frame pointer
     ctx.funcCall = false;
@@ -558,4 +572,19 @@ void function_call::printMips(compilerContext& ctx, std::ostream& stream){
 void LogicalNotOp::printMips(compilerContext& ctx, std::ostream& stream){
     expr->printMips(ctx, stream);
     stream << "sltu $2,$2,1" << std::endl << "andi $2,$2,0x00ff" << std::endl;
+}
+
+void array_call::printMips(compilerContext& ctx, std::ostream& stream){
+    if(ctx.getAddr){
+        array->printMips(ctx, stream);
+        //int temp = idx->eval();
+        //stream << "addi $2, $2, " << (temp*4) std::endl;
+    }else{
+        ctx.getAddr = true;
+        array->printMips(ctx, stream);
+        ctx.getAddr = false;
+        //int temp = idx->eval();
+        //stream << "lw $2, " << (temp*4) << "($2)" << std::endl;
+    }
+
 }

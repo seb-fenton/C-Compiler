@@ -39,10 +39,11 @@ struct varData{
     bool isTypdef = false;
     //NodePtr typedefLoc = NULL; //points to the declaration specifiers the typedef contains
 
+    bool global;
     int elements = 1;
     int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
     varData(){}
-    varData(int _offset, int _elements, int _size); //let declarator increment $sp
+    varData(int _offset, int _elements, int _size, bool _global); //let declarator increment $sp
 };
 
 struct scope{
@@ -50,7 +51,7 @@ struct scope{
     int stackOffset;
 
     scope(std::map<std::string, varData> _bindings, int _stackOffset);
-    void addToBindings(std::string id, int offset, int elements, int size);
+    void addToBindings(std::string id, int offset, int elements, int size, bool global);
 };
 
 struct funcScope{
@@ -58,12 +59,13 @@ struct funcScope{
 
     std::vector<scope> scopes;
     std::map<std::string, varData> parameters;
+    std::map<std::string, varData> globalVars;
     std::vector<LoopContext> LoopsLabels;
 
     int memUsed = 0; //should be incremented as you add new bindings
     void incScope();
     void decScope(std::ostream& stream);
-    funcScope(std::ostream& stream);
+    funcScope(std::ostream& stream, std::map<std::string, varData> _globalVars);
      //the function definition node should pack the info correctly
 };  //for a function with parameters.
 
@@ -77,6 +79,8 @@ struct compilerContext{
     void endFunc(std::ostream& stream);
     bool funcDef = false;
     bool funcCall = false;
+    bool globalDefs = false;
+    bool getAddr = false;
 
     int labelGen = 0;
     std::string generateUniqueLabel();

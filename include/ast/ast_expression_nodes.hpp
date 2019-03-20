@@ -470,6 +470,8 @@ class array_call: public ExpressionNode{ //TODO
 		if(idx != NULL){idx->printTree(n);}
 		std::cout << "]" ;
     }
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class function_call: public ExpressionNode{

@@ -54,7 +54,7 @@ int DeclaratorContext::totSize(){
 //----------------Vardata_Struct---------------//
 //---------------------------------------------//
 
-varData::varData(int _offset, int _elements, int _size): offset(_offset), elements(_elements), size(_size){}
+varData::varData(int _offset, int _elements, int _size, bool _global): offset(_offset), elements(_elements), size(_size), global(_global){}
 
 //---------------------------------------------//
 //----------------Scope_Struct-----------------//
@@ -62,19 +62,20 @@ varData::varData(int _offset, int _elements, int _size): offset(_offset), elemen
 
 scope::scope(std::map<std::string, varData> _bindings, int _stackOffset): bindings(_bindings), stackOffset(_stackOffset){}
 
-void scope::addToBindings(std::string id, int offset, int elements, int size){
-    bindings[id] = varData(offset, elements, size);
+void scope::addToBindings(std::string id, int offset, int elements, int size, bool global){
+    bindings[id] = varData(offset, elements, size, global);
 }
 
 //---------------------------------------------//
 //----------------funcScope_Struct-------------//
 //---------------------------------------------//
 
-funcScope::funcScope(std::ostream& stream){}
+funcScope::funcScope(std::ostream& stream, std::map<std::string, varData> _globalVars): globalVars(_globalVars){}
 
 void funcScope::incScope(){
     if(scopes.size() == 0){
         scopes.push_back(scope(parameters, memUsed));
+        scopes.back().bindings.insert(globalVars.begin(), globalVars.end());
         scopeLevel++;
     }else{
         scopes.push_back(scopes.back()); //when you enter a new scope, take the old scope bindings and put them into the new one

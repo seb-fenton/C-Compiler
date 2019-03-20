@@ -1,4 +1,4 @@
 int f(int num){
-   return (num-1);
+   return f(num-1);
 }
 
