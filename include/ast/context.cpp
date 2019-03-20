@@ -105,9 +105,9 @@ void compilerContext::setup(std::ostream& stream){
 }
 
 void compilerContext::endFunc(std::ostream& stream){
+    stream << "lw $31, "<<  (functions.back().memUsed - 4) << "($sp) \nnop" << std::endl; 
     stream << "move $sp, $fp" << std::endl; //$fp needs to be reset in func call.
-    stream << "lw $31, -4($sp) \nnop" << std::endl; 
-    stream << "j $31"<< std::endl; 
+    stream << "jr $31 \nnop"<< std::endl; 
     stream << std::endl; 
 }
 

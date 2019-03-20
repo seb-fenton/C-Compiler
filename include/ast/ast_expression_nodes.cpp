@@ -7,7 +7,17 @@
 void primary_expression::printMips(compilerContext& ctx, std::ostream& stream){
     if(ctx.funcCall){
         stream << "jal " << identifier << std::endl;
-    }else if((*ctx.currentBindings())[identifier].global){
+    }else if(!((*ctx.currentBindings())[identifier].global)){
+        if(ctx.getAddr){
+            int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
+            stream << "addi $2, $sp, " << retrieveVariable << std::endl;
+        }
+        else{
+            int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
+            stream << "lw $2," << retrieveVariable << "($sp)" << std::endl;
+        }
+    }
+    else{
         if(ctx.getAddr){
             stream << "lui $2, %hi(" << identifier << ")" << std::endl;
             stream << "addi $2, $2, %lo(" << identifier << ")" << std::endl;
@@ -16,14 +26,6 @@ void primary_expression::printMips(compilerContext& ctx, std::ostream& stream){
             stream << "lui $2, %hi(" << identifier << ")" << std::endl;
             stream << "lw $2, %lo(" << identifier << ")($2) \nnop" << std::endl;
         }
-    }
-    else if(ctx.getAddr){
-        int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
-        stream << "addi $2, $sp, " << retrieveVariable << std::endl;
-    }
-    else{
-        int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
-        stream << "lw $2," << retrieveVariable << "($sp)" << std::endl;
     }
 }
 
@@ -48,8 +50,8 @@ void conditional_expression::printMips(compilerContext& ctx, std::ostream& strea
 
     Cond->printMips(ctx,stream);
 
-    std::string tempLabelTrue = ctx.generateUniqueLabel();
-    std::string tempLabelFalse = ctx.generateUniqueLabel();
+    std::string tempLabelTrue = ctx.generateLabel("true_");
+    std::string tempLabelFalse = ctx.generateLabel("false_");
 
 
     stream << "addiu $8,$0,1" << std::endl;
@@ -59,7 +61,7 @@ void conditional_expression::printMips(compilerContext& ctx, std::ostream& strea
     
     FalseExp->printMips(ctx, stream);
 
-    stream << "jump " << tempLabelFalse << std::endl;
+    stream << "j  " << tempLabelFalse << "\nnop" <<std::endl;
     stream << tempLabelTrue << ": \nnop" << std::endl;
 
     TrueExp->printMips(ctx, stream);
@@ -96,14 +98,14 @@ void LogicalOrOp::printMips(compilerContext& ctx, std::ostream& stream){
 	right->printMips(ctx,stream);
 	addOperands(9,2,0,stream);
 
-    std::string tempLabelOne = ctx.generateUniqueLabel();
-    std::string tempLabelTwo = ctx.generateUniqueLabel();
-    std::string tempLabelThree = ctx.generateUniqueLabel();
+    std::string tempLabelOne = ctx.generateLabel("label");
+    std::string tempLabelTwo = ctx.generateLabel("label");
+    std::string tempLabelThree = ctx.generateLabel("label");
 
     stream << "bne $8,$0," << tempLabelOne << std::endl << "nop" << std::endl;
     stream << "beq $9,$0," << tempLabelTwo << std::endl << "nop" << std::endl;
     
-    stream << tempLabelOne << ": \nli $2,1" << std::endl << "b " << tempLabelThree << std::endl << "nop" << std::endl;
+    stream << tempLabelOne << ": \nli $2,1" << std::endl << "j " << tempLabelThree << std::endl << "nop" << std::endl;
 
     stream << tempLabelTwo << ": \nmove $2,$0" << std::endl;
 
@@ -135,13 +137,13 @@ void LogicalAndOp::printMips(compilerContext& ctx, std::ostream& stream){
 	right->printMips(ctx,stream);
 	addOperands(9,2,0,stream);
 
-    std::string tempLabelOne = ctx.generateUniqueLabel();
-    std::string tempLabelTwo = ctx.generateUniqueLabel();
+    std::string tempLabelOne = ctx.generateLabel("label");
+    std::string tempLabelTwo = ctx.generateLabel("label");
 
     stream << "beq $8,$0," << tempLabelOne << std::endl << "nop" << std::endl;
     stream << "beq $9,$0," << tempLabelOne << std::endl << "nop" << std::endl;
     
-    stream << "li $2,1" << std::endl << "b " << tempLabelTwo << std::endl << "nop" << std::endl;
+    stream << "li $2,1" << std::endl << "j " << tempLabelTwo << std::endl << "nop" << std::endl;
 
     stream << tempLabelOne << ": \nmove $2, $0" << std::endl;
 
@@ -255,7 +257,7 @@ void EqualOp::printMips(compilerContext& ctx, std::ostream& stream){
 	right->printMips(ctx,stream);
 	addOperands(9,2,0,stream);
 
-    stream << "xoru $2,$9,$8" << std::endl;            //magically works?
+    stream << "xor $2,$9,$8" << std::endl;            //magically works?
     stream << "slti $2,$2, 1" << std::endl;
     stream << "andi $2,$2,0x00ff" << std::endl;
 
@@ -284,7 +286,7 @@ void NotEqualOp::printMips(compilerContext& ctx, std::ostream& stream){
 	right->printMips(ctx,stream);
 	addOperands(9,2,0,stream);
 
-    stream << "xoru $2,$9,$8" << std::endl;            //magically works?
+    stream << "xor $2,$9,$8" << std::endl;            //magically works?
     stream << "slt $2,$0,$2" << std::endl;
     stream << "andi $2,$2,0x00ff" << std::endl;
 
@@ -594,7 +596,7 @@ void ModulusOp::printMips(compilerContext& ctx, std::ostream& stream){
 	addOperands(9,2,0,stream);
 
     stream << "div $8,$9" << std::endl;
-    stream << "mflo $2" << std::endl;
+    stream << "mfhi $2" << std::endl;
 
 	loadOperand(8, 4, stream);
 	loadOperand(9, 0, stream); 

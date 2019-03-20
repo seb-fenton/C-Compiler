@@ -38,10 +38,9 @@ void init_declarator::printMips(compilerContext& ctx, std::ostream& stream){
             stream << "\t.data" << std::endl;
         }
         if(declaratorPtr != NULL){declaratorPtr->printMips(ctx, stream);}
-        stream << "\t.global " << ctx.tempDeclarator.id << std::endl;
-        stream << "\t.type " << ctx.tempDeclarator.id << ", @object" << std::endl;
-        stream << ctx.tempDeclarator.id << ":" << std::endl;
-        ctx.globalVars[ctx.tempDeclarator.id] = varData(0, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, true);//add global flag
+        if(!ctx.tempDeclarator.id.empty()){
+            ctx.globalVars[ctx.tempDeclarator.id] = varData(0, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, true);//add global flag
+        }
         if(initialiserPtr != NULL){
             initialiserPtr->printMips(ctx, stream);   
         }
@@ -64,10 +63,17 @@ void init_declarator::printMips(compilerContext& ctx, std::ostream& stream){
 direct_declarator::direct_declarator(std::string s): identifier(s) {}
 
 void direct_declarator::printMips(compilerContext& ctx, std::ostream& stream){
-    if(!ctx.funcDef){
+    if(!ctx.funcDef && !ctx.globalDefs){
         ctx.tempDeclarator.id = identifier;
         ctx.tempDeclarator.elements = 1;
-    }else{
+    }else if(!ctx.funcDef && ctx.globalDefs){
+        ctx.tempDeclarator.id = identifier;
+        ctx.tempDeclarator.elements = 1;
+        stream << "\t.global " << ctx.tempDeclarator.id << std::endl;
+        stream << "\t.type " << ctx.tempDeclarator.id << ", @object" << std::endl;
+        stream << ctx.tempDeclarator.id << ":" << std::endl;
+        
+    }else if(ctx.funcDef){
         stream << ".text" << std::endl;
         stream << ".global " << identifier << std::endl;
         stream << ".ent " << identifier << std::endl;
