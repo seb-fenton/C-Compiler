@@ -28,7 +28,7 @@ parser: src/c_lexer.yy.cpp
 
 parsertest : bin/eval_expr
 
-bin/eval_expr : include/ast/context.o include/ast/ast_spec_nodes.o include/ast/ast_branch_nodes.o include/ast/ast_expression_nodes.o src/eval_parser.o src/c_parser.tab.o src/c_lexer.yy.o
+bin/eval_expr : include/ast/context.o include/ast/ast_spec_nodes.o include/ast/ast_branch_nodes.o include/ast/ast_expression_nodes.o include/ast/ast_statement_nodes.o src/eval_parser.o src/c_parser.tab.o src/c_lexer.yy.o
 	mkdir -p bin
 	g++ $(CPPFLAGS) -o bin/eval_expr $^
 
