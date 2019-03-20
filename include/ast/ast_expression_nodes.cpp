@@ -5,8 +5,13 @@
 //primary_expression
 
 void primary_expression::printMips(compilerContext& ctx, std::ostream& stream){
-    int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
-    stream << "lw $2," << retrieveVariable << "($sp)" << std::endl;
+    if(ctx.funcCall){
+        stream << "jal " << identifier << std::endl;
+    }
+    else{
+        int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
+        stream << "lw $2," << retrieveVariable << "($sp)" << std::endl;
+    }
 }
 
 
@@ -543,8 +548,11 @@ void BitwiseNotOp::printMips(compilerContext& ctx, std::ostream& stream){
 void function_call::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.funcCall = true;
     //print arguments
+    stream << "move $fp, $sp" << std::endl; //move frame pointer down to stack pointer
     if(list != NULL){list->printMips(ctx, stream);}
     if(expr != NULL){expr->printMips(ctx, stream);}
+    stream << "lw $fp, " << (ctx.currentFunc()->memUsed - 8) << "($sp)" << std::endl; //reset frame pointer
+    ctx.funcCall = false;
 }
 
 void LogicalNotOp::printMips(compilerContext& ctx, std::ostream& stream){
