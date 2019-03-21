@@ -1,6 +1,5 @@
 int f(){
-   if(1)
-      return 0;
-   return 5;
+   int x = 4;
+   return x += -4;
 }
 

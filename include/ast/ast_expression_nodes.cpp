@@ -50,14 +50,15 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         ctx.addToStack(4, stream);
         storeOperand(8, 0, stream);
 
-        if(right != NULL){right->printMips(ctx, stream);}
-        addOperands(8,2,0,stream);
 
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
+        addOperands(8,2,0,stream);
+
+        if(right != NULL){right->printMips(ctx, stream);}
         
-        stream << "sw $8, 0($2)" << std::endl;
+        stream << "sw $2, 0($8)" << std::endl;
         loadOperand(8, 0, stream);
         ctx.removeFromStack(4, stream);
     }      
@@ -72,13 +73,16 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
 
+        stream << "sllv $8,$9,$8" << std::endl;
+        
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        stream << "sllv $8,$9,$8" << std::endl;
+        
         
         stream << "sw $8, 0($2)" << std::endl;
+        addOperands(2,8,0,stream);  
 
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
@@ -95,13 +99,16 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
 
+        stream << "srlv $8,$9,$8" << std::endl;
+
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        stream << "srlv $8,$9,$8" << std::endl;
+        
         
         stream << "sw $8, 0($2)" << std::endl;
+        addOperands(2,8,0,stream);  
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
@@ -118,13 +125,17 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
 
+
+        stream << "add $8,$9,$8" << std::endl;
+
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        stream << "add $8,$9,$8" << std::endl;
+        
         
         stream << "sw $8, 0($2)" << std::endl;
+        addOperands(2,8,0,stream);  
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
@@ -141,13 +152,16 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
 
+        stream << "sub $8,$9,$8" << std::endl;
+
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        stream << "sub $8,$9,$8" << std::endl;
+
         
         stream << "sw $8, 0($2)" << std::endl;
+        addOperands(2,8,0,stream);  
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
@@ -164,13 +178,15 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
 
+        stream << "mult $8,$9" << std::endl << "mflo $8" << std::endl;
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        stream << "mult $8,$9" << std::endl << "mflo $8" << std::endl;
+        
         
         stream << "sw $8, 0($2)" << std::endl;
+        addOperands(2,8,0,stream);  
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
@@ -187,13 +203,16 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
 
+        stream << "div $8,$9" << std::endl << "mflo $8" << std::endl;
+
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        stream << "div $8,$9" << std::endl << "mflo $8" << std::endl;
+       
         
         stream << "sw $8, 0($2)" << std::endl;
+        addOperands(2,8,0,stream);  
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
@@ -210,13 +229,16 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
 
+        stream << "div $8,$9" << std::endl << "mfhi $8" << std::endl;
+
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        stream << "div $8,$9" << std::endl << "mfhi $8" << std::endl;
+        
         
         stream << "sw $8, 0($2)" << std::endl;
+        addOperands(2,8,0,stream);  
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
@@ -232,14 +254,16 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
 
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
+        stream << "and $8,$9,$8" << std::endl;
 
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        stream << "and $8,$9,$8" << std::endl;
+
         
         stream << "sw $8, 0($2)" << std::endl;
+        addOperands(2,8,0,stream);  
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
@@ -255,14 +279,16 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
 
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
+        stream << "or $8,$9,$8" << std::endl;
 
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        stream << "or $8,$9,$8" << std::endl;
+        
         
         stream << "sw $8, 0($2)" << std::endl;
+        addOperands(2,8,0,stream);  
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
@@ -278,14 +304,15 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
 
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(9,2,0,stream);
-
+        stream << "xor $8,$9,$8" << std::endl;
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        stream << "xor $8,$9,$8" << std::endl;
+
         
         stream << "sw $8, 0($2)" << std::endl;
+        addOperands(2,8,0,stream);  
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
@@ -968,7 +995,7 @@ int UAddOp::eval(){
 
 void USubOp::printMips(compilerContext& ctx, std::ostream& stream){
     expr->printMips(ctx, stream);
-    stream << "subu $2,$0,$2" << std::endl;
+    stream << "sub $2,$0,$2" << std::endl;
 }
 
 int USubOp::eval(){

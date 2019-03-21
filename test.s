@@ -7,28 +7,35 @@ f:
 addiu $sp, $sp, -8
 sw $fp, 0($sp)
 sw $31, 4($sp)
-addiu $2,$0,1
-beq $2, $0, TRUE_END_0
+addiu $sp, $sp, -4
+addiu $2,$0,4
+sw $2,0($sp)
+addiu $sp, $sp, -8
+sw $8, 4($sp)
+sw $9, 0($sp)
+addiu $2,$0,4
+sub $2,$0,$2
+add $8, $2, $0
+lw $2,8($sp)
+add $9, $2, $0
+add $8,$9,$8
+addi $2, $sp, 8
+sw $8, 0($2)
+add $2, $8, $0
+lw $8, 4($sp)
+lw $9, 0($sp)
+addiu $sp, $sp, 8
+lw $31, 8($sp) 
 nop
-addiu $2,$0,1
 move $sp, $fp
-lw $31, -4($sp) 
+jr $31 
 nop
-j $31
 
-TRUE_END_0:
+addiu $sp, $sp, 4
+lw $31, 8($sp) 
 nop
-move $2, $0
-addiu $2,$0,5
 move $sp, $fp
-lw $31, -4($sp) 
+jr $31 
 nop
-j $31
-
-addiu $sp, $sp, 0
-move $sp, $fp
-lw $31, -4($sp) 
-nop
-j $31
 
 .end f

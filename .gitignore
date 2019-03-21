@@ -7,3 +7,5 @@ src/c_parser.output
 Vagrantfile
 ubuntu-xenial-16.04-cloudimg-console.log
 .vagrant
+test.o
+test
