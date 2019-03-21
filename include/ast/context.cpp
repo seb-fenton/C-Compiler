@@ -95,8 +95,8 @@ void funcScope::incScope(){
 void funcScope::decScope(std::ostream& stream){
     int scopeMem = memUsed - scopes.back().stackOffset; //should give the amount of memory the scope has used
     stream << "addiu $sp, $sp, " << scopeMem << std::endl; //positive value moves up the stack
-
-}
+    memUsed -= scopeMem;
+}   
 
 //li $5, x
 //lw $2, 0($5)

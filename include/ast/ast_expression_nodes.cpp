@@ -1030,13 +1030,17 @@ int LogicalNotOp::eval(){
 
 void function_call::printMips(compilerContext& ctx, std::ostream& stream){
     //print arguments
-     //move frame pointer down to stack pointer
+    //move frame pointer down to stack pointer
+    int memUsedStore = ctx.currentFunc()->memUsed;
     if(list != NULL){list->printMips(ctx, stream);}
     stream << "move $fp, $sp" << std::endl;
     ctx.funcCall = true;
     if(expr != NULL){expr->printMips(ctx, stream);}
-    stream << "lw $fp, " << (ctx.currentFunc()->memUsed - 8) << "($sp)" << std::endl; //reset frame pointer
+    stream << "lw $fp, " << (ctx.currentFunc()->memUsed - 8) << "($sp)\nnop" << std::endl; //reset frame pointer
     ctx.funcCall = false;
+    int funcOffset = ctx.currentFunc()->memUsed - memUsedStore;
+    stream << "addi $sp, $sp, " << funcOffset << std::endl;
+    ctx.currentFunc()->memUsed = memUsedStore;
 }
 
 void array_call::printMips(compilerContext& ctx, std::ostream& stream){
