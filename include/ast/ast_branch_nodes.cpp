@@ -50,3 +50,13 @@ void parameter_list::printMips(compilerContext& ctx, std::ostream& stream){
 		branches[i]->printMips(ctx, stream);
 	}
 }
+
+//enumarator_list
+void enumerator_list::printMips(compilerContext& ctx, std::ostream& stream){
+	for(int i = 0; i < (int)branches.size(); i++){
+		branches[i]->printMips(ctx, stream);
+	}
+	ctx.enumCtx.reset();
+}
+
+

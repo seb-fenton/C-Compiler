@@ -153,3 +153,28 @@ void parameter_declaration::printMips(compilerContext& ctx, std::ostream& stream
     
 }
 
+//EnumConstants
+void EnumConstants::printMips(compilerContext& ctx, std::ostream& stream){
+    if(enumList != NULL){enumList->printMips(ctx, stream);}
+}
+
+//EnumSpecifier
+
+void EnumSpecifier::printMips(compilerContext& ctx, std::ostream& stream){
+    ctx.tempDeclarator.size = 4;
+}
+
+void enumerator::printMips(compilerContext& ctx, std::ostream& stream){
+    int enumVal;
+    if(val != NULL){
+        enumVal = val->eval();
+        ctx.enumCtx.nextVal = enumVal + 1;
+    }else{
+        enumVal = ctx.enumCtx.nextVal++;
+    }
+	if(ctx.functions.size() == 0){
+        ctx.globalVars[id] = varData(enumVal, true, true);
+    }else{
+        (*ctx.currentBindings())[id] = varData(enumVal, true, false);
+    }
+}

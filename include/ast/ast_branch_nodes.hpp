@@ -191,6 +191,8 @@ class enumerator_list : public BranchNode{
 			branches[i]->printTree(n);
 		}
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 

@@ -11,6 +11,8 @@ void primary_expression::printMips(compilerContext& ctx, std::ostream& stream){
         if(ctx.getAddr){
             int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
             stream << "addi $2, $sp, " << retrieveVariable << std::endl;
+        }else if((*ctx.currentBindings())[identifier].isEnum){
+            stream << "addi $2, $0, " << ((*ctx.currentBindings())[identifier].enumVal) << std::endl;
         }
         else{
             int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;

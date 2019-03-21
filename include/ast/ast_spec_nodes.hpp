@@ -426,6 +426,8 @@ class EnumConstants : public Node{
 		std::cout << "Enum Constants" << std::endl;
 		if(enumList != NULL){enumList->printTree(n+1);}
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class EnumDeclaration : public EnumConstants {
@@ -439,6 +441,7 @@ class EnumDeclaration : public EnumConstants {
 		std::cout << "Enum Declaration: " << id << std::endl;
 		if(enumList != NULL){enumList->printTree(n+1);}
 	}
+
 };
 
 class EnumSpecifier : public Node {
@@ -451,6 +454,8 @@ class EnumSpecifier : public Node {
 		}
 		std::cout << "Enum Specifier: " << id << std::endl;
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
  
 class enumerator : public Node {
@@ -473,6 +478,8 @@ class enumerator : public Node {
 			std::cout << std::endl; 
 		}
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 

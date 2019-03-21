@@ -57,6 +57,14 @@ int DeclaratorContext::totSize(){
 varData::varData(int _offset, int _elements, int _size, bool _global): offset(_offset), elements(_elements), size(_size), global(_global){}
 
 //---------------------------------------------//
+//----------------EnumContext------------------//
+//---------------------------------------------//
+
+void EnumContext::reset(){
+    nextVal = 1;
+}
+
+//---------------------------------------------//
 //----------------Scope_Struct-----------------//
 //---------------------------------------------//
 

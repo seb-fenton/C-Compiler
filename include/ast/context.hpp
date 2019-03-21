@@ -33,16 +33,24 @@ struct LoopContext{ //needed for continue and break
     LoopContext(std::string _cont, std::string _brk): cont(_cont), brk(_brk){}
 };
 
+struct EnumContext{
+    int nextVal = 1;
+    void reset();
+};
+
 struct varData{
     int size; //used mainly for arrays but we can initlialise it for normal integers, to be used with the SizeOf command
 
     bool isTypdef = false;
     //NodePtr typedefLoc = NULL; //points to the declaration specifiers the typedef contains
+    bool isEnum;
+    int enumVal;
 
     bool global;
     int elements = 1;
     int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
     varData(){}
+    varData(int _enumVal, bool _isEnum, bool _global): isEnum(_isEnum), enumVal(_enumVal), global(_global){}
     varData(int _offset, int _elements, int _size, bool _global); //let declarator increment $sp
 };
 
@@ -95,6 +103,7 @@ struct compilerContext{
     void addToStack(int size, std::ostream& stream);
     void removeFromStack(int size, std::ostream& stream);
 
+    EnumContext enumCtx;
     DeclaratorContext tempDeclarator; //can be used by declarators to keep track of info needed to add to bindings.
     
 };
