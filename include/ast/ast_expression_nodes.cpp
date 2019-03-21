@@ -245,7 +245,7 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         ctx.removeFromStack(8, stream);
     }    
     else if(op == "&="){
-        ctx.addToStack(4, stream);
+        ctx.addToStack(8, stream);
         storeOperand(16, 4, stream);
         storeOperand(17, 0, stream);
 
@@ -1031,6 +1031,11 @@ int LogicalNotOp::eval(){
 void function_call::printMips(compilerContext& ctx, std::ostream& stream){
     //print arguments
     //move frame pointer down to stack pointer
+    ctx.addToStack(16, stream); //store previous function args
+	storeOperand(4, 0, stream);
+	storeOperand(5, 4, stream);
+	storeOperand(6, 8, stream);
+	storeOperand(7, 12, stream);
     int memUsedStore = ctx.currentFunc()->memUsed;
     if(list != NULL){list->printMips(ctx, stream);}
     stream << "move $fp, $sp" << std::endl;
@@ -1040,7 +1045,12 @@ void function_call::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.funcCall = false;
     int funcOffset = ctx.currentFunc()->memUsed - memUsedStore;
     stream << "addi $sp, $sp, " << funcOffset << std::endl;
-    ctx.currentFunc()->memUsed = memUsedStore;
+    ctx.currentFunc()->memUsed = memUsedStore; //data used for function call needs to reset
+    loadOperand(4, 0, stream);
+	loadOperand(5, 4, stream);
+	loadOperand(6, 8, stream);
+	loadOperand(7, 12, stream);
+	ctx.removeFromStack(16, stream);
 }
 
 void array_call::printMips(compilerContext& ctx, std::ostream& stream){
