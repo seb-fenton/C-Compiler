@@ -235,8 +235,6 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        
-        
         stream << "sw $16, 0($2)" << std::endl;
         addOperands(2,16,0,stream);  
         
@@ -245,7 +243,7 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         ctx.removeFromStack(8, stream);
     }    
     else if(op == "&="){
-        ctx.addToStack(4, stream);
+        ctx.addToStack(8, stream);
         storeOperand(16, 4, stream);
         storeOperand(17, 0, stream);
 
@@ -254,13 +252,12 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
 
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(17,2,0,stream);
+
         stream << "and $16,$17,$16" << std::endl;
 
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
-
-
         
         stream << "sw $16, 0($2)" << std::endl;
         addOperands(2,16,0,stream);  
@@ -279,14 +276,13 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
 
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(17,2,0,stream);
+
         stream << "or $16,$17,$16" << std::endl;
 
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-        
-        
         stream << "sw $16, 0($2)" << std::endl;
         addOperands(2,16,0,stream);  
         
@@ -304,13 +300,13 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
 
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(17,2,0,stream);
+
         stream << "xor $16,$17,$16" << std::endl;
+
         ctx.getAddr = true;
         if(left != NULL){left->printMips(ctx, stream);}
         ctx.getAddr = false;
 
-
-        
         stream << "sw $16, 0($2)" << std::endl;
         addOperands(2,16,0,stream);  
         
