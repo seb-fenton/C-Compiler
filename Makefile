@@ -60,16 +60,17 @@ src/eval_parser.o : src/eval_parser.cpp
 
 ###CLEAN RULES###
 clean :
-	-rm -rf prog prog.exe
-	-rm -rf src/*.yy.cpp
-	-rm -rf src/*.yy.hpp
-	-rm -rf src/*.tab.hpp
-	-rm -rf src/*.tab.cpp
-	-rm -rf src/*.o
-	-rm -rf src/*.output
-	-rm -rf bin
-	-rm -rf include/ast/*.o
-	-rm -rf src/*.output
-	-rm -rf bin
-	-rm -rf tmp
-	-rm -rf include/ast/*.o
+	@rm -rf prog prog.exe
+	@rm -rf src/*.yy.cpp
+	@rm -rf src/*.yy.hpp
+	@rm -rf src/*.tab.hpp
+	@rm -rf src/*.tab.cpp
+	@rm -rf src/*.o
+	@rm -rf src/*.output
+	@rm -rf bin
+	@rm -rf include/ast/*.o
+	@rm -rf src/*.output
+	@rm -rf tmp
+	@rm -rf include/ast/*.o
+	@rm -rf working
+	@echo "all clean"

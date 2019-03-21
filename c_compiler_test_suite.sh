@@ -1,38 +1,48 @@
 #!/bin/bash
 
-make compiler -B 
+if [[ "$1" != "" ]] ; then
+    compiler="$1"
+else
+    compiler="bin/c_compiler"
+fi
+
+if [[ ! -f bin/c_compiler ]] ; then
+    >&2 echo "Warning : cannot find compiler at path ${compiler}."
+    exit
+fi
+
+
 
 input_dir="test_deliverable/test_cases"
-working="bin/working"
+working="working"
 
 mkdir -p ${working}
 
 
 for i in ${input_dir}/*.c ; do
+    j=${i##*/}
+    base=${j%.c}
+    #base=$(echo $i | sed -E -e "s|${input_dir}/([^.]+[^_driver])[.]c|\1|g")
+    if [ "${base: -7}" = "_driver" ]; then
+        continue;
+    fi
+    $compiler -S $input_dir/$base.c -o $working/$base.s &> /dev/NULL
 
-    base=$(echo $i | sed -E -e "s|${input_dir}/([^.]+[^_driver])[.]c|\1|g")
+    mips-linux-gnu-gcc -mfp32 -o $working/$base.o -c $working/$base.s &> /dev/NULL
 
-    bin/c_compiler -S $input_dir/$base.c -o $working/$base.s
+    base_drivers="${base}_driver"
 
-    mips-linux-gnu-gcc -mfp32 -o $working/$base.o -c $working/$base.s
+    mips-linux-gnu-gcc -mfp32 -static -o $working/$base $working/$base.o $input_dir/$base_drivers.c &> /dev/NULL
 
-    base_drivers=$(echo $i | sed -E -e "s|${input_dir}/([^.]+[_driver])[.]c|\1|g")
-
-    mips-linux-gnu-gcc -mfp32 -static -o $working/$base $working/$base.o $base_drivers.c
-
-    qemu-mips $working/$base
+    qemu-mips $working/$base &> /dev/NULL
 
     GOT_OUT=$?
-
     if [[ $GOT_OUT -ne 0 ]] ; then
-        echo -e "${wht}$base.c ${red}[FAIL] ${wht}Expected 0 got $GOT_OUT"
+        echo -e "${wht}$base ${red}[FAIL] ${wht}Expected 0 got $GOT_OUT \n"
 
     else
-        echo -e "${wht}$base.c [PASS]"
+        echo -e "${wht}$base [PASS] \n"
 
-    rm bin/working/*
     fi
 
 done
-
-make clean

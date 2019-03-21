@@ -46,7 +46,7 @@ struct varData{
     bool isEnum = false;
     int enumVal;
 
-    bool global;
+    bool global = true;
     int elements = 1;
     int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
     varData(){}
