@@ -43,7 +43,7 @@ struct varData{
 
     bool isTypdef = false;
     //NodePtr typedefLoc = NULL; //points to the declaration specifiers the typedef contains
-    bool isEnum;
+    bool isEnum = false;
     int enumVal;
 
     bool global;

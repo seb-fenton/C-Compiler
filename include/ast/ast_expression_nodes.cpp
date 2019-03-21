@@ -61,8 +61,8 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         loadOperand(8, 0, stream);
         ctx.removeFromStack(4, stream);
     }      
-    else if(op == "<<"){
-        ctx.addToStack(4, stream);
+    else if(op == "<<="){
+        ctx.addToStack(8, stream);
         storeOperand(8, 4, stream);
         storeOperand(9, 0, stream);
 
@@ -82,10 +82,10 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
 
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
-        ctx.removeFromStack(4, stream);
+        ctx.removeFromStack(8, stream);
     }  
-    else if(op == ">>"){
-        ctx.addToStack(4, stream);
+    else if(op == ">>="){
+        ctx.addToStack(8, stream);
         storeOperand(8, 4, stream);
         storeOperand(9, 0, stream);
 
@@ -105,10 +105,10 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
-        ctx.removeFromStack(4, stream);
+        ctx.removeFromStack(8, stream);
     }  
     else if(op == "+="){
-        ctx.addToStack(4, stream);
+        ctx.addToStack(8, stream);
         storeOperand(8, 4, stream);
         storeOperand(9, 0, stream);
 
@@ -128,10 +128,10 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
-        ctx.removeFromStack(4, stream);
+        ctx.removeFromStack(8, stream);
     }
     else if(op == "-="){
-        ctx.addToStack(4, stream);
+        ctx.addToStack(8, stream);
         storeOperand(8, 4, stream);
         storeOperand(9, 0, stream);
 
@@ -151,10 +151,10 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
-        ctx.removeFromStack(4, stream);
+        ctx.removeFromStack(8, stream);
     } 
     else if(op == "*="){
-        ctx.addToStack(4, stream);
+        ctx.addToStack(8, stream);
         storeOperand(8, 4, stream);
         storeOperand(9, 0, stream);
 
@@ -174,10 +174,10 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
-        ctx.removeFromStack(4, stream);
+        ctx.removeFromStack(8, stream);
     }  
     else if(op == "/="){
-        ctx.addToStack(4, stream);
+        ctx.addToStack(8, stream);
         storeOperand(8, 4, stream);
         storeOperand(9, 0, stream);
 
@@ -197,10 +197,10 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
-        ctx.removeFromStack(4, stream);
+        ctx.removeFromStack(8, stream);
     }
     else if(op == "%="){
-        ctx.addToStack(4, stream);
+        ctx.addToStack(8, stream);
         storeOperand(8, 4, stream);
         storeOperand(9, 0, stream);
 
@@ -220,7 +220,7 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
-        ctx.removeFromStack(4, stream);
+        ctx.removeFromStack(8, stream);
     }    
     else if(op == "&="){
         ctx.addToStack(4, stream);
@@ -243,10 +243,10 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
-        ctx.removeFromStack(4, stream);
+        ctx.removeFromStack(8, stream);
     }    
     else if(op == "|="){
-        ctx.addToStack(4, stream);
+        ctx.addToStack(8, stream);
         storeOperand(8, 4, stream);
         storeOperand(9, 0, stream);
 
@@ -266,10 +266,10 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
-        ctx.removeFromStack(4, stream);
+        ctx.removeFromStack(8, stream);
     }  
-    else if(op == "|="){
-        ctx.addToStack(4, stream);
+    else if(op == "^="){
+        ctx.addToStack(8, stream);
         storeOperand(8, 4, stream);
         storeOperand(9, 0, stream);
 
@@ -289,7 +289,7 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         
         loadOperand(8, 4, stream);
         loadOperand(9, 0, stream);
-        ctx.removeFromStack(4, stream);
+        ctx.removeFromStack(8, stream);
     }             
 }
 
@@ -568,7 +568,7 @@ void GreaterThanOp::printMips(compilerContext& ctx, std::ostream& stream){
 	right->printMips(ctx,stream);
 	addOperands(9,2,0,stream);
 
-    stream << "slt $2,$8,$9" << std::endl;                // checks if $8 < $9
+    stream << "slt $2,$9,$8" << std::endl;                // checks if $8 < $9
     stream << "andi $2,$2,0x00ff" << std::endl;         //magic?
 
 	loadOperand(8, 0, stream);
@@ -867,32 +867,86 @@ int ModulusOp::eval(){
 //PreIncOp
 
 void PreIncOp::printMips(compilerContext& ctx, std::ostream& stream){
+    ctx.addToStack(4, stream);
+    storeOperand(8, 0, stream);
+
+    ctx.getAddr = true;
     expr->printMips(ctx,stream);
-    stream << "addiu $2,$2,1" << std::endl;
+    ctx.getAddr = false;
+    addOperands(8,2,0,stream);
+    
+    expr->printMips(ctx,stream);
+    stream << "addi $2, $2, 1" << std::endl;
+
+    stream << "sw $2, 0($8) " << std::endl;
+    addOperands(2,8,0,stream);
+    loadOperand(8, 0, stream);
+    ctx.removeFromStack(4, stream);
+    
+
 }
 
 
 //PreDecOp
 
 void PreDecOp::printMips(compilerContext& ctx, std::ostream& stream){
+    ctx.addToStack(4, stream);
+    storeOperand(8, 0, stream);
+
+    ctx.getAddr = true;
     expr->printMips(ctx,stream);
-    stream << "addiu $2,$2,-1" << std::endl;
+    ctx.getAddr = false;
+    addOperands(8,2,0,stream);
+    
+    expr->printMips(ctx,stream);
+    stream << "addi $2, $2, -1" << std::endl;
+    stream << "sw $2, 0($8) " << std::endl;
+    
+    addOperands(2,8,0,stream);
+    loadOperand(8, 0, stream);
+    ctx.removeFromStack(4, stream);
 }
 
 
 //PreIncOp
 
 void PostIncOp::printMips(compilerContext& ctx, std::ostream& stream){
+    ctx.addToStack(4, stream);
+    storeOperand(8, 0, stream);
+
+    ctx.getAddr = true;
     expr->printMips(ctx,stream);
-    stream << "addiu $2,$2,1" << std::endl;
+    ctx.getAddr = false;
+    addOperands(8,2,0,stream);
+    
+    expr->printMips(ctx,stream);
+
+    stream << "sw $2, 0($8) " << std::endl;
+    stream << "addi $2, $2, 1" << std::endl;
+    addOperands(2,8,0,stream);
+    loadOperand(8, 0, stream);
+    ctx.removeFromStack(4, stream);
 }
 
 
 //PostDecOp
 
 void PostDecOp::printMips(compilerContext& ctx, std::ostream& stream){
+    ctx.addToStack(4, stream);
+    storeOperand(8, 0, stream);
+
+    ctx.getAddr = true;
     expr->printMips(ctx,stream);
-    stream << "addiu $2,$2,-1" << std::endl;
+    ctx.getAddr = false;
+    addOperands(8,2,0,stream);
+    
+    expr->printMips(ctx,stream);
+
+    stream << "sw $2, 0($8)" << std::endl;
+    stream << "addi $2, $2, -1" << std::endl;
+    addOperands(2,8,0,stream);
+    loadOperand(8, 0, stream);
+    ctx.removeFromStack(4, stream);
 }
 
 
