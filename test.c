@@ -1,8 +1,6 @@
-int main(){
-    int i;
-    for(i = 5; i < 10; i++){
-        int r;
-    }
-    return i;
+int f(){
+   if(1)
+      return 0;
+   return 5;
 }
 

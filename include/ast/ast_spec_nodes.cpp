@@ -32,14 +32,29 @@ init_declarator::init_declarator(NodePtr declarator): declaratorPtr(declarator) 
 
 void init_declarator::printMips(compilerContext& ctx, std::ostream& stream){
     //need to do something different for arrays
-    if(declaratorPtr != NULL){declaratorPtr->printMips(ctx, stream);}
-    ctx.tempDeclarator.offset = ctx.functions.back().memUsed + 4; //setting the offset
-    ctx.addToStack(ctx.tempDeclarator.totSize(), stream);
-    if(initialiserPtr != NULL){
-        initialiserPtr->printMips(ctx, stream);
-        stream << "sw $2, 0($sp)" << std::endl;   
+    if(ctx.functions.size() == 0){ //global vars
+        if(!ctx.globalDefs){
+            ctx.globalDefs = true;
+            stream << "\t.data" << std::endl;
+        }
+        if(declaratorPtr != NULL){declaratorPtr->printMips(ctx, stream);}
+        if(!ctx.tempDeclarator.id.empty()){
+            ctx.globalVars[ctx.tempDeclarator.id] = varData(0, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, true);//add global flag
+        }
+        if(initialiserPtr != NULL){
+            initialiserPtr->printMips(ctx, stream);   
+        }
+        stream << std::endl;
+    }else{
+        if(declaratorPtr != NULL){declaratorPtr->printMips(ctx, stream);}
+        ctx.tempDeclarator.offset = ctx.functions.back().memUsed + 4; //setting the offset
+        ctx.addToStack(ctx.tempDeclarator.totSize(), stream);
+        ctx.currentScope()->addToBindings(ctx.tempDeclarator.id, ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, false);
+        if(initialiserPtr != NULL){
+            initialiserPtr->printMips(ctx, stream);   
+        }
     }
-    ctx.currentScope()->addToBindings(ctx.tempDeclarator.id, ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.size);
+    
 }
 
 
@@ -48,17 +63,37 @@ void init_declarator::printMips(compilerContext& ctx, std::ostream& stream){
 direct_declarator::direct_declarator(std::string s): identifier(s) {}
 
 void direct_declarator::printMips(compilerContext& ctx, std::ostream& stream){
-    if(!ctx.funcDef){ctx.tempDeclarator.id = identifier;}
-    else{
+    if(!ctx.funcDef && !ctx.globalDefs){
+        ctx.tempDeclarator.id = identifier;
+        ctx.tempDeclarator.elements = 1;
+    }else if(!ctx.funcDef && ctx.globalDefs){
+        ctx.tempDeclarator.id = identifier;
+        ctx.tempDeclarator.elements = 1;
+        stream << "\t.global " << ctx.tempDeclarator.id << std::endl;
+        stream << "\t.type " << ctx.tempDeclarator.id << ", @object" << std::endl;
+        stream << ctx.tempDeclarator.id << ":" << std::endl;
+        
+    }else if(ctx.funcDef){
         stream << ".text" << std::endl;
-        stream << ".global " << identifier << std::endl << std::endl;
+        stream << ".global " << identifier << std::endl;
+        stream << ".ent " << identifier << std::endl;
+        stream << ".type " << identifier << ", @function" << std::endl << std::endl;
         stream << identifier << ":" << std::endl;
+        ctx.funcName = identifier;
     }
 }
 
 
 void initialiser::printMips(compilerContext& ctx, std::ostream& stream){
-    if(assignment != NULL){assignment->printMips(ctx, stream);}
+    if(assignment != NULL){
+        if(!ctx.globalDefs){
+            assignment->printMips(ctx, stream);
+            stream << "sw $2,"<<  (ctx.currentFunc()->memUsed - ctx.tempDeclarator.offset) <<"($sp)" << std::endl;
+        }else{
+            int temp = assignment->eval(); //implemente val function
+            stream << "\t.word " << temp << std::endl;
+        }
+    }
 }
 
 
@@ -69,8 +104,9 @@ initialiser::initialiser(ExpPtr a): assignment(a) {}
 //ArrayDeclaration
 
 void ArrayDeclaration::printMips(compilerContext& ctx, std::ostream& stream){
+    if(varName != NULL){varName->printMips(ctx, stream);}
     if(size != NULL){
-    //ctx.tempDeclarator.elements = size->eval(); need to make eval function to calculate size of arrays at compile time
+    ctx.tempDeclarator.elements = size->eval(); 
     }
     else{
         ctx.tempDeclarator.elements = 0; //represents empty array
@@ -81,7 +117,8 @@ void ArrayDeclaration::printMips(compilerContext& ctx, std::ostream& stream){
 //function definition
 void function_definition::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.funcDef = true;
-    ctx.functions.push_back(funcScope(stream)); //creates function
+    ctx. globalDefs = false;
+    ctx.functions.push_back(funcScope(stream, ctx.globalVars)); //creates function
     if(name != NULL){name->printMips(ctx, stream);} //prints a label
     ctx.setup(stream);
     for(int i = 0; i < ctx.currentFunc()->parameters.size(); i++){
@@ -91,13 +128,17 @@ void function_definition::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.funcDef = false;
     if(statement != NULL){statement->printMips(ctx, stream);} //prints actual statement
     ctx.endFunc(stream);
+    stream << ".end " << ctx.funcName << std::endl;
+    ctx.funcName.clear();
     ctx.functions.pop_back();
 }
 
 //FunctionDeclaration
 void FunctionDeclaration::printMips(compilerContext& ctx, std::ostream& stream){
-    if(funcName != NULL){funcName->printMips(ctx, stream);}
-    if(argList != NULL){argList->printMips(ctx, stream);}
+    if(ctx.funcDef){
+        if(funcName != NULL){funcName->printMips(ctx, stream);}
+        if(argList != NULL){argList->printMips(ctx, stream);}
+    }
 }
 
 void parameter_declaration::printMips(compilerContext& ctx, std::ostream& stream){
@@ -106,7 +147,7 @@ void parameter_declaration::printMips(compilerContext& ctx, std::ostream& stream
     if(specifiers != NULL){specifiers->printMips(ctx, stream);}
     if(dec != NULL){dec->printMips(ctx, stream);}
     ctx.tempDeclarator.offset = -(ctx.currentFunc()->parameters.size()*4);
-    ctx.currentFunc()->parameters[ctx.tempDeclarator.id] = varData(ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.size);
+    ctx.currentFunc()->parameters[ctx.tempDeclarator.id] = varData(ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, false);
     ctx.tempDeclarator.purge();
     ctx.funcDef = temp;
     

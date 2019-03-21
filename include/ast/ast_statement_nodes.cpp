@@ -22,11 +22,11 @@ void IfStatement::printMips(compilerContext& ctx, std::ostream& stream){
     if(cond != NULL){cond->printMips(ctx, stream);}
     stream << "beq $2, $0, " << trueEnd << "\nnop" << std::endl;
     _true->printMips(ctx, stream);
-    if(_false != NULL){stream << "b " << falseEnd << "\nnop" << std::endl;}
+    if(_false != NULL){stream << "j " << falseEnd << "\nnop" << std::endl;}
     stream << trueEnd << ":" << std::endl;
     if(_false != NULL){
         _false->printMips(ctx, stream);
-        stream << falseEnd << std::endl;
+        stream << falseEnd << ":" << std::endl;
     }
     stream << "nop" << std::endl;
     stream << "move $2, $0" << std::endl;
@@ -41,7 +41,7 @@ void WhileStatement::printMips(compilerContext& ctx, std::ostream& stream){
     cond->printMips(ctx, stream);
     stream << "beq $2, $0, " << endLabel << "\nnop" << std::endl;
     stmt->printMips(ctx, stream);
-    stream << "b " << startLabel << "\nnop" << std::endl;
+    stream << "j " << startLabel << "\nnop" << std::endl;
     stream << endLabel << ":" << std::endl;
     stream << "move $2, $0" << std::endl;
 
@@ -87,7 +87,7 @@ void ForStatement::printMips(compilerContext& ctx, std::ostream& stream){
 
     stream << iterateLabel << ":" << std::endl;
     if(iter != NULL){iter->printMips(ctx,stream);}
-    stream << "b " << startLabel << "\nnop" << std::endl;
+    stream << "j " << startLabel << "\nnop" << std::endl;
 
     stream << endLabel << ":" << std::endl;
     stream << "move $2, $0" << std::endl;
@@ -101,9 +101,13 @@ void ReturnStatement::printMips(compilerContext& ctx, std::ostream& stream){
 }
 
 void ContinueStatement::printMips(compilerContext& ctx, std::ostream& stream){
-    stream << "b " << ctx.currentFunc()->LoopsLabels.back().cont << " \nnop" << std::endl;
+    stream << "j " << ctx.currentFunc()->LoopsLabels.back().cont << " \nnop" << std::endl;
 }
 
 void BreakStatement::printMips(compilerContext& ctx, std::ostream& stream){
-    stream << "b " << ctx.currentFunc()->LoopsLabels.back().brk << " \nnop" << std::endl;
+    stream << "j " << ctx.currentFunc()->LoopsLabels.back().brk << " \nnop" << std::endl;
+}
+
+void expression_statement::printMips(compilerContext& ctx, std::ostream& stream){
+    if(stmt != NULL){stmt->printMips(ctx,stream);}
 }

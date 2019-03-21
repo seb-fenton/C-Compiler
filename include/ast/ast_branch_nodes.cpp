@@ -31,6 +31,18 @@ void init_declarator_list::printMips(compilerContext& ctx, std::ostream& stream)
 
 argument_expression_list::argument_expression_list(NodePtr p){branches.push_back(p);}
 
+void argument_expression_list::printMips(compilerContext& ctx, std::ostream& stream){
+	ctx.addToStack((int)branches.size()*4, stream);
+	for(int i = branches.size() - 1; i >= 0; i--){
+		if(i < 4){
+			branches[i]->printMips(ctx, stream);
+			stream << "move $" << i + 4  << ", $2" << std::endl;
+		} else{
+			branches[i]->printMips(ctx, stream);
+			stream << "sw $2, 0($sp)" << std::endl;
+		}
+	}
+}
 //parameter list
 
 void parameter_list::printMips(compilerContext& ctx, std::ostream& stream){

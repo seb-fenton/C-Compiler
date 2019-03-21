@@ -116,7 +116,7 @@ WHITESPACE          [ \t\r\n]+
 
 {HEXPREFIX}{HEX}+{INTEGERSUFFIX}?                               {yylval.number=strtod(yytext, 0); return INT_CONSTANT; }
 {NONZERO}{DEC}*{INTEGERSUFFIX}?                                 {yylval.number=strtod(yytext, 0);  return INT_CONSTANT; }
-"0"{OCTAL}*{INTEGERSUFFIX}?                                     { return INT_CONSTANT; }
+"0"{OCTAL}*{INTEGERSUFFIX}?                                     {yylval.number=strtod(yytext, 0); return INT_CONSTANT; }
 
 {DEC}+{EXPONENTSUFFIX}{FLOATINGSUFFIX}?                         {yylval.number=strtod(yytext, 0); return FLOAT_CONSTANT;}
 {DEC}*"."{DEC}+{EXPONENTSUFFIX}?{FLOATINGSUFFIX}?               {yylval.number=strtod(yytext, 0); return FLOAT_CONSTANT;}

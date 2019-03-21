@@ -1,30 +1,34 @@
 .text
-.global main
+.global f
+.ent f
+.type f, @function
 
-main:
+f:
 addiu $sp, $sp, -8
 sw $fp, 0($sp)
 sw $31, 4($sp)
-addiu $sp, $sp, -4
-start_0:
-beq $2, $0, end_1
+addiu $2,$0,1
+beq $2, $0, TRUE_END_0
 nop
-addiu $sp, $sp, -4
-addiu $sp, $sp, 4
-iterate_2:
-addiu $2,$2,1
-b start_0
+addiu $2,$0,1
+move $sp, $fp
+lw $31, -4($sp) 
 nop
-end_1:
+j $31
+
+TRUE_END_0:
+nop
 move $2, $0
+addiu $2,$0,5
 move $sp, $fp
 lw $31, -4($sp) 
 nop
 j $31
 
-addiu $sp, $sp, 4
+addiu $sp, $sp, 0
 move $sp, $fp
 lw $31, -4($sp) 
 nop
 j $31
 
+.end f

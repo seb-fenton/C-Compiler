@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <fstream>
+#include <cmath>
 #include "context.hpp"
 
 class Node{
@@ -32,14 +33,16 @@ class ExpressionNode : public Node{
     virtual ~ExpressionNode()  {};
 
 		void addOperands(int one, int two, int three, std::ostream& stream){
-			stream << "add $" << one << ",$" << two << ",$" << three << std::endl;
+			stream << "add $" << one << ", $" << two << ", $" << three << std::endl;
 		}
-		void storeOperand(int operand, std::ostream& stream){
-			stream << "sw $" << operand << ",0($sp)" << std::endl;
+		void storeOperand(int operand, int offset, std::ostream& stream){
+			stream << "sw $" << operand << ", " << offset << "($sp)" << std::endl;
 		}
-		void loadOperand(int operand, std::ostream& stream){
-			stream << "lw $" << operand << ",0($sp)" << std::endl;
+		void loadOperand(int operand, int offset, std::ostream& stream){
+			stream << "lw $" << operand << ", " << offset << "($sp)" << std::endl;
 		}
+
+		virtual int eval(){return 0;}
 };
 typedef ExpressionNode* ExpPtr;
 
