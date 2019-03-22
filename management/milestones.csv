@@ -3,23 +3,22 @@ DefineInitialMilestones, , 30m, SF, Y, Come up with initial milestones for getti
 FinishLabExercises, , ?, ALL, Y, Finish CodeGen lab exercise and problem sheets 
 WriteLexerTokens, , 3h, NG, Y, Write initial Lexer structure based on ANSI C
 WriteLexerTypedefs, WriteLexerTokens, 1.5h, NG, Y, Add typedef support to Lexer
-DebugLexer, WriteLexerTypedefs, 5h, SF, N, Test Lexer by creating fake context header and using separate main
-AddTypedefExtremeCaseSupport, DebugLexer, 4h, SF, N, Add support for extreme typdef use cases
+DebugLexer, WriteLexerTypedefs, 5h, SF, Y, Test Lexer by creating fake context header and using separate main
+AddTypedefExtremeCaseSupport, DebugLexer, 4h, SF, Y, Add support for extreme typdef use cases
 AddParserRules, WriteLexerTypedefs, 4h, NG, Y, Create Parser template with basic rules
-AddParserASTSupport,AddParserRules, 6h?, ALL, N, Add AST support in Parser rules
+AddParserASTSupport,AddParserRules, 6h?, ALL, Y, Add AST support in Parser rules
 CreateAST, , 15h, ALL, Y, Create AST with nodes
-PrintFunctionForNodes, , 3h, NG, N, Create printfunction for AST nodes
-DebugParser, AddParserASTSupport, 6h?, ALL, N, Debug parser using completed Lexer
+PrintFunctionForNodes, , 3h, NG, Y, Create printfunction for AST nodes
+DebugParser, AddParserASTSupport, 6h?, ALL, Y, Debug parser using completed Lexer
 MakeTestSuite, , 2h, SF, Y, Create the test suite 
 CreateTestCasesTestSuite, MakeTestSuite, 2h, SF, Y, Create the test_deliverable cases
 MakeOverheadInfrastructure, ,3h, SF, Y, Create infrastructure to allow for automated testing compliant to spec
 CtoPython, CreateAST, 15h, SF, Y, Create c to python translator
-CtoPythonDebugging, CtoPython, 5h, SF, N, Debug the translator and make to work with test suite
+CtoPythonDebugging, CtoPython, 5h, SF, Y, Debug the translator and make to work with test suite
 MipsContext, CreateAST, 6h, NG, Y, Create the context structs for CodeGen
 MipsOverhead, MipsContext, 15h, NG, Y ,Codegen for declarations, functions etc.
 MipsExpressions, CreateAST, 12h, SF, Y, Create mips code for basic-intermediate expressions
 MipsStatements, CreateAST, 15h, ALL, Y, Create mips code for basic-intermediate statements
-MipsBranches, CreateAST, 4h, ALL, N, Create mips code for basic-intermediate branches
-
-
+MipsBranches, CreateAST, 2h, SF, Y, Create mips code for basic-intermediate branches
+MakeAdditionalTestCases, ALL, 3h, SF, Y, Create additional test cases
 Submissions, ALL, 30m, ALL, N, Do final check and submit commit hash

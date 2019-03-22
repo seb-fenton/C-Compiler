@@ -31,7 +31,10 @@ Date,Effort,Developers,Milestones
 19/03,2h,SF,MipsExpressions
 20/03,4h,NG,MipsStatements
 20/03,3h,SF,MipsExpressions
+20/03,2h,SF,MipsBranches
 21/03,2h,NG,MipsOverhead
 21/03,3h,NG,MipsStatements
 21/03,2h,NG,MipsExpressions
-22/03,3h,NG,MipsStatements
+22/03,3h,NG,MipsStatements  
+22/03,3h,SF,MakeAdditionalTestCases
+22/03,0.5h,ALL,Submissions
