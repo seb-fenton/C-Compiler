@@ -35,7 +35,7 @@ struct LoopContext{ //needed for continue and break
 };
 
 struct EnumContext{
-    int nextVal = 1;
+    int nextVal = 0;
     void reset();
 };
 

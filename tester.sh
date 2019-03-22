@@ -11,3 +11,5 @@ mips-linux-gnu-gcc -mfp32 -static -o $filename $filename.o $driver.c
 
 qemu-mips $filename
 echo $?
+
+rm $filename $filename.o $filename.s

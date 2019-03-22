@@ -61,7 +61,7 @@ varData::varData(int _offset, int _elements, int _size, bool _global): offset(_o
 //---------------------------------------------//
 
 void EnumContext::reset(){
-    nextVal = 1;
+    nextVal = 0;
 }
 
 //---------------------------------------------//
