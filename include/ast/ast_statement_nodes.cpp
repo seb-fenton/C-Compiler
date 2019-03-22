@@ -44,7 +44,7 @@ void WhileStatement::printMips(compilerContext& ctx, std::ostream& stream){
     stream << "j " << startLabel << "\nnop" << std::endl;
     stream << endLabel << ":" << std::endl;
     stream << "move $2, $0" << std::endl;
-
+    ctx.currentFunc()->LoopsLabels.pop_back();
 }
 
 //Do statement
@@ -65,6 +65,7 @@ void DoStatement::printMips(compilerContext& ctx, std::ostream& stream){
     stream << endLabel << ":" << std::endl;
 
     stream << "move $2, $0" << std::endl;
+    ctx.currentFunc()->LoopsLabels.pop_back();
 
 }
 
@@ -91,6 +92,7 @@ void ForStatement::printMips(compilerContext& ctx, std::ostream& stream){
 
     stream << endLabel << ":" << std::endl;
     stream << "move $2, $0" << std::endl;
+    ctx.currentFunc()->LoopsLabels.pop_back();
 }
 
 

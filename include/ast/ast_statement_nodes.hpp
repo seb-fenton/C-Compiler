@@ -116,7 +116,8 @@ class SwitchStatement : public Node{
         std::cout<< std::endl;
         if(stmt != NULL) {stmt->printTree(n+1);}
 	}
-};
+}; //For implementation set $18 as a flag, if the case expression is a match or $18 is high do that set of statements, when you match something set $18 to,
+//also each case only has one statement so make a context which prints the previous cases jump label when its brinting its condition.
 
 class WhileStatement : public Node{
     public:
