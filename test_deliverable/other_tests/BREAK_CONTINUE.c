@@ -6,8 +6,8 @@ int break_continue_func(){
     }
     while(y < 1){
         if(x == 0){ 
-            continue;
             y++;
+            continue;
         }
         x = 1;
     }

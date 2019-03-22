@@ -1,7 +1,7 @@
 int for_loop(){
-    int x;
-    for(x = 1; x > 0; x--){
-        x--;
+    int y = 1;
+    for(int i = 0; i < 1; i++){
+        y--;
     }
-    return x;
+    return y;
 }
