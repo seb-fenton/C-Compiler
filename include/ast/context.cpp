@@ -96,6 +96,7 @@ void funcScope::decScope(std::ostream& stream){
     int scopeMem = memUsed - scopes.back().stackOffset; //should give the amount of memory the scope has used
     stream << "addiu $sp, $sp, " << scopeMem << std::endl; //positive value moves up the stack
     memUsed -= scopeMem;
+    scopes.pop_back();
 }   
 
 //li $5, x
@@ -109,10 +110,19 @@ void compilerContext::setup(std::ostream& stream){
     addToStack(8, stream);
     stream << "sw $fp, 0($sp)" << std::endl;
     stream << "sw $31, 4($sp)" << std::endl;
-    
+    /*addToStack(16,stream);
+    stream<< "sw $16, 0($sp)" << std::endl;
+    stream<< "sw $17, 4($sp)" << std::endl;
+    stream<< "sw $18, 8($sp)" << std::endl;
+    stream<< "sw $19, 12($sp)" << std::endl;*/
 }
 
 void compilerContext::endFunc(std::ostream& stream){
+    /*stream << "lw $16, "<<  (functions.back().memUsed - 12) << "($sp) \nnop" << std::endl; 
+    stream << "lw $17, "<<  (functions.back().memUsed - 16) << "($sp) \nnop" << std::endl; 
+    stream << "lw $18, "<<  (functions.back().memUsed - 20) << "($sp) \nnop" << std::endl; 
+    stream << "lw $19, "<<  (functions.back().memUsed - 24) << "($sp) \nnop" << std::endl;
+    removeFromStack(16,stream);*/
     stream << "lw $31, "<<  (functions.back().memUsed - 4) << "($sp) \nnop" << std::endl; 
     stream << "move $sp, $fp" << std::endl; //$fp needs to be reset in func call.
     stream << "jr $31 \nnop"<< std::endl; 

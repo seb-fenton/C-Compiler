@@ -116,6 +116,7 @@ class SwitchStatement : public Node{
         std::cout<< std::endl;
         if(stmt != NULL) {stmt->printTree(n+1);}
 	}
+    void printMips(compilerContext& ctx, std::ostream& stream);
 }; //For implementation set $18 as a flag, if the case expression is a match or $18 is high do that set of statements, when you match something set $18 to,
 //also each case only has one statement so make a context which prints the previous cases jump label when its brinting its condition.
 
@@ -219,6 +220,7 @@ class CaseStatement : public Node{
         std::cout << std::endl;
         if(stmt != NULL) {stmt->printTree(n+1);}
     }
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class DefaultStatement : public Node{
@@ -232,6 +234,7 @@ class DefaultStatement : public Node{
 		std::cout << "Default Statement: " << std::endl;
         if(stmt != NULL) {stmt->printTree(n+1);}
     }
+    void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class ContinueStatement : public Node{

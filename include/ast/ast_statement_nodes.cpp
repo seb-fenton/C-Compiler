@@ -103,7 +103,9 @@ void ReturnStatement::printMips(compilerContext& ctx, std::ostream& stream){
 }
 
 void ContinueStatement::printMips(compilerContext& ctx, std::ostream& stream){
-    stream << "j " << ctx.currentFunc()->LoopsLabels.back().cont << " \nnop" << std::endl;
+    std::vector<LoopContext>::reverse_iterator rit = ctx.currentFunc()->LoopsLabels.rbegin();
+    for(;(*rit).cont.empty();++rit){}  
+    stream << "j " << (*rit).cont << " \nnop" << std::endl;
 }
 
 void BreakStatement::printMips(compilerContext& ctx, std::ostream& stream){
@@ -112,4 +114,59 @@ void BreakStatement::printMips(compilerContext& ctx, std::ostream& stream){
 
 void expression_statement::printMips(compilerContext& ctx, std::ostream& stream){
     if(stmt != NULL){stmt->printMips(ctx,stream);}
+}
+
+//SwitchStatement
+
+void SwitchStatement::printMips(compilerContext& ctx, std::ostream& stream){
+    ctx.addToStack(8, stream);
+    storeOperand(18,0,stream); //for test
+    storeOperand(19,4,stream); //for flags
+    int memUsedStore = ctx.currentFunc()->memUsed;
+    if(test != NULL){test->printMips(ctx,stream);}
+    addOperands(18,2,0, stream); //set to test val
+    addOperands(19,0,0, stream); //set to 0
+    std::string skipLabel = ctx.generateLabel("skip_");
+    std::string endLabel = ctx.generateLabel("end_");
+    ctx.currentFunc()->LoopsLabels.push_back(LoopContext(endLabel));
+    ctx.currentFunc()->swtchCtx.push_back(SwitchContext());
+    ctx.currentFunc()->swtchCtx.back().prevLabel = skipLabel;
+    stream << "j " << skipLabel << std::endl;
+    if(stmt != NULL){stmt->printMips(ctx,stream);}
+    if(!(ctx.currentFunc()->swtchCtx.back().prevLabel.empty())){
+        stream << ctx.currentFunc()->swtchCtx.back().prevLabel << ":" << std::endl;
+    }
+    ctx.currentFunc()->swtchCtx.pop_back();
+    stream << endLabel << ":" << std::endl;
+    int switchMem = ctx.currentFunc()->memUsed - memUsedStore;
+    stream << "addi $sp, $sp, " << switchMem << std::endl;
+    ctx.currentFunc()->memUsed = memUsedStore;
+    loadOperand(18,0,stream);
+    loadOperand(19,4,stream);
+    ctx.addToStack(8, stream);
+}
+
+//CaseStatement
+
+void CaseStatement::printMips(compilerContext& ctx, std::ostream& stream){
+    int caseVal = 0;
+    stream << ctx.currentFunc()->swtchCtx.back().prevLabel << ":" << std::endl;
+    std::string caseLabel = ctx.generateLabel("case_");
+    ctx.currentFunc()->swtchCtx.back().prevLabel = caseLabel;
+    if(val != NULL){caseVal = val->eval();}
+    stream << "addi $8, $0, " << caseVal << std::endl;
+    stream << "xor $2,$18,$8" << std::endl;            //magically works?
+    stream << "slti $2,$2, 1" << std::endl;
+    stream << "or $2, $2, $19" << std::endl;
+    stream << "beq $0, $2, " << caseLabel << std::endl; //shouldnt print if last one
+    stream << "nop" << std::endl;
+    stream << "addi $19, $0, 1" << std::endl; //set 19 to 1 if you hit this
+    if(stmt != NULL){stmt->printMips(ctx, stream);}
+}
+
+//DefaultStatement
+void DefaultStatement::printMips(compilerContext& ctx, std::ostream& stream){
+    stream << ctx.currentFunc()->swtchCtx.back().prevLabel << ":" << std::endl;
+    ctx.currentFunc()->swtchCtx.back().prevLabel.clear();
+    if(stmt != NULL){stmt->printMips(ctx, stream);}
 }

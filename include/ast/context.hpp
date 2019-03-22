@@ -31,11 +31,16 @@ struct DeclaratorContext{
 struct LoopContext{ //needed for continue and break
     std::string cont, brk ;
     LoopContext(std::string _cont, std::string _brk): cont(_cont), brk(_brk){}
+    LoopContext(std::string _brk): brk(_brk){} //for switches
 };
 
 struct EnumContext{
     int nextVal = 1;
     void reset();
+};
+
+struct SwitchContext{
+    std::string prevLabel;
 };
 
 struct varData{
@@ -69,6 +74,7 @@ struct funcScope{
     std::map<std::string, varData> parameters;
     std::map<std::string, varData> globalVars;
     std::vector<LoopContext> LoopsLabels;
+    std::vector<SwitchContext> swtchCtx;
 
     int memUsed = 0; //should be incremented as you add new bindings
     void incScope();
