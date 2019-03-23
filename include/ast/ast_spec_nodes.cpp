@@ -50,7 +50,7 @@ void init_declarator::printMips(compilerContext& ctx, std::ostream& stream){
         if(declaratorPtr != NULL){declaratorPtr->printMips(ctx, stream);}
         if(ctx.tempDeclarator.isArray){
             ctx.addToStack(4, stream);
-            stream << "addi $8, $sp, 4" << std::endl;
+            stream << "addi $8, $sp, -4" << std::endl;
             stream << "sw $8, 0($sp)" << std::endl;
         }
         ctx.addToStack(ctx.tempDeclarator.totSize(), stream);

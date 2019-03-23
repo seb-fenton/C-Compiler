@@ -650,7 +650,7 @@ void LessThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
 	right->printMips(ctx,stream);
 	addOperands(17,2,0,stream);
 
-    stream << "slt $2,$16,$17" << std::endl;               // checks if $16 < $17
+    stream << "slt $2,$17,$16" << std::endl;               // checks if $16 < $17
     stream << "xori $2,$2,0x1" << std::endl;            //magically works?
     stream << "andi $2,$2,0x00ff" << std::endl;
 
@@ -679,7 +679,7 @@ void GreaterThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
 	right->printMips(ctx,stream);
 	addOperands(17,2,0,stream);
 
-    stream << "slt $2,$17,$16" << std::endl;                // checks if $16 > $17
+    stream << "slt $2,$16,$17" << std::endl;                // checks if $16 > $17
     stream << "xori $2,$2,0x1" << std::endl;            //magically works?
     stream << "andi $2,$2,0x00ff" << std::endl;
 
@@ -1081,7 +1081,7 @@ void array_call::printMips(compilerContext& ctx, std::ostream& stream){
 
     ctx.getAddr = temp;
     stream << "sll $17, $17, 2" << std::endl;
-    addOperands(2,16,17,stream);
+    stream << "sub $2, $16, $17" << std::endl;
 
     if(!ctx.getAddr){
         stream << "lw $2, 0($2)" << std::endl;
