@@ -418,6 +418,7 @@ class RefOp: public ExpressionNode{
 	void printTree(int n){
         if(expr != NULL){std::cout<< "&" ;expr->printTree(n);}
     }
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 //do we need this?
 
@@ -428,6 +429,7 @@ class PtrOp: public ExpressionNode{
 	void printTree(int n){
         if(expr != NULL){std::cout<< "->" ;expr->printTree(n);}
     }
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 //do we need this?
 

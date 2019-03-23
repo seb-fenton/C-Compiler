@@ -37,6 +37,7 @@ void DeclaratorContext::purge(){
     int size = 0;
     offset = 0;
     elements = 1;
+    isArray = false;
 }
 
 void DeclaratorContext::nextElement(){
@@ -44,6 +45,7 @@ void DeclaratorContext::nextElement(){
     initliased = false;
     offset = 0;
     elements = 1;
+    isArray = false;
 }
 
 int DeclaratorContext::totSize(){
@@ -54,7 +56,7 @@ int DeclaratorContext::totSize(){
 //----------------Vardata_Struct---------------//
 //---------------------------------------------//
 
-varData::varData(int _offset, int _elements, int _size, bool _global): offset(_offset), elements(_elements), size(_size), global(_global){}
+varData::varData(int _offset, int _elements, int _size, bool _global, bool _pointer): offset(_offset), elements(_elements), size(_size), global(_global), isPointer(_pointer){}
 
 //---------------------------------------------//
 //----------------EnumContext------------------//
@@ -70,8 +72,8 @@ void EnumContext::reset(){
 
 scope::scope(std::map<std::string, varData> _bindings, int _stackOffset): bindings(_bindings), stackOffset(_stackOffset){}
 
-void scope::addToBindings(std::string id, int offset, int elements, int size, bool global){
-    bindings[id] = varData(offset, elements, size, global);
+void scope::addToBindings(std::string id, int offset, int elements, int size, bool global, bool pointer){
+    bindings[id] = varData(offset, elements, size, global, pointer);
 }
 
 //---------------------------------------------//
@@ -110,21 +112,11 @@ void compilerContext::setup(std::ostream& stream){
     addToStack(8, stream);
     stream << "sw $fp, 0($sp)" << std::endl;
     stream << "sw $31, 4($sp)" << std::endl;
-    /*addToStack(16,stream);
-    stream<< "sw $16, 0($sp)" << std::endl;
-    stream<< "sw $17, 4($sp)" << std::endl;
-    stream<< "sw $18, 8($sp)" << std::endl;
-    stream<< "sw $19, 12($sp)" << std::endl;*/
 }
 
 void compilerContext::endFunc(std::ostream& stream){
-    /*stream << "lw $16, "<<  (functions.back().memUsed - 12) << "($sp) \nnop" << std::endl; 
-    stream << "lw $17, "<<  (functions.back().memUsed - 16) << "($sp) \nnop" << std::endl; 
-    stream << "lw $18, "<<  (functions.back().memUsed - 20) << "($sp) \nnop" << std::endl; 
-    stream << "lw $19, "<<  (functions.back().memUsed - 24) << "($sp) \nnop" << std::endl;
-    removeFromStack(16,stream);*/
     stream << "lw $31, "<<  (functions.back().memUsed - 4) << "($sp) \nnop" << std::endl; 
-    stream << "move $sp, $fp" << std::endl; //$fp needs to be reset in func call.
+    stream << "addiu $sp, $sp, " << functions.back().memUsed <<std::endl; //$fp needs to be reset in func call.
     stream << "jr $31 \nnop"<< std::endl; 
     stream << std::endl; 
 }

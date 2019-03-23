@@ -22,6 +22,8 @@ struct DeclaratorContext{
     int size; //declaration specifier determines this
     int elements = 1; // usually for arrays, set to 1 by default for normal declaration
     int offset;
+    bool isArray = false;
+    bool isPointer = false;
 
     int totSize();
     void purge();
@@ -44,6 +46,8 @@ struct SwitchContext{
 };
 
 struct varData{
+    int offset;
+    int elements = 1;
     int size; //used mainly for arrays but we can initlialise it for normal integers, to be used with the SizeOf command
 
     bool isTypdef = false;
@@ -52,11 +56,10 @@ struct varData{
     int enumVal;
 
     bool global = true;
-    int elements = 1;
-    int offset; //used to specifiy how far this variable is from the stack pointer(frame pointer)? idk
+    bool isPointer = false;
     varData(){}
     varData(int _enumVal, bool _isEnum, bool _global): isEnum(_isEnum), enumVal(_enumVal), global(_global){}
-    varData(int _offset, int _elements, int _size, bool _global); //let declarator increment $sp
+    varData(int _offset, int _elements, int _size, bool _global, bool _pointer); //let declarator increment $sp
 };
 
 struct scope{
@@ -64,7 +67,7 @@ struct scope{
     int stackOffset;
 
     scope(std::map<std::string, varData> _bindings, int _stackOffset);
-    void addToBindings(std::string id, int offset, int elements, int size, bool global);
+    void addToBindings(std::string id, int offset, int elements, int size, bool global, bool pointer);
 };
 
 struct funcScope{
@@ -95,6 +98,8 @@ struct compilerContext{
     bool funcCall = false;
     bool globalDefs = false;
     bool getAddr = false;
+    bool ptrMath = false;
+    bool ptrCheck = false;
     std::string funcName; //used for .end flag at the end of assembly
 
     int labelGen = 0;

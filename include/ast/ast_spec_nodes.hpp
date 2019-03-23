@@ -96,11 +96,11 @@ class declarator : public Node{
 		directDeclarator->printPy(context, stream);
 		pointerPtr->printPy(context, stream);
 	} 
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class direct_declarator : public Node{
 	public:
-	//TODO: Need to adapt so that it has functions which turn this class into array declarators and function calls
 	direct_declarator(std::string s);
 
 	std::string identifier;
