@@ -100,6 +100,7 @@ struct compilerContext{
     bool getAddr = false;
     bool ptrMath = false;
     bool ptrCheck = false;
+    bool arrayCall = false;
     std::string funcName; //used for .end flag at the end of assembly
 
     int labelGen = 0;

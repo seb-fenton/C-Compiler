@@ -13,15 +13,14 @@ void primary_expression::printMips(compilerContext& ctx, std::ostream& stream){
             stream << "addi $2, $sp, " << retrieveVariable << std::endl;
         }else if((*ctx.currentBindings())[identifier].isEnum){
             stream << "addi $2, $0, " << ((*ctx.currentBindings())[identifier].enumVal) << std::endl;
-        }
-        else{
+        }else{
             int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
             stream << "lw $2," << retrieveVariable << "($sp)" << std::endl;
         }
-        ctx.ptrMath = (*ctx.currentBindings())[identifier].isPointer;
+        ctx.ptrCheck = (*ctx.currentBindings())[identifier].isPointer;
     }
     else{
-        if(ctx.getAddr){
+        if(ctx.getAddr || ctx.arrayCall){
             stream << "lui $2, %hi(" << identifier << ")" << std::endl;
             stream << "addi $2, $2, %lo(" << identifier << ")" << std::endl;
         }
@@ -798,11 +797,25 @@ void SubOp::printMips(compilerContext& ctx, std::ostream& stream){
 	storeOperand(16, 4,stream);
 	storeOperand(17, 0,stream);
 
+    bool op1, op2 = false;
+
+    ctx.ptrCheck = false;
 	left->printMips(ctx,stream);
 	addOperands(16,2,0,stream);
+    op2 = ctx.ptrCheck;
 
+    ctx.ptrCheck = false;
 	right->printMips(ctx,stream);
 	addOperands(17,2,0,stream);
+    op1 = ctx.ptrCheck;
+
+    if(op1 && !op2){
+        stream << "sll $16, $16, 2" << std::endl;
+    }
+
+    if(!op1 && op2){
+        stream << "sll $17, $17, 2" << std::endl;
+    }
 		
 	stream << "sub $2,$16,$17" << std::endl;
 		
@@ -810,6 +823,7 @@ void SubOp::printMips(compilerContext& ctx, std::ostream& stream){
 	loadOperand(17, 0, stream); 
     stream << std::endl;
     ctx.removeFromStack(8, stream);
+    ctx.ptrCheck = op1 || op2;
 }
 
 int SubOp::eval(){
@@ -914,8 +928,10 @@ void PreIncOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.getAddr = false;
     addOperands(16,2,0,stream);
     
+    ctx.ptrCheck = false;
     expr->printMips(ctx,stream);
-    stream << "addi $2, $2, 1" << std::endl;
+    if(ctx.ptrCheck){stream << "addi $2, $2, 4" << std::endl;}
+    else{stream << "addi $2, $2, 1" << std::endl;}
 
     stream << "sw $2, 0($16) " << std::endl;
     loadOperand(16, 0, stream);
@@ -935,9 +951,11 @@ void PreDecOp::printMips(compilerContext& ctx, std::ostream& stream){
     expr->printMips(ctx,stream);
     ctx.getAddr = false;
     addOperands(16,2,0,stream);
-    
+    ctx.ptrCheck = false;
     expr->printMips(ctx,stream);
-    stream << "addi $2, $2, -1" << std::endl;
+    
+    if(ctx.ptrCheck){stream << "addi $2, $2, -4" << std::endl;}
+    else{stream << "addi $2, $2, -1" << std::endl;}
     stream << "sw $2, 0($16) " << std::endl;
     
     loadOperand(16, 0, stream);
@@ -956,10 +974,18 @@ void PostIncOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.getAddr = false;
     addOperands(16,2,0,stream);
     
+    ctx.ptrCheck = false;
     expr->printMips(ctx,stream);
-    stream << "addi $2, $2, 1" << std::endl;
-    stream << "sw $2, 0($16) " << std::endl;
-    stream << "addi $2, $2, -1" << std::endl;
+    if(ctx.ptrCheck){
+        stream << "addi $2, $2, 4" << std::endl;
+        stream << "sw $2, 0($16) " << std::endl;
+        stream << "addi $2, $2, -4" << std::endl;
+    }else{
+        stream << "addi $2, $2, 1" << std::endl;
+        stream << "sw $2, 0($16) " << std::endl;
+        stream << "addi $2, $2, -1" << std::endl;
+
+    }
     loadOperand(16, 0, stream);
     ctx.removeFromStack(4, stream);
 }
@@ -976,10 +1002,18 @@ void PostDecOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.getAddr = false;
     addOperands(16,2,0,stream);
     
+    ctx.ptrCheck = false;
     expr->printMips(ctx,stream);
-    stream << "addi $2, $2, -1" << std::endl;
-    stream << "sw $2, 0($16)" << std::endl;
-    stream << "addi $2, $2, 1" << std::endl;
+    if(ctx.ptrCheck){
+        stream << "addi $2, $2, -4" << std::endl;
+        stream << "sw $2, 0($16) " << std::endl;
+        stream << "addi $2, $2, 4" << std::endl;
+    }else{
+        stream << "addi $2, $2, -1" << std::endl;
+        stream << "sw $2, 0($16) " << std::endl;
+        stream << "addi $2, $2, 1" << std::endl;
+
+    }
     loadOperand(16, 0, stream);
     ctx.removeFromStack(4, stream);
 }
@@ -1073,15 +1107,17 @@ void array_call::printMips(compilerContext& ctx, std::ostream& stream){
     storeOperand(16, 4,stream);
     storeOperand(17, 0,stream);
 
+    ctx.arrayCall = true;
     if(array != NULL){array->printMips(ctx, stream);}
     addOperands(16,2,0,stream);
+    ctx.arrayCall = true;
 
     if(idx != NULL){idx->printMips(ctx, stream);}
     addOperands(17,2,0,stream);
 
     ctx.getAddr = temp;
     stream << "sll $17, $17, 2" << std::endl;
-    stream << "sub $2, $16, $17" << std::endl;
+    addOperands(2,16,17, stream);
 
     if(!ctx.getAddr){
         stream << "lw $2, 0($2)" << std::endl;
