@@ -12,8 +12,9 @@
 #include <sstream>
 
 
-class Node;
-typedef Node* NodePtr; //never use any member functions for this class
+
+
+class Node; //never use any member functions for this class
 
 struct DeclaratorContext{
     std::string id;
@@ -51,13 +52,14 @@ struct varData{
     int size; //used mainly for arrays but we can initlialise it for normal integers, to be used with the SizeOf command
 
     bool isTypdef = false;
-    //NodePtr typedefLoc = NULL; //points to the declaration specifiers the typedef contains
+    int type; //points to the declaration specifiers the typedef contains
     bool isEnum = false;
     int enumVal;
 
     bool global = true;
     bool isPointer = false;
     varData(){}
+    varData(bool _typedef, int _type);
     varData(int _enumVal, bool _isEnum, bool _global): isEnum(_isEnum), enumVal(_enumVal), global(_global){}
     varData(int _offset, int _elements, int _size, bool _global, bool _pointer); //let declarator increment $sp
 };

@@ -191,3 +191,22 @@ void declarator::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.tempDeclarator.isPointer = true;
     if(directDeclarator != NULL){directDeclarator->printMips(ctx, stream);}
 }
+
+void typedef_declaration::printMips(compilerContext& ctx, std::ostream& stream){
+    if(defName != NULL){specifierList->printMips(ctx,stream);}
+    if(specifierList != NULL){specifierList->printMips(ctx,stream);}
+    if(ctx.functions.size() == 0){
+        ctx.globalVars[ctx.tempDeclarator.id] = varData(true, ctx.tempDeclarator.size);
+    }else{
+        (*ctx.currentBindings())[ctx.tempDeclarator.id] = varData(true, ctx.tempDeclarator.size);
+    }
+    ctx.tempDeclarator.purge();
+}
+
+void TypdefSpecifier::printMips(compilerContext& ctx, std::ostream& stream){
+    if(ctx.functions.size() == 0){
+        ctx.tempDeclarator.size = ctx.globalVars[defName].type;
+    }else{
+        ctx.tempDeclarator.size = (*ctx.currentBindings())[defName].type;
+    }
+}

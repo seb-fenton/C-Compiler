@@ -279,6 +279,8 @@ class typedef_declaration : public Node{
 		if(specifierList != NULL){specifierList->printTree(n+1);}
 		if(defName != NULL){defName->printTree(n+1);}
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class TypdefSpecifier : public Node{
@@ -291,6 +293,7 @@ class TypdefSpecifier : public Node{
 		}
 		std::cout << "Typedef: " << defName << std::endl;
 	}
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class struct_specifier : public Node{

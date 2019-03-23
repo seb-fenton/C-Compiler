@@ -1,4 +1,5 @@
 #include "context.hpp"
+#include "ast_base_nodes.hpp"
 
 //---------------------------------------------//
 //--------------Lexer_Context------------------//
@@ -55,6 +56,8 @@ int DeclaratorContext::totSize(){
 //---------------------------------------------//
 //----------------Vardata_Struct---------------//
 //---------------------------------------------//
+
+varData::varData(bool _typedef, int _type): type(_type), isTypdef(_typedef){}
 
 varData::varData(int _offset, int _elements, int _size, bool _global, bool _pointer): offset(_offset), elements(_elements), size(_size), global(_global), isPointer(_pointer){}
 
