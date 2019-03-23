@@ -104,8 +104,6 @@ void funcScope::decScope(std::ostream& stream){
     scopes.pop_back();
 }   
 
-//li $5, x
-//lw $2, 0($5)
 
 //---------------------------------------------//
 //----------------Compiler_Context-------------//

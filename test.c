@@ -1,6 +1,7 @@
-typedef int x;
 
 int f(){
-    x a = 5;
-    return a;
+	int x[5];
+	int *a = x + 2;
+	x[2] = 3;
+	return *a;
 }

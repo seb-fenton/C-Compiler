@@ -18,6 +18,7 @@ void primary_expression::printMips(compilerContext& ctx, std::ostream& stream){
             stream << "lw $2," << retrieveVariable << "($sp)" << std::endl;
         }
         ctx.ptrCheck = (*ctx.currentBindings())[identifier].isPointer;
+        if(((*ctx.currentBindings())[identifier].elements != 1) && (!ctx.arrayCall)){ctx.ptrCheck = true;}
     }
     else{
         if(ctx.getAddr || ctx.arrayCall){
@@ -761,12 +762,10 @@ void AddOp::printMips(compilerContext& ctx, std::ostream& stream){
 	left->printMips(ctx,stream);
 	addOperands(16,2,0,stream);
     op2 = ctx.ptrCheck;
-
     ctx.ptrCheck = false;
 	right->printMips(ctx,stream);
 	addOperands(17,2,0,stream);
     op1 = ctx.ptrCheck;
-
     if(op1 && !op2){
         stream << "sll $16, $16, 2" << std::endl;
     }
