@@ -206,7 +206,8 @@ void typedef_declaration::printMips(compilerContext& ctx, std::ostream& stream){
 void TypdefSpecifier::printMips(compilerContext& ctx, std::ostream& stream){
     if(ctx.functions.size() == 0){
         ctx.tempDeclarator.size = ctx.globalVars[defName].type;
-    }else{
+    }else{ 
+        std::cerr << defName << std::endl;
         ctx.tempDeclarator.size = (*ctx.currentBindings())[defName].type;
     }
 }

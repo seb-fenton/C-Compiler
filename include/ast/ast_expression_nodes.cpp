@@ -120,11 +120,25 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         storeOperand(16, 4, stream);
         storeOperand(17, 0, stream);
 
+        bool op1, op2 = false; //whether or not to shift
+
+        ctx.ptrCheck = false;
         if(right != NULL){right->printMips(ctx, stream);}
         addOperands(16,2,0,stream);
+        op2 = ctx.ptrCheck;
 
+        ctx.ptrCheck = false;
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(17,2,0,stream);
+        op1 = ctx.ptrCheck;
+
+        if(op1 && !op2){
+            stream << "sll $16, $16, 2" << std::endl;
+        }
+
+        if(!op1 && op2){
+            stream << "sll $17, $17, 2" << std::endl;
+        }
 
 
         stream << "add $16,$17,$16" << std::endl;
@@ -141,17 +155,32 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         loadOperand(16, 4, stream);
         loadOperand(17, 0, stream);
         ctx.removeFromStack(8, stream);
+        ctx.ptrCheck = op1 || op2;
     }
     else if(op == "-="){
         ctx.addToStack(8, stream);
         storeOperand(16, 4, stream);
         storeOperand(17, 0, stream);
 
+        bool op1, op2 = false; //whether or not to shift        
+
+        ctx.ptrCheck = false;
         if(right != NULL){right->printMips(ctx, stream);}
         addOperands(16,2,0,stream);
+        op2 = ctx.ptrCheck;
 
+        ctx.ptrCheck = false;
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(17,2,0,stream);
+        op1 = ctx.ptrCheck;
+
+        if(op1 && !op2){
+            stream << "sll $16, $16, 2" << std::endl;
+        }
+
+        if(!op1 && op2){
+            stream << "sll $17, $17, 2" << std::endl;
+        }
 
         stream << "sub $16,$17,$16" << std::endl;
 
@@ -167,6 +196,7 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         loadOperand(16, 4, stream);
         loadOperand(17, 0, stream);
         ctx.removeFromStack(8, stream);
+        ctx.ptrCheck = op1 || op2;
     } 
     else if(op == "*="){
         ctx.addToStack(8, stream);
