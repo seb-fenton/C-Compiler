@@ -92,14 +92,24 @@ void direct_declarator::printMips(compilerContext& ctx, std::ostream& stream){
 void initialiser::printMips(compilerContext& ctx, std::ostream& stream){
     if(assignment != NULL){
         if(!ctx.globalDefs){
-            assignment->printMips(ctx, stream);
-            stream << "sw $2,"<<  (ctx.currentFunc()->memUsed - ctx.tempDeclarator.offset) <<"($sp)" << std::endl;
+            if(ctx.tempDeclarator.isArray){
+                assignment->printMips(ctx, stream);
+                stream << "sw $2,"<<  (ctx.currentFunc()->memUsed - ctx.tempDeclarator.offset - (ctx.tempDeclarator.size*4) + ctx.tempDeclarator.initOffset) <<"($sp)" << std::endl;
+            }else{
+                assignment->printMips(ctx, stream);
+                stream << "sw $2,"<<  (ctx.currentFunc()->memUsed - ctx.tempDeclarator.offset) <<"($sp)" << std::endl;
+            }
         }else{
             int temp = assignment->eval(); //implemente val function
             stream << "\t.word " << temp << std::endl;
         }
     }
 }
+
+void ObjectInitialiser::printMips(compilerContext& ctx, std::ostream& stream){
+    if(initList != NULL){initList->printMips(ctx, stream);}
+}
+
 
 
 //initialiser

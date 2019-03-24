@@ -265,6 +265,7 @@ class ObjectInitialiser : public Node{
 	void printPy(pyContext& context, std::ostream& stream){
 		initList->printPy(context, stream);
 	}
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class typedef_declaration : public Node{

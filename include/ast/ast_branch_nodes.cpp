@@ -62,3 +62,9 @@ void enumerator_list::printMips(compilerContext& ctx, std::ostream& stream){
 }
 
 
+void initialiser_list::printMips(compilerContext& ctx, std::ostream& stream){
+	for(int i = 0; i < (int)branches.size(); i++){
+		branches[i]->printMips(ctx, stream);
+		ctx.tempDeclarator.initOffset += 4;
+	}
+}

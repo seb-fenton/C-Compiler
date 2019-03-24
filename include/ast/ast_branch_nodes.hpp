@@ -150,6 +150,7 @@ class initialiser_list : public BranchNode{
 			branches[i]->printTree(n);
 		}
 	}
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class struct_declaration_list : public BranchNode {

@@ -25,6 +25,7 @@ struct DeclaratorContext{
     int offset;
     bool isArray = false;
     bool isPointer = false;
+    int initOffset = 0;
 
     int totSize();
     void purge();

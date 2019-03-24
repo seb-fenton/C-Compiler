@@ -39,6 +39,7 @@ void DeclaratorContext::purge(){
     offset = 0;
     elements = 1;
     isArray = false;
+    initOffset = 0;
 }
 
 void DeclaratorContext::nextElement(){
@@ -47,6 +48,7 @@ void DeclaratorContext::nextElement(){
     offset = 0;
     elements = 1;
     isArray = false;
+    initOffset = 0;
 }
 
 int DeclaratorContext::totSize(){
