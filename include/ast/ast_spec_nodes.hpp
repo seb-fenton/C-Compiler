@@ -96,11 +96,11 @@ class declarator : public Node{
 		directDeclarator->printPy(context, stream);
 		pointerPtr->printPy(context, stream);
 	} 
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class direct_declarator : public Node{
 	public:
-	//TODO: Need to adapt so that it has functions which turn this class into array declarators and function calls
 	direct_declarator(std::string s);
 
 	std::string identifier;
@@ -279,6 +279,8 @@ class typedef_declaration : public Node{
 		if(specifierList != NULL){specifierList->printTree(n+1);}
 		if(defName != NULL){defName->printTree(n+1);}
 	}
+
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class TypdefSpecifier : public Node{
@@ -291,6 +293,7 @@ class TypdefSpecifier : public Node{
 		}
 		std::cout << "Typedef: " << defName << std::endl;
 	}
+	void printMips(compilerContext& ctx, std::ostream& stream);
 };
 
 class struct_specifier : public Node{

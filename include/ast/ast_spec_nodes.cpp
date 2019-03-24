@@ -39,17 +39,22 @@ void init_declarator::printMips(compilerContext& ctx, std::ostream& stream){
         }
         if(declaratorPtr != NULL){declaratorPtr->printMips(ctx, stream);}
         if(!ctx.tempDeclarator.id.empty()){
-            ctx.globalVars[ctx.tempDeclarator.id] = varData(0, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, true);//add global flag
+            ctx.globalVars[ctx.tempDeclarator.id] = varData(0, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, true, false);//add global flag
         }
         if(initialiserPtr != NULL){
             initialiserPtr->printMips(ctx, stream);   
         }
         stream << std::endl;
     }else{
-        if(declaratorPtr != NULL){declaratorPtr->printMips(ctx, stream);}
         ctx.tempDeclarator.offset = ctx.functions.back().memUsed + 4; //setting the offset
+        if(declaratorPtr != NULL){declaratorPtr->printMips(ctx, stream);}
+        if(ctx.tempDeclarator.isArray){
+            ctx.addToStack(4, stream);
+            stream << "addi $8, $sp, "<< -(ctx.tempDeclarator.totSize()) << std::endl;
+            stream << "sw $8, 0($sp)" << std::endl;
+        }
         ctx.addToStack(ctx.tempDeclarator.totSize(), stream);
-        ctx.currentScope()->addToBindings(ctx.tempDeclarator.id, ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, false);
+        ctx.currentScope()->addToBindings(ctx.tempDeclarator.id, ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, false, ctx.tempDeclarator.isPointer);
         if(initialiserPtr != NULL){
             initialiserPtr->printMips(ctx, stream);   
         }
@@ -106,7 +111,9 @@ initialiser::initialiser(ExpPtr a): assignment(a) {}
 void ArrayDeclaration::printMips(compilerContext& ctx, std::ostream& stream){
     if(varName != NULL){varName->printMips(ctx, stream);}
     if(size != NULL){
-    ctx.tempDeclarator.elements = size->eval(); 
+        ctx.tempDeclarator.elements = size->eval();
+        ctx.tempDeclarator.isArray = true;
+
     }
     else{
         ctx.tempDeclarator.elements = 0; //represents empty array
@@ -147,7 +154,7 @@ void parameter_declaration::printMips(compilerContext& ctx, std::ostream& stream
     if(specifiers != NULL){specifiers->printMips(ctx, stream);}
     if(dec != NULL){dec->printMips(ctx, stream);}
     ctx.tempDeclarator.offset = -(ctx.currentFunc()->parameters.size()*4);
-    ctx.currentFunc()->parameters[ctx.tempDeclarator.id] = varData(ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, false);
+    ctx.currentFunc()->parameters[ctx.tempDeclarator.id] = varData(ctx.tempDeclarator.offset, ctx.tempDeclarator.elements, ctx.tempDeclarator.size, false, ctx.tempDeclarator.isPointer);
     ctx.tempDeclarator.purge();
     ctx.funcDef = temp;
     
@@ -176,5 +183,31 @@ void enumerator::printMips(compilerContext& ctx, std::ostream& stream){
         ctx.globalVars[id] = varData(enumVal, true, true);
     }else{
         (*ctx.currentBindings())[id] = varData(enumVal, true, false);
+    }
+}
+
+
+void declarator::printMips(compilerContext& ctx, std::ostream& stream){
+    ctx.tempDeclarator.isPointer = true;
+    if(directDeclarator != NULL){directDeclarator->printMips(ctx, stream);}
+}
+
+void typedef_declaration::printMips(compilerContext& ctx, std::ostream& stream){
+    if(defName != NULL){specifierList->printMips(ctx,stream);}
+    if(specifierList != NULL){specifierList->printMips(ctx,stream);}
+    if(ctx.functions.size() == 0){
+        ctx.globalVars[ctx.tempDeclarator.id] = varData(true, ctx.tempDeclarator.size);
+    }else{
+        (*ctx.currentBindings())[ctx.tempDeclarator.id] = varData(true, ctx.tempDeclarator.size);
+    }
+    ctx.tempDeclarator.purge();
+}
+
+void TypdefSpecifier::printMips(compilerContext& ctx, std::ostream& stream){
+    if(ctx.functions.size() == 0){
+        ctx.tempDeclarator.size = ctx.globalVars[defName].type;
+    }else{ 
+        std::cerr << defName << std::endl;
+        ctx.tempDeclarator.size = (*ctx.currentBindings())[defName].type;
     }
 }

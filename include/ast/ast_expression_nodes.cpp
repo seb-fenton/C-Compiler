@@ -13,14 +13,15 @@ void primary_expression::printMips(compilerContext& ctx, std::ostream& stream){
             stream << "addi $2, $sp, " << retrieveVariable << std::endl;
         }else if((*ctx.currentBindings())[identifier].isEnum){
             stream << "addi $2, $0, " << ((*ctx.currentBindings())[identifier].enumVal) << std::endl;
-        }
-        else{
+        }else{
             int retrieveVariable = ctx.currentFunc()->memUsed - (*ctx.currentBindings())[identifier].offset;
             stream << "lw $2," << retrieveVariable << "($sp)" << std::endl;
         }
+        ctx.ptrCheck = (*ctx.currentBindings())[identifier].isPointer;
+        if(((*ctx.currentBindings())[identifier].elements != 1) && (!ctx.arrayCall)){ctx.ptrCheck = true;}
     }
     else{
-        if(ctx.getAddr){
+        if(ctx.getAddr || ctx.arrayCall){
             stream << "lui $2, %hi(" << identifier << ")" << std::endl;
             stream << "addi $2, $2, %lo(" << identifier << ")" << std::endl;
         }
@@ -119,11 +120,25 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         storeOperand(16, 4, stream);
         storeOperand(17, 0, stream);
 
+        bool op1, op2 = false; //whether or not to shift
+
+        ctx.ptrCheck = false;
         if(right != NULL){right->printMips(ctx, stream);}
         addOperands(16,2,0,stream);
+        op2 = ctx.ptrCheck;
 
+        ctx.ptrCheck = false;
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(17,2,0,stream);
+        op1 = ctx.ptrCheck;
+
+        if(op1 && !op2){
+            stream << "sll $16, $16, 2" << std::endl;
+        }
+
+        if(!op1 && op2){
+            stream << "sll $17, $17, 2" << std::endl;
+        }
 
 
         stream << "add $16,$17,$16" << std::endl;
@@ -140,17 +155,32 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         loadOperand(16, 4, stream);
         loadOperand(17, 0, stream);
         ctx.removeFromStack(8, stream);
+        ctx.ptrCheck = op1 || op2;
     }
     else if(op == "-="){
         ctx.addToStack(8, stream);
         storeOperand(16, 4, stream);
         storeOperand(17, 0, stream);
 
+        bool op1, op2 = false; //whether or not to shift        
+
+        ctx.ptrCheck = false;
         if(right != NULL){right->printMips(ctx, stream);}
         addOperands(16,2,0,stream);
+        op2 = ctx.ptrCheck;
 
+        ctx.ptrCheck = false;
         if(left != NULL){left->printMips(ctx, stream);}
         addOperands(17,2,0,stream);
+        op1 = ctx.ptrCheck;
+
+        if(op1 && !op2){
+            stream << "sll $16, $16, 2" << std::endl;
+        }
+
+        if(!op1 && op2){
+            stream << "sll $17, $17, 2" << std::endl;
+        }
 
         stream << "sub $16,$17,$16" << std::endl;
 
@@ -166,6 +196,7 @@ void assignment_expression::printMips(compilerContext& ctx, std::ostream& stream
         loadOperand(16, 4, stream);
         loadOperand(17, 0, stream);
         ctx.removeFromStack(8, stream);
+        ctx.ptrCheck = op1 || op2;
     } 
     else if(op == "*="){
         ctx.addToStack(8, stream);
@@ -649,7 +680,7 @@ void LessThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
 	right->printMips(ctx,stream);
 	addOperands(17,2,0,stream);
 
-    stream << "slt $2,$16,$17" << std::endl;               // checks if $16 < $17
+    stream << "slt $2,$17,$16" << std::endl;               // checks if $16 < $17
     stream << "xori $2,$2,0x1" << std::endl;            //magically works?
     stream << "andi $2,$2,0x00ff" << std::endl;
 
@@ -678,7 +709,7 @@ void GreaterThanEqOp::printMips(compilerContext& ctx, std::ostream& stream){
 	right->printMips(ctx,stream);
 	addOperands(17,2,0,stream);
 
-    stream << "slt $2,$17,$16" << std::endl;                // checks if $16 > $17
+    stream << "slt $2,$16,$17" << std::endl;                // checks if $16 > $17
     stream << "xori $2,$2,0x1" << std::endl;            //magically works?
     stream << "andi $2,$2,0x00ff" << std::endl;
 
@@ -755,11 +786,23 @@ void AddOp::printMips(compilerContext& ctx, std::ostream& stream){
 	storeOperand(16, 4,stream);
 	storeOperand(17, 0,stream);
 
+    bool op1, op2 = false; //whether or not to shift
+
+    ctx.ptrCheck = false;
 	left->printMips(ctx,stream);
 	addOperands(16,2,0,stream);
-
+    op2 = ctx.ptrCheck;
+    ctx.ptrCheck = false;
 	right->printMips(ctx,stream);
 	addOperands(17,2,0,stream);
+    op1 = ctx.ptrCheck;
+    if(op1 && !op2){
+        stream << "sll $16, $16, 2" << std::endl;
+    }
+
+    if(!op1 && op2){
+        stream << "sll $17, $17, 2" << std::endl;
+    }
 		
 	addOperands(2,16,17,stream);
 
@@ -767,6 +810,7 @@ void AddOp::printMips(compilerContext& ctx, std::ostream& stream){
 	loadOperand(17, 0, stream); 
     stream << std::endl;
     ctx.removeFromStack(8, stream);
+    ctx.ptrCheck = op1 || op2;
 }
 
 int AddOp::eval(){
@@ -782,11 +826,25 @@ void SubOp::printMips(compilerContext& ctx, std::ostream& stream){
 	storeOperand(16, 4,stream);
 	storeOperand(17, 0,stream);
 
+    bool op1, op2 = false;
+
+    ctx.ptrCheck = false;
 	left->printMips(ctx,stream);
 	addOperands(16,2,0,stream);
+    op2 = ctx.ptrCheck;
 
+    ctx.ptrCheck = false;
 	right->printMips(ctx,stream);
 	addOperands(17,2,0,stream);
+    op1 = ctx.ptrCheck;
+
+    if(op1 && !op2){
+        stream << "sll $16, $16, 2" << std::endl;
+    }
+
+    if(!op1 && op2){
+        stream << "sll $17, $17, 2" << std::endl;
+    }
 		
 	stream << "sub $2,$16,$17" << std::endl;
 		
@@ -794,6 +852,7 @@ void SubOp::printMips(compilerContext& ctx, std::ostream& stream){
 	loadOperand(17, 0, stream); 
     stream << std::endl;
     ctx.removeFromStack(8, stream);
+    ctx.ptrCheck = op1 || op2;
 }
 
 int SubOp::eval(){
@@ -898,8 +957,10 @@ void PreIncOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.getAddr = false;
     addOperands(16,2,0,stream);
     
+    ctx.ptrCheck = false;
     expr->printMips(ctx,stream);
-    stream << "addi $2, $2, 1" << std::endl;
+    if(ctx.ptrCheck){stream << "addi $2, $2, 4" << std::endl;}
+    else{stream << "addi $2, $2, 1" << std::endl;}
 
     stream << "sw $2, 0($16) " << std::endl;
     loadOperand(16, 0, stream);
@@ -919,9 +980,11 @@ void PreDecOp::printMips(compilerContext& ctx, std::ostream& stream){
     expr->printMips(ctx,stream);
     ctx.getAddr = false;
     addOperands(16,2,0,stream);
-    
+    ctx.ptrCheck = false;
     expr->printMips(ctx,stream);
-    stream << "addi $2, $2, -1" << std::endl;
+    
+    if(ctx.ptrCheck){stream << "addi $2, $2, -4" << std::endl;}
+    else{stream << "addi $2, $2, -1" << std::endl;}
     stream << "sw $2, 0($16) " << std::endl;
     
     loadOperand(16, 0, stream);
@@ -940,10 +1003,18 @@ void PostIncOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.getAddr = false;
     addOperands(16,2,0,stream);
     
+    ctx.ptrCheck = false;
     expr->printMips(ctx,stream);
-    stream << "addi $2, $2, 1" << std::endl;
-    stream << "sw $2, 0($16) " << std::endl;
-    stream << "addi $2, $2, -1" << std::endl;
+    if(ctx.ptrCheck){
+        stream << "addi $2, $2, 4" << std::endl;
+        stream << "sw $2, 0($16) " << std::endl;
+        stream << "addi $2, $2, -4" << std::endl;
+    }else{
+        stream << "addi $2, $2, 1" << std::endl;
+        stream << "sw $2, 0($16) " << std::endl;
+        stream << "addi $2, $2, -1" << std::endl;
+
+    }
     loadOperand(16, 0, stream);
     ctx.removeFromStack(4, stream);
 }
@@ -960,10 +1031,18 @@ void PostDecOp::printMips(compilerContext& ctx, std::ostream& stream){
     ctx.getAddr = false;
     addOperands(16,2,0,stream);
     
+    ctx.ptrCheck = false;
     expr->printMips(ctx,stream);
-    stream << "addi $2, $2, -1" << std::endl;
-    stream << "sw $2, 0($16)" << std::endl;
-    stream << "addi $2, $2, 1" << std::endl;
+    if(ctx.ptrCheck){
+        stream << "addi $2, $2, -4" << std::endl;
+        stream << "sw $2, 0($16) " << std::endl;
+        stream << "addi $2, $2, 4" << std::endl;
+    }else{
+        stream << "addi $2, $2, -1" << std::endl;
+        stream << "sw $2, 0($16) " << std::endl;
+        stream << "addi $2, $2, 1" << std::endl;
+
+    }
     loadOperand(16, 0, stream);
     ctx.removeFromStack(4, stream);
 }
@@ -1050,45 +1129,48 @@ void function_call::printMips(compilerContext& ctx, std::ostream& stream){
 }
 
 void array_call::printMips(compilerContext& ctx, std::ostream& stream){
-    if(ctx.getAddr){
-        ctx.addToStack(8, stream);
-        storeOperand(16, 4,stream);
-        storeOperand(17, 0,stream);
+    bool temp = ctx.getAddr;
+    ctx.getAddr = false;
 
-        if(array != NULL){array->printMips(ctx, stream);}
-        addOperands(16,2,0,stream);
+    ctx.addToStack(8, stream);
+    storeOperand(16, 4,stream);
+    storeOperand(17, 0,stream);
 
-        ctx.getAddr = false; //maybe need to set it back to true?
-        if(idx != NULL){idx->printMips(ctx, stream);}
-        addOperands(17,2,0,stream);
+    ctx.arrayCall = true;
+    if(array != NULL){array->printMips(ctx, stream);}
+    addOperands(16,2,0,stream);
+    ctx.arrayCall = true;
 
-        stream << "sll $17, $17, 2" << std::endl;
+    if(idx != NULL){idx->printMips(ctx, stream);}
+    addOperands(17,2,0,stream);
 
-        addOperands(2,16,17,stream);
-        loadOperand(16, 4, stream);
-	    loadOperand(17, 0, stream); 
-        ctx.removeFromStack(8, stream);
-        stream << std::endl;
-    }else{
-        ctx.addToStack(8, stream);
-        storeOperand(16, 4,stream);
-        storeOperand(17, 0,stream);
+    ctx.getAddr = temp;
+    stream << "sll $17, $17, 2" << std::endl;
+    addOperands(2,16,17, stream);
 
-        ctx.getAddr = true;
-        if(array != NULL){array->printMips(ctx, stream);}
-        addOperands(16,2,0,stream);
-        ctx.getAddr = false;
-
-        if(idx != NULL){idx->printMips(ctx, stream);}
-        addOperands(17,2,0,stream);
-
-        stream << "sll $17, $17, 2" << std::endl;
-
-        addOperands(2,16,17,stream);
+    if(!ctx.getAddr){
         stream << "lw $2, 0($2)" << std::endl;
-        loadOperand(16, 4, stream);
-	    loadOperand(17, 0, stream); 
-        ctx.removeFromStack(8, stream);
     }
+
+    loadOperand(16, 4, stream);
+	loadOperand(17, 0, stream); 
+    ctx.removeFromStack(8, stream);
 }
 
+void RefOp::printMips(compilerContext& ctx, std::ostream& stream){
+    bool temp = ctx.getAddr;
+    ctx.getAddr = true;
+    if(expr != NULL){expr->printMips(ctx, stream);}
+    ctx.getAddr = temp;
+}
+
+void PtrOp::printMips(compilerContext& ctx, std::ostream& stream){
+    bool temp = ctx.getAddr;
+    ctx.getAddr = false;
+    expr->printMips(ctx, stream);
+
+    ctx.getAddr = temp;
+    if(!ctx.getAddr){
+        stream << "lw $2, 0($2)" << std::endl;
+    }
+}

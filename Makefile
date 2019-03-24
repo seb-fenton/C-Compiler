@@ -6,7 +6,7 @@ CPPFLAGS += -I include
 CPPFLAGS += -std=c++0x
 
 # Avoid warnings about yyunput not used
-CPPFLAGS += -Wno-unused-function
+CPPFLAGS += -w
 
 
 
