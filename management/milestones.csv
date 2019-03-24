@@ -20,5 +20,6 @@ MipsOverhead, MipsContext, 15h, NG, Y ,Codegen for declarations, functions etc.
 MipsExpressions, CreateAST, 12h, SF, Y, Create mips code for basic-intermediate expressions
 MipsStatements, CreateAST, 15h, ALL, Y, Create mips code for basic-intermediate statements
 MipsBranches, CreateAST, 2h, SF, Y, Create mips code for basic-intermediate branches
+AdvancedFeatures, MipsCodegen, NG, 8h,Y, Try to get some advanced features implemented and working
 MakeAdditionalTestCases, ALL, 3h, SF, Y, Create additional test cases
 Submissions, ALL, 30m, ALL, N, Do final check and submit commit hash
