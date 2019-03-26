@@ -36,7 +36,7 @@ void IfStatement::printMips(compilerContext& ctx, std::ostream& stream){
 void WhileStatement::printMips(compilerContext& ctx, std::ostream& stream){
     std::string startLabel = ctx.generateLabel("start_");
     std::string endLabel = ctx.generateLabel("end_");
-    ctx.currentFunc()->LoopsLabels.push_back(LoopContext(startLabel, endLabel));
+    ctx.currentFunc()->LoopsLabels.push_back(LoopContext(startLabel, endLabel, ctx.currentFunc()->scopes.size()));
     stream << startLabel << ":" << std::endl;
     cond->printMips(ctx, stream);
     stream << "beq $2, $0, " << endLabel << "\nnop" << std::endl;
@@ -53,7 +53,7 @@ void DoStatement::printMips(compilerContext& ctx, std::ostream& stream){
     std::string endLabel = ctx.generateLabel("end_");
     std::string doTrueLabel = ctx.generateLabel("doTrue_");
 
-    ctx.currentFunc()->LoopsLabels.push_back(LoopContext(startLabel, endLabel));
+    ctx.currentFunc()->LoopsLabels.push_back(LoopContext(startLabel, endLabel, ctx.currentFunc()->scopes.size()));
 
     stream << doTrueLabel << ":" << std::endl;
     stmt->printMips(ctx, stream);
@@ -76,7 +76,7 @@ void ForStatement::printMips(compilerContext& ctx, std::ostream& stream){
     std::string endLabel = ctx.generateLabel("end_");
     std::string iterateLabel = ctx.generateLabel("iterate_");
 
-    ctx.currentFunc()->LoopsLabels.push_back(LoopContext(iterateLabel, endLabel));
+    ctx.currentFunc()->LoopsLabels.push_back(LoopContext(iterateLabel, endLabel, ctx.currentFunc()->scopes.size()));
 
     if(init != NULL){init->printMips(ctx,stream);}
 
@@ -105,10 +105,14 @@ void ReturnStatement::printMips(compilerContext& ctx, std::ostream& stream){
 void ContinueStatement::printMips(compilerContext& ctx, std::ostream& stream){
     std::vector<LoopContext>::reverse_iterator rit = ctx.currentFunc()->LoopsLabels.rbegin();
     for(;(*rit).cont.empty();++rit){}  
+    int stackUsed= ctx.currentFunc()->memUsed - ctx.currentFunc()->scopes[(*rit).scopeLvl].stackOffset;
+    stream << "addi $sp, $sp, " << stackUsed << std::endl;
     stream << "j " << (*rit).cont << " \nnop" << std::endl;
 }
 
 void BreakStatement::printMips(compilerContext& ctx, std::ostream& stream){
+    int stackUsed= ctx.currentFunc()->memUsed - ctx.currentFunc()->scopes[ctx.currentFunc()->LoopsLabels.back().scopeLvl].stackOffset;
+    stream << "addi $sp, $sp, " << stackUsed << std::endl;
     stream << "j " << ctx.currentFunc()->LoopsLabels.back().brk << " \nnop" << std::endl;
 }
 
@@ -128,7 +132,7 @@ void SwitchStatement::printMips(compilerContext& ctx, std::ostream& stream){
     addOperands(19,0,0, stream); //set to 0
     std::string skipLabel = ctx.generateLabel("skip_");
     std::string endLabel = ctx.generateLabel("end_");
-    ctx.currentFunc()->LoopsLabels.push_back(LoopContext(endLabel));
+    ctx.currentFunc()->LoopsLabels.push_back(LoopContext(endLabel, ctx.currentFunc()->scopes.size()));
     ctx.currentFunc()->swtchCtx.push_back(SwitchContext());
     ctx.currentFunc()->swtchCtx.back().prevLabel = skipLabel;
     stream << "j " << skipLabel << std::endl;

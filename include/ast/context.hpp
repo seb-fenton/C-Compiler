@@ -34,8 +34,9 @@ struct DeclaratorContext{
 
 struct LoopContext{ //needed for continue and break
     std::string cont, brk ;
-    LoopContext(std::string _cont, std::string _brk): cont(_cont), brk(_brk){}
-    LoopContext(std::string _brk): brk(_brk){} //for switches
+    int scopeLvl;
+    LoopContext(std::string _cont, std::string _brk, int _scope): cont(_cont), brk(_brk), scopeLvl(_scope){}
+    LoopContext(std::string _brk, int _scope): brk(_brk), scopeLvl(_scope){} //for switches
 };
 
 struct EnumContext{

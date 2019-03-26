@@ -10,3 +10,6 @@ ubuntu-xenial-16.04-cloudimg-console.log
 test.o
 test
 working/*
+test.c
+test.s
+test_driver.c
